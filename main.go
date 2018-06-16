@@ -92,7 +92,10 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+var host = flag.String("h", ":1234", "host of server")
+
 func main() {
+	flag.Parse()
 	go refreshEmoteSetCache()
 	emoteSets = make(map[string]EmoteSet)
 	kvCache = cache.New(30*time.Minute, 10*time.Minute)
@@ -104,5 +107,5 @@ func main() {
 
 	router.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":1234", router))
+	log.Fatal(http.ListenAndServe(*host, router))
 }
