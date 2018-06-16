@@ -137,6 +137,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 var host = flag.String("h", ":1234", "host of server")
+var prefix = flag.String("p", "", "optional prefix")
 
 func main() {
 	flag.Parse()
@@ -145,10 +146,12 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/twitchemotes/sets", cacheRequest("https://twitchemotes.com/api_cache/v3/sets.json", "twitchemotes:sets", 30*time.Minute)).Methods("GET")
-	router.HandleFunc("/twitchemotes/subscriber", cacheRequest("https://twitchemotes.com/api_cache/v3/subscriber.json", "twitchemotes:subscriber", 30*time.Minute)).Methods("GET")
+	sr := router.PathPrefix(*prefix).Subrouter()
 
-	router.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
+	sr.HandleFunc("/twitchemotes/sets", cacheRequest("https://twitchemotes.com/api_cache/v3/sets.json", "twitchemotes:sets", 30*time.Minute)).Methods("GET")
+	sr.HandleFunc("/twitchemotes/subscriber", cacheRequest("https://twitchemotes.com/api_cache/v3/subscriber.json", "twitchemotes:subscriber", 30*time.Minute)).Methods("GET")
+
+	sr.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(*host, router))
 }
