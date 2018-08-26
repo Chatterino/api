@@ -11,10 +11,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	cache "github.com/patrickmn/go-cache"
 )
 
-var kvCache *cache.Cache
 var firstRun = true
 
 const offlineMode = false
@@ -41,29 +39,6 @@ func getData(url, key string) ([]byte, error) {
 	}
 	fmt.Println("Fetched!")
 	return body, nil
-}
-
-func cacheRequest(url, key string, cacheDuration time.Duration) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		data, found := kvCache.Get(key)
-		if found {
-			log.Printf("Responding with cached %s", url)
-			w.Write(data.([]byte))
-		} else {
-			resp, err := http.Get(url)
-			log.Printf("Fetching %s live...", url)
-			if err != nil {
-				return
-			}
-			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return
-			}
-			kvCache.Set(key, body, cacheDuration)
-			w.Write(body)
-		}
-	}
 }
 
 type EmoteSet struct {
@@ -136,15 +111,30 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var client *http.Client
 var host = flag.String("h", ":1234", "host of server")
 var prefix = flag.String("p", "", "optional prefix")
+
+func init() {
+	client = &http.Client{}
+
+	err := initializeCache()
+	if err != nil {
+		panic(err)
+	}
+
+	err = initializeYoutubeAPI()
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	flag.Parse()
 	go refreshEmoteSetCache()
-	kvCache = cache.New(30*time.Minute, 10*time.Minute)
 
-	router := mux.NewRouter()
+	// Skip clean is used to make link_resolver work KKona
+	router := mux.NewRouter().SkipClean(true)
 
 	sr := router.PathPrefix(*prefix).Subrouter()
 
@@ -153,5 +143,15 @@ func main() {
 
 	sr.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(*host, router))
+	sr.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
+
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         *host,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	fmt.Println("Listening on", *host)
+	log.Fatal(srv.ListenAndServe())
 }
