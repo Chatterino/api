@@ -126,9 +126,12 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 			}
 
 			title := doc.Find("title").First().Text()
+			if title != "" {
+				title = fmt.Sprintf("<b>%s</b><hr>", title)
+			}
 			return json.Marshal(&LinkResolverResponse{
 				Status:  resp.StatusCode,
-				Tooltip: fmt.Sprintf("<div style=\"text-align: left;\"><b>%s</b><hr><b>URL:</b> %s</div>", title, resp.Request.URL.String()),
+				Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", title, resp.Request.URL.String()),
 			})
 		}
 
