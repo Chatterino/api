@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -62,7 +63,7 @@ func insertCommas(str string, n int) string {
 	var lenght = len(str) - 2
 	for i, rune := range str {
 		buffer.WriteRune(rune)
-		if (lenght - i)%n == remainder {
+		if (lenght-i)%n == remainder {
 			buffer.WriteRune(',')
 		}
 	}
