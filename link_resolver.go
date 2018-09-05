@@ -44,6 +44,31 @@ func unescapeURLArgument(r *http.Request, key string) (string, error) {
 	return url, nil
 }
 
+func formatDuration(dur string) string {
+	dur = strings.ToLower(dur)
+	dur = strings.Replace(dur, "pt", "", 1)
+	d, _ := time.ParseDuration(dur)
+	h := d / time.Hour
+	d -= h * time.Hour
+	m := d / time.Minute
+	d -= m * time.Minute
+	s := d / time.Second
+	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
+}
+
+func insertCommas(str string, n int) string {
+	var buffer bytes.Buffer
+	var remainder = n - 1
+	var lenght = len(str) - 2
+	for i, rune := range str {
+		buffer.WriteRune(rune)
+		if (lenght - i)%n == remainder {
+			buffer.WriteRune(',')
+		}
+	}
+	return buffer.String()
+}
+
 func linkResolver(w http.ResponseWriter, r *http.Request) {
 	url, err := unescapeURLArgument(r, "url")
 	if err != nil {
@@ -93,7 +118,7 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 					fmt.Println("Doing YouTube API Request on", videoID)
 					return &LinkResolverResponse{
 						Status:  resp.StatusCode,
-						Tooltip: "<div style=\"text-align: left;\"><b>" + video.Snippet.Title + "</b><hr><b>Channel:</b> " + video.Snippet.ChannelTitle + "<br><b>Duration:</b> " + video.ContentDetails.Duration + "<br><b>Views:</b> " + strconv.FormatUint(video.Statistics.ViewCount, 10) + "<br><b>Likes:</b> <span style=\"color: green;\">+" + strconv.FormatUint(video.Statistics.LikeCount, 10) + "</span>/<span style=\"color: red;\">-" + strconv.FormatUint(video.Statistics.DislikeCount, 10) + "</span></div>",
+						Tooltip: "<div style=\"text-align: left;\"><b>" + video.Snippet.Title + "</b><hr><b>Channel:</b> " + video.Snippet.ChannelTitle + "<br><b>Duration:</b> " + formatDuration(video.ContentDetails.Duration) + "<br><b>Views:</b> " + insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3) + "<br><b>Likes:</b> <span style=\"color: green;\">+" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) + "</span>/<span style=\"color: red;\">-" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) + "</span></div>",
 					}, nil
 				})
 
