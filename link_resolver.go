@@ -19,6 +19,7 @@ type LinkResolverResponse struct {
 	Message string `json:"message,omitempty"`
 
 	Tooltip string `json:"tooltip,omitempty"`
+	Link string `json:"link,omitempty"`
 
 	// Flag in the BTTV API to.. maybe signify that the link will download something? idk
 	// Download *bool  `json:"download,omitempty"`
@@ -133,6 +134,7 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 			return json.Marshal(&LinkResolverResponse{
 				Status:  resp.StatusCode,
 				Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", title, resp.Request.URL.String()),
+				Link: resp.Request.URL.String(),
 			})
 		}
 
