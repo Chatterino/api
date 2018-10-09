@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"path"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gorilla/mux"
@@ -104,8 +105,14 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 			if strings.HasSuffix(resp.Request.URL.Host, ".youtube.com") {
 				// do special youtube parsing
 
-				queryValues := resp.Request.URL.Query()
-				videoID := queryValues.Get("v")
+				url := resp.Request.URL
+				videoID := ""
+
+				if strings.Index(url.Path, "embed") == -1 {
+					videoID = url.Query().Get("v")
+				} else {
+					videoID = path.Base(url.Path)
+				}
 
 				if videoID == "" {
 					return json.Marshal(noLinkInfoFound)
