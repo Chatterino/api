@@ -17,6 +17,15 @@ func initializeCache() (err error) {
 	return
 }
 
+func cacheGet(key string) interface{} {
+	data, found := kvCache.Get(key)
+	if found {
+		return data
+	}
+
+	return nil
+}
+
 func cacheGetOrSet(key string, cacheDuration time.Duration, setter func() (interface{}, error)) interface{} {
 	data, found := kvCache.Get(key)
 	if found {

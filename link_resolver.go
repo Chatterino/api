@@ -9,6 +9,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -72,21 +73,10 @@ func insertCommas(str string, n int) string {
 	return buffer.String()
 }
 
-func linkResolver(w http.ResponseWriter, r *http.Request) {
-	url, err := unescapeURLArgument(r, "url")
-	if err != nil {
-		bytes, err := json.Marshal(invalidURL)
-		if err != nil {
-			fmt.Println("Error marshalling invalidURL struct:", err)
-			return
-		}
-		_, err = w.Write(bytes)
-		if err != nil {
-			fmt.Println("Error in w.Write:", err)
-		}
-		return
-	}
+var linkResolverRequestsMutex sync.Mutex
+var linkResolverRequests = make(map[string][](chan interface{}))
 
+func doRequest(url string) {
 	response := cacheGetOrSet("url:"+url, 10*time.Minute, func() (interface{}, error) {
 		resp, err := client.Get(url)
 		if err != nil {
@@ -147,6 +137,62 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 
 		return json.Marshal(noLinkInfoFound)
 	})
+
+	linkResolverRequestsMutex.Lock()
+	fmt.Println("Notify channels")
+	for _, channel := range linkResolverRequests[url] {
+		fmt.Printf("Notify channel %v\n", channel)
+		/*
+			select {
+			case channel <- response:
+				fmt.Println("hehe")
+			default:
+				fmt.Println("Unable to respond")
+			}
+		*/
+		channel <- response
+	}
+	delete(linkResolverRequests, url)
+	linkResolverRequestsMutex.Unlock()
+}
+
+func linkResolver(w http.ResponseWriter, r *http.Request) {
+	url, err := unescapeURLArgument(r, "url")
+	if err != nil {
+		bytes, err := json.Marshal(invalidURL)
+		if err != nil {
+			fmt.Println("Error marshalling invalidURL struct:", err)
+			return
+		}
+		_, err = w.Write(bytes)
+		if err != nil {
+			fmt.Println("Error in w.Write:", err)
+		}
+		return
+	}
+
+	cacheKey := "url:" + url
+
+	var response interface{}
+
+	if data := cacheGet(cacheKey); data != nil {
+		response = data
+	} else {
+		responseChannel := make(chan interface{})
+
+		linkResolverRequestsMutex.Lock()
+		linkResolverRequests[url] = append(linkResolverRequests[url], responseChannel)
+		urlRequestsLength := len(linkResolverRequests[url])
+		linkResolverRequestsMutex.Unlock()
+		if urlRequestsLength == 1 {
+			// First poll for this URL, start the request!
+			go doRequest(url)
+		}
+
+		fmt.Printf("Listening to channel %v\n", responseChannel)
+		response = <-responseChannel
+		fmt.Println("got response!")
+	}
 
 	_, err = w.Write(response.([]byte))
 	if err != nil {
