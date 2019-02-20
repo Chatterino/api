@@ -76,6 +76,15 @@ func insertCommas(str string, n int) string {
 var linkResolverRequestsMutex sync.Mutex
 var linkResolverRequests = make(map[string][](chan interface{}))
 
+type customURLManager struct {
+	check func(resp *http.Response) bool
+	run   func(resp *http.Response) ([]byte, error)
+}
+
+var (
+	customURLManagers []customURLManager
+)
+
 func doRequest(url string) {
 	response := cacheGetOrSet("url:"+url, 10*time.Minute, func() (interface{}, error) {
 		resp, err := client.Get(url)
@@ -122,6 +131,12 @@ func doRequest(url string) {
 				})
 
 				return json.Marshal(youtubeResponse)
+			}
+
+			for _, m := range customURLManagers {
+				if m.check(resp) {
+					return m.run(resp)
+				}
 			}
 
 			title := doc.Find("title").First().Text()

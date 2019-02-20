@@ -129,29 +129,43 @@ func init() {
 	}
 }
 
+func makeRouter(prefix string) *mux.Router {
+	router := mux.NewRouter().SkipClean(true)
+	sr := router.PathPrefix(prefix).Subrouter()
+
+	return sr
+}
+
+func listen(host string, router *mux.Router) {
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         host,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	fmt.Println("Listening on", host)
+	log.Fatal(srv.ListenAndServe())
+}
+
+func handleLinkResolver(router *mux.Router) {
+	router.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
+}
+
 func main() {
 	flag.Parse()
 	go refreshEmoteSetCache()
 
 	// Skip clean is used to make link_resolver work KKona
-	router := mux.NewRouter().SkipClean(true)
 
-	sr := router.PathPrefix(*prefix).Subrouter()
+	router := makeRouter(*prefix)
 
-	sr.HandleFunc("/twitchemotes/sets", cacheRequest("https://twitchemotes.com/api_cache/v3/sets.json", "twitchemotes:sets", 30*time.Minute)).Methods("GET")
-	sr.HandleFunc("/twitchemotes/subscriber", cacheRequest("https://twitchemotes.com/api_cache/v3/subscriber.json", "twitchemotes:subscriber", 30*time.Minute)).Methods("GET")
+	router.HandleFunc("/twitchemotes/sets", cacheRequest("https://twitchemotes.com/api_cache/v3/sets.json", "twitchemotes:sets", 30*time.Minute)).Methods("GET")
+	router.HandleFunc("/twitchemotes/subscriber", cacheRequest("https://twitchemotes.com/api_cache/v3/subscriber.json", "twitchemotes:subscriber", 30*time.Minute)).Methods("GET")
 
-	sr.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
+	router.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
 
-	sr.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
+	handleLinkResolver(router)
 
-	srv := &http.Server{
-		Handler:      router,
-		Addr:         *host,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-
-	fmt.Println("Listening on", *host)
-	log.Fatal(srv.ListenAndServe())
+	listen(*host, router)
 }
