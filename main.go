@@ -131,7 +131,7 @@ func init() {
 
 func makeRouter(prefix string) *mux.Router {
 	router := mux.NewRouter().SkipClean(true)
-	sr := router.PathPrefix(prefix).Subrouter()
+	sr := router.PathPrefix(prefix).Subrouter().SkipClean(true)
 
 	return sr
 }
