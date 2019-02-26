@@ -95,6 +95,7 @@ func doRequest(url string) {
 
 			return json.Marshal(&LinkResolverResponse{Status: 500, Message: "client.Get " + err.Error()})
 		}
+		defer resp.Body.Close()
 
 		if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
 			doc, err := goquery.NewDocumentFromReader(resp.Body)
