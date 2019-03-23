@@ -127,7 +127,7 @@ func doRequest(url string) {
 
 					fmt.Println("Doing YouTube API Request on", videoID)
 					return &LinkResolverResponse{
-						Status:  resp.StatusCode,
+						Status: resp.StatusCode,
 						Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +
 							"</b><hr><b>Channel:</b> " + html.EscapeString(video.Snippet.ChannelTitle) +
 							"<br><b>Duration:</b> " + html.EscapeString(formatDuration(video.ContentDetails.Duration)) +
@@ -147,13 +147,13 @@ func doRequest(url string) {
 				}
 			}
 
-			title := doc.Find("title").First().Text()
-			if title != "" {
-				title = fmt.Sprintf("<b>%s</b><hr>", title)
+			escapedTitle := doc.Find("title").First().Text()
+			if escapedTitle != "" {
+				escapedTitle = fmt.Sprintf("<b>%s</b><hr>", html.EscapeString(escapedTitle))
 			}
 			return json.Marshal(&LinkResolverResponse{
 				Status:  resp.StatusCode,
-				Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", html.EscapeString(title), html.EscapeString(resp.Request.URL.String())),
+				Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", escapedTitle, html.EscapeString(resp.Request.URL.String())),
 				Link:    resp.Request.URL.String(),
 			})
 		}
