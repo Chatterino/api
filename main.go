@@ -16,6 +16,7 @@ import (
 var firstRun = true
 
 const offlineMode = false
+const httpClient = &http.Client{}
 
 func getData(url, key string) ([]byte, error) {
 	if offlineMode {
@@ -27,7 +28,15 @@ func getData(url, key string) ([]byte, error) {
 		return raw, nil
 	}
 
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	// ensures websites return pages in english (e.g. twitter would return french preview
+	// when the request came from a french IP.)
+	req.Header.Add("Accept-Language", "en-US, en;q=0.9, *;q=0.5")
+	
+	resp, err := httpClient.Do(req)
 	log.Printf("Fetching %s live...", url)
 	if err != nil {
 		return nil, err
