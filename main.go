@@ -27,7 +27,7 @@ func getData(url, key string) ([]byte, error) {
 		return raw, nil
 	}
 
-	httpClient = &http.Client{}
+	httpClient := &http.Client{}
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
