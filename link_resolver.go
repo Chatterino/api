@@ -1,18 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"html"
 	"net/http"
-	"net/url"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gorilla/mux"
 )
 
 type LinkResolverResponse struct {
@@ -34,42 +31,6 @@ var noLinkInfoFound = &LinkResolverResponse{
 var invalidURL = &LinkResolverResponse{
 	Status:  500,
 	Message: "Invalid URL",
-}
-
-func unescapeURLArgument(r *http.Request, key string) (string, error) {
-	vars := mux.Vars(r)
-	escapedURL := vars[key]
-	url, err := url.PathUnescape(escapedURL)
-	if err != nil {
-		return "", err
-	}
-
-	return url, nil
-}
-
-func formatDuration(dur string) string {
-	dur = strings.ToLower(dur)
-	dur = strings.Replace(dur, "pt", "", 1)
-	d, _ := time.ParseDuration(dur)
-	h := d / time.Hour
-	d -= h * time.Hour
-	m := d / time.Minute
-	d -= m * time.Minute
-	s := d / time.Second
-	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
-}
-
-func insertCommas(str string, n int) string {
-	var buffer bytes.Buffer
-	var remainder = n - 1
-	var lenght = len(str) - 2
-	for i, rune := range str {
-		buffer.WriteRune(rune)
-		if (lenght-i)%n == remainder {
-			buffer.WriteRune(',')
-		}
-	}
-	return buffer.String()
 }
 
 var linkResolverRequestsMutex sync.Mutex
