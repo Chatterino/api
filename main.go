@@ -122,13 +122,10 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var client *http.Client
 var host = flag.String("h", ":1234", "host of server")
 var prefix = flag.String("p", "", "optional prefix")
 
 func init() {
-	client = &http.Client{}
-
 	err := initializeCache()
 	if err != nil {
 		panic(err)

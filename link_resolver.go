@@ -88,7 +88,15 @@ var (
 
 func doRequest(url string) {
 	response := cacheGetOrSet("url:"+url, 10*time.Minute, func() (interface{}, error) {
-		resp, err := client.Get(url)
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return nil, err
+		}
+		// ensures websites return pages in english (e.g. twitter would return french preview
+		// when the request came from a french IP.)
+		req.Header.Add("Accept-Language", "en-US, en;q=0.9, *;q=0.5")
+
+		resp, err := httpClient.Do(req)
 		if err != nil {
 			if strings.HasSuffix(err.Error(), "no such host") {
 				return json.Marshal(noLinkInfoFound)
