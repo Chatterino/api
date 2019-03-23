@@ -25,7 +25,7 @@ func getTwitchClip(statusCode int, v5API *gotwitch.TwitchAPI, clipSlug string) f
 		}
 		return &LinkResolverResponse{
 			Status:  statusCode,
-			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(clip.Title) + "</b><hr><b>Channel:</b> " + html.EscapeString(clip.Broadcaster.DisplayName) + "<br><b>Views:</b> " + html.EscapeString(insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3)) + "</div>",
+			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(clip.Title) + "</b><hr><b>Channel:</b> " + html.EscapeString(clip.Broadcaster.DisplayName) + "<br><b>Views:</b> " + insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3) + "</div>",
 		}, nil
 	}
 }
