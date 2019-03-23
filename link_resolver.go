@@ -127,7 +127,13 @@ func doRequest(url string) {
 					fmt.Println("Doing YouTube API Request on", videoID)
 					return &LinkResolverResponse{
 						Status:  resp.StatusCode,
-						Tooltip: "<div style=\"text-align: left;\"><b>" + video.Snippet.Title + "</b><hr><b>Channel:</b> " + video.Snippet.ChannelTitle + "<br><b>Duration:</b> " + formatDuration(video.ContentDetails.Duration) + "<br><b>Views:</b> " + insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3) + "<br><b>Likes:</b> <span style=\"color: green;\">+" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) + "</span>/<span style=\"color: red;\">-" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) + "</span></div>",
+						Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +
+							"</b><hr><b>Channel:</b> " + html.EscapeString(video.Snippet.ChannelTitle) +
+							"<br><b>Duration:</b> " + html.EscapeString(formatDuration(video.ContentDetails.Duration)) +
+							"<br><b>Views:</b> " + insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3) +
+							"<br><b>Likes:</b> <span style=\"color: green;\">+" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) +
+							"</span>/<span style=\"color: red;\">-" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) +
+							"</span></div>",
 					}, nil
 				})
 
@@ -146,7 +152,7 @@ func doRequest(url string) {
 			}
 			return json.Marshal(&LinkResolverResponse{
 				Status:  resp.StatusCode,
-				Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", title, resp.Request.URL.String()),
+				Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", html.EscapeString(title), html.EscapeString(resp.Request.URL.String())),
 				Link:    resp.Request.URL.String(),
 			})
 		}
