@@ -130,11 +130,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
-	err = initializeYoutubeAPI()
-	if err != nil {
-		panic(err)
-	}
 }
 
 func makeRouter(prefix string) *mux.Router {

@@ -7,8 +7,6 @@ import (
 	"html"
 	"net/http"
 	"net/url"
-	"path"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -110,43 +108,6 @@ func doRequest(url string) {
 			doc, err := goquery.NewDocumentFromReader(resp.Body)
 			if err != nil {
 				return json.Marshal(&LinkResolverResponse{Status: 500, Message: "html parser error " + err.Error()})
-			}
-			if strings.HasSuffix(resp.Request.URL.Host, ".youtube.com") {
-				// do special youtube parsing
-
-				url := resp.Request.URL
-				videoID := ""
-
-				if strings.Index(url.Path, "embed") == -1 {
-					videoID = url.Query().Get("v")
-				} else {
-					videoID = path.Base(url.Path)
-				}
-
-				if videoID == "" {
-					return json.Marshal(noLinkInfoFound)
-				}
-
-				youtubeResponse := cacheGetOrSet("youtube:"+videoID, 1*time.Hour, func() (interface{}, error) {
-					video, err := getYoutubeVideo(videoID)
-					if err != nil {
-						return &LinkResolverResponse{Status: 500, Message: "youtube api error " + err.Error()}, nil
-					}
-
-					fmt.Println("Doing YouTube API Request on", videoID)
-					return &LinkResolverResponse{
-						Status: resp.StatusCode,
-						Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +
-							"</b><hr><b>Channel:</b> " + html.EscapeString(video.Snippet.ChannelTitle) +
-							"<br><b>Duration:</b> " + html.EscapeString(formatDuration(video.ContentDetails.Duration)) +
-							"<br><b>Views:</b> " + insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3) +
-							"<br><b>Likes:</b> <span style=\"color: green;\">+" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) +
-							"</span>/<span style=\"color: red;\">-" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) +
-							"</span></div>",
-					}, nil
-				})
-
-				return json.Marshal(youtubeResponse)
 			}
 
 			for _, m := range customURLManagers {

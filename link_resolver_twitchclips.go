@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"html"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -33,6 +34,7 @@ func getTwitchClip(statusCode int, v5API *gotwitch.TwitchAPI, clipSlug string) f
 func init() {
 	clientID, exists := os.LookupEnv("CHATTERINO_API_CACHE_TWITCH_CLIENT_ID")
 	if !exists {
+		log.Println("No CHATTERINO_API_CACHE_TWITCH_CLIENT_ID specified, won't do special responses for twitch clips")
 		return
 	}
 
