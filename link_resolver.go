@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -82,17 +83,7 @@ func doRequest(url string) {
 	})
 
 	linkResolverRequestsMutex.Lock()
-	fmt.Println("Notify channels")
 	for _, channel := range linkResolverRequests[url] {
-		fmt.Printf("Notify channel %v\n", channel)
-		/*
-			select {
-			case channel <- response:
-				fmt.Println("hehe")
-			default:
-				fmt.Println("Unable to respond")
-			}
-		*/
 		channel <- response
 	}
 	delete(linkResolverRequests, url)
@@ -104,7 +95,7 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		_, err = w.Write(rInvalidURL)
 		if err != nil {
-			fmt.Println("Error in w.Write:", err)
+			log.Println("Error writing response:", err)
 		}
 		return
 	}
@@ -127,13 +118,11 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 			go doRequest(url)
 		}
 
-		fmt.Printf("Listening to channel %v\n", responseChannel)
 		response = <-responseChannel
-		fmt.Println("got response!")
 	}
 
 	_, err = w.Write(response.([]byte))
 	if err != nil {
-		fmt.Println("Error in w.Write:", err)
+		log.Println("Error writing response:", err)
 	}
 }

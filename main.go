@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -48,7 +47,7 @@ func getData(url, key string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Fetched!")
+	log.Println("Fetched!")
 	return body, nil
 }
 
@@ -95,13 +94,13 @@ func refreshEmoteSetCache() {
 		panic(err)
 	}
 
-	for k, _ := range emoteSets {
+	for k := range emoteSets {
 		emoteSets[k].Type = "sub"
 	}
 
 	addEmoteSet("13985", "evohistorical2015", "129284508", "sub")
 
-	fmt.Println("Refreshed emote sets")
+	log.Println("Refreshed emote sets")
 
 	time.AfterFunc(30*time.Minute, refreshEmoteSetCache)
 }
@@ -115,7 +114,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s: returning data %s\n", setID, data)
+	log.Printf("%s: returning data %s\n", setID, data)
 	_, err = w.Write(data)
 	if err != nil {
 		panic(err)
@@ -147,7 +146,7 @@ func listen(host string, router *mux.Router) {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	fmt.Println("Listening on", host)
+	log.Println("Listening on", host)
 	log.Fatal(srv.ListenAndServe())
 }
 

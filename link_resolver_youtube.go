@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"html"
 	"log"
 	"net/http"
@@ -71,7 +70,7 @@ func init() {
 					return &LinkResolverResponse{Status: 500, Message: "youtube api error " + err.Error()}, nil
 				}
 
-				fmt.Println("Doing YouTube API Request on", videoID)
+				log.Println("Doing YouTube API Request on", videoID)
 				return &LinkResolverResponse{
 					Status: resp.StatusCode,
 					Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +

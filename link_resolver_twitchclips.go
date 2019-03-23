@@ -20,6 +20,7 @@ var noTwitchClipWithThisIDFound = &LinkResolverResponse{
 
 func getTwitchClip(statusCode int, v5API *gotwitch.TwitchAPI, clipSlug string) func() (interface{}, error) {
 	return func() (interface{}, error) {
+		log.Println("[TwitchClip] GET", clipSlug)
 		clip, _, err := v5API.GetClip(clipSlug)
 		if err != nil {
 			return json.Marshal(noTwitchClipWithThisIDFound)
