@@ -13,7 +13,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var firstRun = true
+var (
+	firstRun   = true
+	httpClient = &http.Client{}
+)
 
 const offlineMode = false
 
@@ -26,8 +29,6 @@ func getData(url, key string) ([]byte, error) {
 
 		return raw, nil
 	}
-
-	httpClient := &http.Client{}
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
