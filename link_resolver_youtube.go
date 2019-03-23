@@ -62,7 +62,7 @@ func init() {
 			}
 
 			if videoID == "" {
-				return json.Marshal(noLinkInfoFound)
+				return rNoLinkInfoFound, nil
 			}
 
 			youtubeResponse := cacheGetOrSet("youtube:"+videoID, 1*time.Hour, func() (interface{}, error) {

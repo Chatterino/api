@@ -23,16 +23,6 @@ type LinkResolverResponse struct {
 	// Download *bool  `json:"download,omitempty"`
 }
 
-var noLinkInfoFound = &LinkResolverResponse{
-	Status:  404,
-	Message: "No link info found",
-}
-
-var invalidURL = &LinkResolverResponse{
-	Status:  500,
-	Message: "Invalid URL",
-}
-
 var linkResolverRequestsMutex sync.Mutex
 var linkResolverRequests = make(map[string][](chan interface{}))
 
@@ -58,7 +48,7 @@ func doRequest(url string) {
 		resp, err := httpClient.Do(req)
 		if err != nil {
 			if strings.HasSuffix(err.Error(), "no such host") {
-				return json.Marshal(noLinkInfoFound)
+				return rNoLinkInfoFound, nil
 			}
 
 			return json.Marshal(&LinkResolverResponse{Status: 500, Message: "client.Get " + err.Error()})
@@ -88,7 +78,7 @@ func doRequest(url string) {
 			})
 		}
 
-		return json.Marshal(noLinkInfoFound)
+		return rNoLinkInfoFound, nil
 	})
 
 	linkResolverRequestsMutex.Lock()
@@ -112,12 +102,7 @@ func doRequest(url string) {
 func linkResolver(w http.ResponseWriter, r *http.Request) {
 	url, err := unescapeURLArgument(r, "url")
 	if err != nil {
-		bytes, err := json.Marshal(invalidURL)
-		if err != nil {
-			fmt.Println("Error marshalling invalidURL struct:", err)
-			return
-		}
-		_, err = w.Write(bytes)
+		_, err = w.Write(rInvalidURL)
 		if err != nil {
 			fmt.Println("Error in w.Write:", err)
 		}
