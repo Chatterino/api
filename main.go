@@ -14,7 +14,9 @@ import (
 
 var (
 	firstRun   = true
-	httpClient = &http.Client{}
+	httpClient = &http.Client{
+		Timeout: time.Second * 3,
+	}
 )
 
 const offlineMode = false
