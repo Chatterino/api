@@ -15,7 +15,7 @@ import (
 var (
 	firstRun   = true
 	httpClient = &http.Client{
-		Timeout: time.Second * 3,
+		Timeout: 3 * time.Second,
 	}
 )
 
