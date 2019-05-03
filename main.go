@@ -17,6 +17,7 @@ var (
 	httpClient = &http.Client{
 		Timeout: 3 * time.Second,
 	}
+	startTime = time.Now()
 )
 
 const offlineMode = false
@@ -168,6 +169,8 @@ func main() {
 	router.HandleFunc("/twitchemotes/subscriber", cacheRequest("https://twitchemotes.com/api_cache/v3/subscriber.json", "twitchemotes:subscriber", 30*time.Minute)).Methods("GET")
 
 	router.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
+
+	handleHealth(router)
 
 	handleLinkResolver(router)
 
