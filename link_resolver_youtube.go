@@ -43,6 +43,10 @@ func getYoutubeVideo(statusCode int, youtubeClient *youtube.Service, videoID str
 
 		video := youtubeResponse.Items[0]
 
+		if video.ContentDetails == nil {
+			return &LinkResolverResponse{Status: 500, Message: "video unavailable"}, nil
+		}
+
 		return &LinkResolverResponse{
 			Status: statusCode,
 			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +
