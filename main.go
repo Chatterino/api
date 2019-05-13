@@ -15,7 +15,7 @@ import (
 var (
 	firstRun   = true
 	httpClient = &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: 15 * time.Second,
 	}
 	startTime = time.Now()
 )
