@@ -4,6 +4,7 @@
 *.so
 *.dylib
 chatterino-api-cache
+api
 
 # Test binary, build with `go test -c`
 *.test
