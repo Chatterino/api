@@ -2,4 +2,6 @@
 
 # chatterino-api-cache
 
-simple go web service that serves as a cache to APIs that chatterino wants to use
+simple go web service that serves as a cache to APIs that chatterino wants to use.
+
+Emote data is served cached from [twitchemotes.com](https://twitchemotes.com/)
