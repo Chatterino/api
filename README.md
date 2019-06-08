@@ -9,7 +9,7 @@ Emote data is served cached from [twitchemotes.com](https://twitchemotes.com/).
 ## routes
 `/twitchemotes/set/:setID`  
 returns information about a given twitch emote set. Response example:
-```json
+```
 {
     "channel_name": "forsen", // twitch user name
     "channel_id": "22484632", // twitch user id
