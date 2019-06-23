@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gorilla/mux"
 )
 
 type LinkResolverResponse struct {
@@ -105,4 +106,8 @@ var linkResolverCache *loadingCache
 
 func init() {
 	linkResolverCache = newLoadingCache("url", doRequest, 10*time.Minute)
+}
+
+func handleLinkResolver(router *mux.Router) {
+	router.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
 }
