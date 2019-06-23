@@ -128,6 +128,7 @@ var host = flag.String("h", ":1234", "host of server")
 var prefix = flag.String("p", "", "optional prefix")
 
 func makeRouter(prefix string) *mux.Router {
+	// Skip clean is used to make link_resolver work
 	router := mux.NewRouter().SkipClean(true)
 	sr := router.PathPrefix(prefix).Subrouter().SkipClean(true)
 
@@ -154,12 +155,7 @@ func main() {
 	flag.Parse()
 	go refreshEmoteSetCache()
 
-	// Skip clean is used to make link_resolver work KKona
-
 	router := makeRouter(*prefix)
-
-	router.HandleFunc("/twitchemotes/sets", cacheRequest("https://twitchemotes.com/api_cache/v3/sets.json", "twitchemotes:sets", 30*time.Minute)).Methods("GET")
-	router.HandleFunc("/twitchemotes/subscriber", cacheRequest("https://twitchemotes.com/api_cache/v3/subscriber.json", "twitchemotes:subscriber", 30*time.Minute)).Methods("GET")
 
 	router.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
 
