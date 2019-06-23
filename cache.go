@@ -11,32 +11,8 @@ import (
 
 var kvCache *cache.Cache
 
-func initializeCache() (err error) {
+func init() {
 	kvCache = cache.New(30*time.Minute, 10*time.Minute)
-
-	return
-}
-
-func cacheGet(key string) interface{} {
-	data, found := kvCache.Get(key)
-	if found {
-		return data
-	}
-
-	return nil
-}
-
-func cacheGetOrSet(key string, cacheDuration time.Duration, setter func() (interface{}, error)) interface{} {
-	data, found := kvCache.Get(key)
-	if found {
-		return data
-	}
-
-	newData, err := setter()
-	if err == nil {
-		kvCache.Set(key, newData, cacheDuration)
-	}
-	return newData
 }
 
 func cacheRequest(url, key string, cacheDuration time.Duration) func(w http.ResponseWriter, r *http.Request) {

@@ -127,13 +127,6 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 var host = flag.String("h", ":1234", "host of server")
 var prefix = flag.String("p", "", "optional prefix")
 
-func init() {
-	err := initializeCache()
-	if err != nil {
-		panic(err)
-	}
-}
-
 func makeRouter(prefix string) *mux.Router {
 	router := mux.NewRouter().SkipClean(true)
 	sr := router.PathPrefix(prefix).Subrouter().SkipClean(true)

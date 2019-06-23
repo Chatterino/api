@@ -25,8 +25,24 @@ func getYoutubeVideoIDFromURL(url *url.URL) string {
 	return path.Base(url.Path)
 }
 
-func getYoutubeVideo(statusCode int, youtubeClient *youtube.Service, videoID string) func() (interface{}, error) {
-	return func() (interface{}, error) {
+func init() {
+	apiKey, exists := os.LookupEnv("YOUTUBE_API_KEY")
+	if !exists {
+		log.Println("No YOUTUBE_API_KEY specified, won't do special responses for youtube")
+		return
+	}
+
+	youtubeHTTPClient := &http.Client{
+		Transport: &transport.APIKey{Key: apiKey},
+	}
+
+	youtubeClient, err := youtube.New(youtubeHTTPClient)
+	if err != nil {
+		log.Println("Error initialization youtube api client:", err)
+		return
+	}
+
+	load := func(videoID string) (interface{}, error) {
 		log.Println("[YouTube] GET", videoID)
 		youtubeResponse, err := youtubeClient.Videos.List("statistics,snippet,contentDetails").Id(videoID).Do()
 		if err != nil {
@@ -48,7 +64,7 @@ func getYoutubeVideo(statusCode int, youtubeClient *youtube.Service, videoID str
 		}
 
 		return &LinkResolverResponse{
-			Status: statusCode,
+			Status: 200,
 			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +
 				"</b><hr><b>Channel:</b> " + html.EscapeString(video.Snippet.ChannelTitle) +
 				"<br><b>Duration:</b> " + html.EscapeString(formatDuration(video.ContentDetails.Duration)) +
@@ -58,24 +74,8 @@ func getYoutubeVideo(statusCode int, youtubeClient *youtube.Service, videoID str
 				"</span></div>",
 		}, nil
 	}
-}
 
-func init() {
-	apiKey, exists := os.LookupEnv("YOUTUBE_API_KEY")
-	if !exists {
-		log.Println("No YOUTUBE_API_KEY specified, won't do special responses for youtube")
-		return
-	}
-
-	youtubeHTTPClient := &http.Client{
-		Transport: &transport.APIKey{Key: apiKey},
-	}
-
-	youtubeClient, err := youtube.New(youtubeHTTPClient)
-	if err != nil {
-		log.Println("Error initialization youtube api client:", err)
-		return
-	}
+	cache := newLoadingCache("youtube", load, 1*time.Hour)
 
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(resp *http.Response) bool {
@@ -88,7 +88,7 @@ func init() {
 				return rNoLinkInfoFound, nil
 			}
 
-			apiResponse := cacheGetOrSet("youtube:"+videoID, 1*time.Hour, getYoutubeVideo(resp.StatusCode, youtubeClient, videoID))
+			apiResponse := cache.Get(videoID)
 			return json.Marshal(apiResponse)
 		},
 	})

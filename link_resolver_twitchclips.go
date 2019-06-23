@@ -18,20 +18,6 @@ var noTwitchClipWithThisIDFound = &LinkResolverResponse{
 	Message: "No Twitch Clip with this ID found",
 }
 
-func getTwitchClip(statusCode int, v5API *gotwitch.TwitchAPI, clipSlug string) func() (interface{}, error) {
-	return func() (interface{}, error) {
-		log.Println("[TwitchClip] GET", clipSlug)
-		clip, _, err := v5API.GetClip(clipSlug)
-		if err != nil {
-			return json.Marshal(noTwitchClipWithThisIDFound)
-		}
-		return &LinkResolverResponse{
-			Status:  statusCode,
-			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(clip.Title) + "</b><hr><b>Channel:</b> " + html.EscapeString(clip.Broadcaster.DisplayName) + "<br><b>Views:</b> " + insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3) + "</div>",
-		}, nil
-	}
-}
-
 func init() {
 	clientID, exists := os.LookupEnv("CHATTERINO_API_CACHE_TWITCH_CLIENT_ID")
 	if !exists {
@@ -41,6 +27,20 @@ func init() {
 
 	v5API := gotwitch.NewV5(clientID)
 
+	load := func(clipSlug string) (interface{}, error) {
+		log.Println("[TwitchClip] GET", clipSlug)
+		clip, _, err := v5API.GetClip(clipSlug)
+		if err != nil {
+			return json.Marshal(noTwitchClipWithThisIDFound)
+		}
+		return &LinkResolverResponse{
+			Status:  200,
+			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(clip.Title) + "</b><hr><b>Channel:</b> " + html.EscapeString(clip.Broadcaster.DisplayName) + "<br><b>Views:</b> " + insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3) + "</div>",
+		}, nil
+	}
+
+	cache := newLoadingCache("twitchclip", load, 1*time.Hour)
+
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(resp *http.Response) bool {
 			return strings.HasSuffix(resp.Request.URL.Host, "clips.twitch.tv")
@@ -48,8 +48,9 @@ func init() {
 		run: func(resp *http.Response) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(resp.Request.URL.Path, "/"), "/")
 			clipSlug := pathParts[0]
-			twitchClipResponse := cacheGetOrSet("twitchclip:"+clipSlug, 1*time.Hour, getTwitchClip(resp.StatusCode, v5API, clipSlug))
-			return json.Marshal(twitchClipResponse)
+
+			apiResponse := cache.Get(clipSlug)
+			return json.Marshal(apiResponse)
 		},
 	})
 }
