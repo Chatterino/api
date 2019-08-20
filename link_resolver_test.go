@@ -45,3 +45,33 @@ func TestResolveTwitchClip(t *testing.T) {
 	//
 	// 	fmt.Println("lol")
 }
+
+func TestResolve1M(t *testing.T) {
+	// var resp *http.Response
+	// var err error
+
+	// fmt.Println("test resolve 1M")
+	// resp, err = makeRequest("http://speedtest.tele2.net/100MB.zip")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// resp, err = makeRequest("http://httpbin.org/redirect/5")
+	// fmt.Println(resp)
+	// fmt.Println(resp.Request.URL)
+	// resp, err = makeRequest("http://httpbin.org/image")
+	// fmt.Println(resp)
+	// resp, err = makeRequest("http://speedtest.tele2.net/1MB.zip")
+	// fmt.Println(resp)
+}
+
+func TestDoRequest(t *testing.T) {
+	// var err error
+
+	// fmt.Println("test resolve 1M")
+	// _, err = doRequest("http://speedtest.tele2.net/100MB.zip")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+}
