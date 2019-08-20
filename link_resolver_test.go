@@ -67,11 +67,34 @@ func TestResolve1M(t *testing.T) {
 
 func TestDoRequest(t *testing.T) {
 	// var err error
+	// var data interface{}
 
-	// fmt.Println("test resolve 1M")
-	// _, err = doRequest("http://speedtest.tele2.net/100MB.zip")
+	// data, err = doRequest("http://localhost:3000")
 	// if err != nil {
 	// 	fmt.Println(err)
 	// 	return
 	// }
+	// fmt.Println(string(data.([]byte)))
+
+	// data, err = doRequest("http://httpbin.org/redirect/5")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println(string(data.([]byte)))
+
+	// data, err = doRequest("http://httpbin.org/redirect/15")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println(string(data.([]byte)))
+
+	// data, err = doRequest("http://speedtest.tele2.net/100MB.zip")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// fmt.Println(string(data.([]byte)))
 }
