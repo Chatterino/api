@@ -1,6 +1,8 @@
 package main
 
-import "errors"
+import (
+	"errors"
+)
 
 // WriteLimiter can limit how many bytes can be written before erroring out
 type WriteLimiter struct {

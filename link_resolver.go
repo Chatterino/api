@@ -2,9 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"html"
 	"io"
 	"log"
 	"net/http"
@@ -37,28 +35,7 @@ var (
 )
 
 func makeRequest(url string) (response *http.Response, err error) {
-	resp, err := httpClient.Head(url)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
-		contentLengthBytes, err := strconv.Atoi(contentLength)
-		if err != nil {
-			return nil, err
-		}
-		if contentLengthBytes > maxContentLength {
-			return nil, errors.New("head: content-length exceeded max size (5MB)")
-		}
-	}
-
-	if resp.Request == nil {
-		return nil, errors.New("bad response, no request")
-	}
-
-	req, err := http.NewRequest("GET", resp.Request.URL.String(), nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +45,7 @@ func makeRequest(url string) (response *http.Response, err error) {
 	req.Header.Add("Accept-Language", "en-US, en;q=0.9, *;q=0.5")
 	req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
 
-	return getClient.Do(req)
+	return httpClient.Do(req)
 }
 
 func doRequest(url string) (interface{}, error) {
@@ -80,11 +57,24 @@ func doRequest(url string) (interface{}, error) {
 
 		return json.Marshal(&LinkResolverResponse{
 			Status:  http.StatusInternalServerError,
-			Message: html.EscapeString(err.Error()),
+			Message: clean(err.Error()),
 		})
 	}
 
 	defer resp.Body.Close()
+
+	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
+		contentLengthBytes, err := strconv.Atoi(contentLength)
+		if err != nil {
+			return nil, err
+		}
+		if contentLengthBytes > maxContentLength {
+			return json.Marshal(&LinkResolverResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "too big",
+			})
+		}
+	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		return rNoLinkInfoFound, nil
@@ -96,7 +86,7 @@ func doRequest(url string) (interface{}, error) {
 	if err != nil {
 		return json.Marshal(&LinkResolverResponse{
 			Status:  http.StatusInternalServerError,
-			Message: "html parser error (or download) " + html.EscapeString(err.Error()),
+			Message: "html parser error (or download) " + clean(err.Error()),
 		})
 	}
 
@@ -108,11 +98,11 @@ func doRequest(url string) (interface{}, error) {
 
 	escapedTitle := doc.Find("title").First().Text()
 	if escapedTitle != "" {
-		escapedTitle = fmt.Sprintf("<b>%s</b><hr>", html.EscapeString(escapedTitle))
+		escapedTitle = fmt.Sprintf("<b>%s</b><hr>", clean(escapedTitle))
 	}
 	return json.Marshal(&LinkResolverResponse{
 		Status:  resp.StatusCode,
-		Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", escapedTitle, html.EscapeString(resp.Request.URL.String())),
+		Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", escapedTitle, clean(resp.Request.URL.String())),
 		Link:    resp.Request.URL.String(),
 	})
 }

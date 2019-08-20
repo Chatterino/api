@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
 	"net/http"
@@ -19,18 +18,6 @@ var (
 	firstRun   = true
 	httpClient = &http.Client{
 		Timeout: 15 * time.Second,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if len(via) > maxRedirects {
-				return errors.New("too many redirects")
-			}
-			return nil
-		},
-	}
-	getClient = &http.Client{
-		Timeout: 15 * time.Second,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return errors.New("no redirects allowed")
-		},
 	}
 	startTime = time.Now()
 )
