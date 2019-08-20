@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"log"
 	"net/http"
@@ -9,10 +10,27 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const (
+	maxRedirects     = 10
+	maxContentLength = 1024 * 1024 * 5 // 5MB
+)
+
 var (
 	firstRun   = true
 	httpClient = &http.Client{
 		Timeout: 15 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) > maxRedirects {
+				return errors.New("too many redirects")
+			}
+			return nil
+		},
+	}
+	getClient = &http.Client{
+		Timeout: 15 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return errors.New("no redirects allowed")
+		},
 	}
 	startTime = time.Now()
 )
