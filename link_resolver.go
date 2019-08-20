@@ -50,7 +50,7 @@ func makeRequest(url string) (response *http.Response, err error) {
 			return nil, err
 		}
 		if contentLengthBytes > maxContentLength {
-			return nil, errors.New("too big")
+			return nil, errors.New("head: content-length exceeded max size (5MB)")
 		}
 	}
 
@@ -80,7 +80,7 @@ func doRequest(url string) (interface{}, error) {
 
 		return json.Marshal(&LinkResolverResponse{
 			Status:  http.StatusInternalServerError,
-			Message: "client.Get " + err.Error(),
+			Message: html.EscapeString(err.Error()),
 		})
 	}
 
@@ -96,7 +96,7 @@ func doRequest(url string) (interface{}, error) {
 	if err != nil {
 		return json.Marshal(&LinkResolverResponse{
 			Status:  http.StatusInternalServerError,
-			Message: "html parser error (or download) " + err.Error(),
+			Message: "html parser error (or download) " + html.EscapeString(err.Error()),
 		})
 	}
 

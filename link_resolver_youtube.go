@@ -54,7 +54,10 @@ func init() {
 		}
 
 		if err != nil {
-			return &LinkResolverResponse{Status: 500, Message: "youtube api error " + err.Error()}, nil
+			return &LinkResolverResponse{
+				Status:  500,
+				Message: "youtube api error " + html.EscapeString(err.Error()),
+			}, nil
 		}
 
 		video := youtubeResponse.Items[0]
