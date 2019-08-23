@@ -40,5 +40,5 @@ to be filled in
 
 ## Using your self-hosted version
 If you host your own version of this api, you can modify which url Chatterino2 uses to resolve links and to resolve twitch emote sets.  
-[Change link resolver](https://github.com/Chatterino/chatterino2/blob/nightly/docs/ENV.md#chatterino2_link_resolver_url)  
-[Change twitch emote resolver](https://github.com/Chatterino/chatterino2/blob/nightly/docs/ENV.md#chatterino2_twitch_emote_set_resolver_url)  
+[Change link resolver](https://github.com/Chatterino/chatterino2/blob/master/docs/ENV.md#chatterino2_link_resolver_url)  
+[Change twitch emote resolver](https://github.com/Chatterino/chatterino2/blob/master/docs/ENV.md#chatterino2_twitch_emote_set_resolver_url)  
