@@ -65,12 +65,12 @@ func init() {
 		return &LinkResolverResponse{
 			Status: 200,
 			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +
-				"</b><hr><b>Channel:</b> " + html.EscapeString(video.Snippet.ChannelTitle) +
+				"</b><br><b>Channel:</b> " + html.EscapeString(video.Snippet.ChannelTitle) +
 				"<br><b>Duration:</b> " + html.EscapeString(formatDuration(video.ContentDetails.Duration)) +
 				"<br><b>Views:</b> " + insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3) +
-				"<br><b>Likes:</b> <span style=\"color: green;\">+" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) +
-				"</span>/<span style=\"color: red;\">-" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) +
-				"</span></div>",
+				"<br><span style=\"color: #2ecc71;\">" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) +
+				" likes</span> • <span style=\"color: #e74c3c;\">" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) +
+				" dislikes</span></div>",
 		}, nil, noSpecialDur
 	}
 
