@@ -42,28 +42,24 @@ func init() {
 		return
 	}
 
-	load := func(videoID string) (interface{}, error) {
+	load := func(videoID string) (interface{}, error, time.Duration) {
 		log.Println("[YouTube] GET", videoID)
 		youtubeResponse, err := youtubeClient.Videos.List("statistics,snippet,contentDetails").Id(videoID).Do()
 		if err != nil {
-			return nil, err
+			return &LinkResolverResponse{
+				Status:  500,
+				Message: "youtube api error " + clean(err.Error()),
+			}, nil, 1 * time.Hour
 		}
 
 		if len(youtubeResponse.Items) != 1 {
-			return nil, errors.New("Videos response is not size 1")
-		}
-
-		if err != nil {
-			return &LinkResolverResponse{
-				Status:  500,
-				Message: "youtube api error " + html.EscapeString(err.Error()),
-			}, nil
+			return nil, errors.New("Videos response is not size 1"), noSpecialDur
 		}
 
 		video := youtubeResponse.Items[0]
 
 		if video.ContentDetails == nil {
-			return &LinkResolverResponse{Status: 500, Message: "video unavailable"}, nil
+			return &LinkResolverResponse{Status: 500, Message: "video unavailable"}, nil, noSpecialDur
 		}
 
 		return &LinkResolverResponse{
@@ -75,10 +71,10 @@ func init() {
 				"<br><b>Likes:</b> <span style=\"color: green;\">+" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) +
 				"</span>/<span style=\"color: red;\">-" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) +
 				"</span></div>",
-		}, nil
+		}, nil, noSpecialDur
 	}
 
-	cache := newLoadingCache("youtube", load, 1*time.Hour)
+	cache := newLoadingCache("youtube", load, 24*time.Hour)
 
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(resp *http.Response) bool {

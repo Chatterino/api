@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
 
-type loader func(key string) (interface{}, error)
+type loader func(key string) (interface{}, error, time.Duration)
+
+var noSpecialDur time.Duration
 
 type loadingCache struct {
 	loader loader
@@ -19,12 +22,20 @@ type loadingCache struct {
 }
 
 func (c *loadingCache) load(key string) {
-	value, err := c.loader(key)
+	value, err, overrideDuration := c.loader(key)
+
+	var dur = c.cacheDuration
+	if overrideDuration != 0 {
+		fmt.Println("Overriding duration")
+		dur = overrideDuration
+	}
 
 	// Cache it
 	if err == nil {
 		cacheKey := c.prefix + ":" + key
-		kvCache.Set(cacheKey, value, c.cacheDuration)
+		kvCache.Set(cacheKey, value, dur)
+	} else {
+		fmt.Println("Error when some load function was called:", err)
 	}
 
 	c.requestsMutex.Lock()

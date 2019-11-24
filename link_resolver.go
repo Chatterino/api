@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -48,14 +47,14 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func doRequest(url string) (interface{}, error) {
+func doRequest(url string) (interface{}, error, time.Duration) {
 	resp, err := makeRequest(url)
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return rNoLinkInfoFound, nil
+			return rNoLinkInfoFound, nil, noSpecialDur
 		}
 
-		return json.Marshal(&LinkResolverResponse{
+		return marshalNoDur(&LinkResolverResponse{
 			Status:  http.StatusInternalServerError,
 			Message: clean(err.Error()),
 		})
@@ -66,10 +65,10 @@ func doRequest(url string) (interface{}, error) {
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, err
+			return nil, err, noSpecialDur
 		}
 		if contentLengthBytes > maxContentLength {
-			return json.Marshal(&LinkResolverResponse{
+			return marshalNoDur(&LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "too big",
 			})
@@ -77,14 +76,14 @@ func doRequest(url string) (interface{}, error) {
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-		return rNoLinkInfoFound, nil
+		return rNoLinkInfoFound, nil, noSpecialDur
 	}
 
 	limiter := &WriteLimiter{Limit: maxContentLength}
 
 	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
 	if err != nil {
-		return json.Marshal(&LinkResolverResponse{
+		return marshalNoDur(&LinkResolverResponse{
 			Status:  http.StatusInternalServerError,
 			Message: "html parser error (or download) " + clean(err.Error()),
 		})
@@ -92,7 +91,8 @@ func doRequest(url string) (interface{}, error) {
 
 	for _, m := range customURLManagers {
 		if m.check(resp) {
-			return m.run(resp)
+			data, err := m.run(resp)
+			return data, err, noSpecialDur
 		}
 	}
 
@@ -100,7 +100,7 @@ func doRequest(url string) (interface{}, error) {
 	if escapedTitle != "" {
 		escapedTitle = fmt.Sprintf("<b>%s</b><hr>", clean(escapedTitle))
 	}
-	return json.Marshal(&LinkResolverResponse{
+	return marshalNoDur(&LinkResolverResponse{
 		Status:  resp.StatusCode,
 		Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", escapedTitle, clean(resp.Request.URL.String())),
 		Link:    resp.Request.URL.String(),
