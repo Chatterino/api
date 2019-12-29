@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"html"
 	"log"
-	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -45,11 +45,11 @@ func init() {
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(resp *http.Response) bool {
-			return strings.HasSuffix(resp.Request.URL.Host, "clips.twitch.tv")
+		check: func(url *url.URL) bool {
+			return strings.HasSuffix(url.Host, "clips.twitch.tv")
 		},
-		run: func(resp *http.Response) ([]byte, error) {
-			pathParts := strings.Split(strings.TrimPrefix(resp.Request.URL.Path, "/"), "/")
+		run: func(url *url.URL) ([]byte, error) {
+			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[0]
 
 			apiResponse := cache.Get(clipSlug)
@@ -59,17 +59,17 @@ func init() {
 
 	// Find clips that look like https://twitch.tv/StreamerName/clip/SlugHere
 	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(resp *http.Response) bool {
-			if !strings.HasSuffix(resp.Request.URL.Host, "twitch.tv") {
+		check: func(url *url.URL) bool {
+			if !strings.HasSuffix(url.Host, "twitch.tv") {
 				return false
 			}
 
-			pathParts := strings.Split(resp.Request.URL.Path, "/")
+			pathParts := strings.Split(url.Path, "/")
 
 			return len(pathParts) >= 4 && pathParts[2] == "clip"
 		},
-		run: func(resp *http.Response) ([]byte, error) {
-			pathParts := strings.Split(strings.TrimPrefix(resp.Request.URL.Path, "/"), "/")
+		run: func(url *url.URL) ([]byte, error) {
+			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[2]
 
 			apiResponse := cache.Get(clipSlug)

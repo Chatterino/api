@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -25,8 +26,8 @@ type LinkResolverResponse struct {
 }
 
 type customURLManager struct {
-	check func(resp *http.Response) bool
-	run   func(resp *http.Response) ([]byte, error)
+	check func(url *url.URL) bool
+	run   func(url *url.URL) ([]byte, error)
 }
 
 var (
@@ -47,8 +48,20 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func doRequest(url string) (interface{}, error, time.Duration) {
-	resp, err := makeRequest(url)
+func doRequest(urlString string) (interface{}, error, time.Duration) {
+	url, err := url.Parse(urlString)
+	if err != nil {
+		return rInvalidURL, nil, noSpecialDur
+	}
+
+	for _, m := range customURLManagers {
+		if m.check(url) {
+			data, err := m.run(url)
+			return data, err, noSpecialDur
+		}
+	}
+
+	resp, err := makeRequest(url.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
 			return rNoLinkInfoFound, nil, noSpecialDur
@@ -76,6 +89,7 @@ func doRequest(url string) (interface{}, error, time.Duration) {
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
+		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
 		return rNoLinkInfoFound, nil, noSpecialDur
 	}
 
@@ -89,12 +103,7 @@ func doRequest(url string) (interface{}, error, time.Duration) {
 		})
 	}
 
-	for _, m := range customURLManagers {
-		if m.check(resp) {
-			data, err := m.run(resp)
-			return data, err, noSpecialDur
-		}
-	}
+	fmt.Println("Normal link resolve on:", resp.Request.URL)
 
 	escapedTitle := doc.Find("title").First().Text()
 	if escapedTitle != "" {

@@ -77,11 +77,27 @@ func init() {
 	cache := newLoadingCache("youtube", load, 24*time.Hour)
 
 	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(resp *http.Response) bool {
-			return strings.HasSuffix(resp.Request.URL.Host, ".youtube.com")
+		check: func(url *url.URL) bool {
+			return strings.HasSuffix(url.Host, ".youtube.com")
 		},
-		run: func(resp *http.Response) ([]byte, error) {
-			videoID := getYoutubeVideoIDFromURL(resp.Request.URL)
+		run: func(url *url.URL) ([]byte, error) {
+			videoID := getYoutubeVideoIDFromURL(url)
+
+			if videoID == "" {
+				return rNoLinkInfoFound, nil
+			}
+
+			apiResponse := cache.Get(videoID)
+			return json.Marshal(apiResponse)
+		},
+	})
+
+	customURLManagers = append(customURLManagers, customURLManager{
+		check: func(url *url.URL) bool {
+			return url.Host == "youtu.be"
+		},
+		run: func(url *url.URL) ([]byte, error) {
+			videoID := getYoutubeVideoIDFromURL(url)
 
 			if videoID == "" {
 				return rNoLinkInfoFound, nil
