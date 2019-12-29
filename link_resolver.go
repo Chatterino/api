@@ -103,8 +103,6 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 		})
 	}
 
-	fmt.Println("Normal link resolve on:", resp.Request.URL)
-
 	escapedTitle := doc.Find("title").First().Text()
 	if escapedTitle != "" {
 		escapedTitle = fmt.Sprintf("<b>%s</b><hr>", clean(escapedTitle))
