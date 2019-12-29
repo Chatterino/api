@@ -15,7 +15,6 @@ const (
 )
 
 var (
-	firstRun   = true
 	httpClient = &http.Client{
 		Timeout: 15 * time.Second,
 	}
@@ -54,7 +53,6 @@ func main() {
 
 	handleHealth(router)
 
-	go refreshEmoteSetCache()
 	handleLinkResolver(router)
 
 	listen(*host, router)
