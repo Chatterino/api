@@ -1,11 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"html"
 	"log"
-	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -13,15 +13,19 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/api/googleapi/transport"
+	"google.golang.org/api/option"
 	youtube "google.golang.org/api/youtube/v3"
 )
 
 func getYoutubeVideoIDFromURL(url *url.URL) string {
-	if strings.Index(url.Path, "embed") == -1 {
-		return url.Query().Get("v")
+	if strings.Contains(url.Path, "embed") {
+		return path.Base(url.Path)
 	}
 
+	return url.Query().Get("v")
+}
+
+func getYoutubeVideoIDFromURL2(url *url.URL) string {
 	return path.Base(url.Path)
 }
 
@@ -32,11 +36,8 @@ func init() {
 		return
 	}
 
-	youtubeHTTPClient := &http.Client{
-		Transport: &transport.APIKey{Key: apiKey},
-	}
-
-	youtubeClient, err := youtube.New(youtubeHTTPClient)
+	ctx := context.Background()
+	youtubeClient, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
 		log.Println("Error initialization youtube api client:", err)
 		return
@@ -97,7 +98,7 @@ func init() {
 			return url.Host == "youtu.be"
 		},
 		run: func(url *url.URL) ([]byte, error) {
-			videoID := getYoutubeVideoIDFromURL(url)
+			videoID := getYoutubeVideoIDFromURL2(url)
 
 			if videoID == "" {
 				return rNoLinkInfoFound, nil
