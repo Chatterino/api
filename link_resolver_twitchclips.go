@@ -17,7 +17,6 @@ var noTwitchClipWithThisIDFound = &LinkResolverResponse{
 	Status:  404,
 	Message: "No Twitch Clip with this ID found",
 }
-var mNoTwitchClipWithThisIDFound = mustMarshal(noTwitchClipWithThisIDFound)
 
 func init() {
 	clientID, exists := os.LookupEnv("CHATTERINO_API_CACHE_TWITCH_CLIENT_ID")

@@ -89,6 +89,9 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 			Status:  v.Status,
 			Message: v.Error.Error(),
 		})
+		if err != nil {
+			log.Println("Error marshalling twitch emotes error response:", err)
+		}
 		_, err = w.Write(data)
 		if err != nil {
 			log.Println("Error writing response:", err)
