@@ -1,8 +1,8 @@
-[![CircleCI](https://circleci.com/gh/Chatterino/api.svg?style=svg)](https://circleci.com/gh/Chatterino/api)
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FChatterino%2Fapi%2Fbadge&style=flat)](https://actions-badge.atrox.dev/Chatterino/api/goto)
 
-# chatterino-api-cache
+# api
 
-simple go web service that serves as a cache to APIs that chatterino wants to use.
+Go web service that serves as a cache to APIs that each Chatterino client could use.
 
 Emote data is served cached from [twitchemotes.com](https://twitchemotes.com/).
 
@@ -15,6 +15,7 @@ returns information about a given twitch emote set. Example response:
     "channel_id": "22484632", // twitch user id
     "type": "sub",            // string describing what type of emote set this is (e.g. "sub")
     "custom": false           // indicates whether this is added/modified by us or straight passthrough from the twitchemotes api
+    "tier": 1,                // integer describing what tier the sub emote is part of
 }
 ```
 
