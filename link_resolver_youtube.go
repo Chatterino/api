@@ -79,7 +79,7 @@ func init() {
 
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(url *url.URL) bool {
-			return strings.HasSuffix(url.Host, ".youtube.com")
+			return strings.HasSuffix(url.Host, ".youtube.com") || url.Host == "youtube.com"
 		},
 		run: func(url *url.URL) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL(url)
