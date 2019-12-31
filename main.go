@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	maxRedirects     = 10
 	maxContentLength = 1024 * 1024 * 5 // 5MB
 )
 

@@ -57,7 +57,10 @@ func init() {
 
 func setsHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: Implement multiset-fetcher and in future version of Chatterino which sends a list of sets instead of one per request
-	w.Write([]byte("{\"error\": \"not implemented\"}"))
+	_, err := w.Write([]byte("{\"error\": \"not implemented\"}"))
+	if err != nil {
+		log.Println("Error writing response:", err)
+	}
 }
 
 func setHandler(w http.ResponseWriter, r *http.Request) {

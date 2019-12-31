@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -45,4 +46,9 @@ func insertCommas(str string, n int) string {
 		}
 	}
 	return buffer.String()
+}
+
+func marshalNoDur(i interface{}) ([]byte, error, time.Duration) {
+	data, err := json.Marshal(i)
+	return data, err, noSpecialDur
 }
