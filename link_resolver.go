@@ -81,10 +81,7 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 			return nil, err, noSpecialDur
 		}
 		if contentLengthBytes > maxContentLength {
-			return marshalNoDur(&LinkResolverResponse{
-				Status:  http.StatusInternalServerError,
-				Message: "too big",
-			})
+			return rResponseTooLarge, nil, noSpecialDur
 		}
 	}
 
