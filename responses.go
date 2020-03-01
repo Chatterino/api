@@ -18,7 +18,7 @@ func init() {
 	var err error
 	r := &LinkResolverResponse{
 		Status:  404,
-		Message: "No link info found",
+		Message: "Could not fetch link info: No link info found",
 	}
 
 	rNoLinkInfoFound, err = json.Marshal(r)
@@ -29,7 +29,7 @@ func init() {
 
 	r = &LinkResolverResponse{
 		Status:  500,
-		Message: "Invalid URL",
+		Message: "Could not fetch link info: Invalid URL",
 	}
 	rInvalidURL, err = json.Marshal(r)
 	if err != nil {
@@ -39,7 +39,7 @@ func init() {
 
 	r = &LinkResolverResponse{
 		Status:  http.StatusInternalServerError,
-		Message: fmt.Sprintf("Response too large (>%dMB)", maxContentLength/1024/1024),
+		Message: fmt.Sprintf("Could not fetch link info: Response too large (>%dMB)", maxContentLength/1024/1024),
 	}
 	rResponseTooLarge, err = json.Marshal(r)
 	if err != nil {
