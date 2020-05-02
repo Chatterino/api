@@ -18,6 +18,7 @@ type LinkResolverResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 
+	Embed   string `json:"embed,omitempty"`
 	Tooltip string `json:"tooltip,omitempty"`
 	Link    string `json:"link,omitempty"`
 
@@ -104,8 +105,10 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 	if escapedTitle != "" {
 		escapedTitle = fmt.Sprintf("<b>%s</b><hr>", clean(escapedTitle))
 	}
+
 	return marshalNoDur(&LinkResolverResponse{
 		Status:  resp.StatusCode,
+		Embed:   buildEmbed(resp, urlString),
 		Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", escapedTitle, clean(resp.Request.URL.String())),
 		Link:    resp.Request.URL.String(),
 	})
@@ -137,4 +140,12 @@ func init() {
 
 func handleLinkResolver(router *mux.Router) {
 	router.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
+}
+
+func buildEmbed(resp *http.Response, urlString string) string {
+	if strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
+		return fmt.Sprintf("<img src=\"%s\" alt=\"link-preview\">", urlString)
+	}
+
+	return ""
 }
