@@ -103,7 +103,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "youtube template error " + clean(err.Error()),
-			}, nil, 1 * time.Hour
+			}, nil, noSpecialDur
 		}
 
 		return &LinkResolverResponse{
