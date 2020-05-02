@@ -33,10 +33,6 @@ type customURLManager struct {
 	run   func(url *url.URL) ([]byte, error)
 }
 
-type requestOptions struct {
-	richTooltip bool
-}
-
 const tooltip = `<div style="text-align: left;">
 {{if .Title}}
 <b>{{.Title}}</b><hr>
