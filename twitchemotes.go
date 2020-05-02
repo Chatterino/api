@@ -77,7 +77,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 2. Cache a request from twitchemotes.com
-	response := twitchemotesCache.Get(setID)
+	response := twitchemotesCache.Get(setID, requestOptions{})
 
 	switch v := response.(type) {
 	case []byte:
@@ -102,7 +102,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func doTwitchemotesRequest(setID string) (interface{}, error, time.Duration) {
+func doTwitchemotesRequest(setID string, options requestOptions) (interface{}, error, time.Duration) {
 	url := fmt.Sprintf("https://api.twitchemotes.com/api/v4/sets?id=%s", setID)
 
 	req, err := http.NewRequest("GET", url, nil)

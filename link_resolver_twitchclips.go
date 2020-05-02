@@ -1,21 +1,38 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
-	"html"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/dankeroni/gotwitch"
 )
 
 var noTwitchClipWithThisIDFound = &LinkResolverResponse{
-	Status:  404,
+	Status:  http.StatusNotFound,
 	Message: "No Twitch Clip with this ID found",
+}
+
+const twitchClipsTooltip = `<div style="text-align: left;">
+{{if .ThumbnailSrc}}
+<img src="{{.ThumbnailSrc}}"><br>
+{{end}}
+<b>{{.Title}}</b><hr>
+<b>Channel:</b> {{.ChannelName}}<br>
+<b>Views: </b> {{.Views}}</div>`
+
+type twitchClipsTooltipData struct {
+	Title        string
+	ChannelName  string
+	Views        string
+	ThumbnailSrc string
 }
 
 func init() {
@@ -27,16 +44,40 @@ func init() {
 
 	v5API := gotwitch.NewV5(clientID)
 
-	load := func(clipSlug string) (interface{}, error, time.Duration) {
+	tooltipTemplate, err := template.New("twitchclipsTooltip").Parse(twitchClipsTooltip)
+	if err != nil {
+		log.Println("Error initialization twitchclips tooltip template:", err)
+		return
+	}
+
+	load := func(clipSlug string, options requestOptions) (interface{}, error, time.Duration) {
 		log.Println("[TwitchClip] GET", clipSlug)
 		clip, _, err := v5API.GetClip(clipSlug)
 		if err != nil {
 			return noTwitchClipWithThisIDFound, nil, noSpecialDur
 		}
 
+		data := twitchClipsTooltipData{
+			Title:       clip.Title,
+			ChannelName: clip.Broadcaster.DisplayName,
+			Views:       insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3),
+		}
+
+		if options.richTooltip {
+			data.ThumbnailSrc = clip.Thumbnails.Medium
+		}
+
+		var tooltip bytes.Buffer
+		if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
+			return &LinkResolverResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "youtube template error " + clean(err.Error()),
+			}, nil, noSpecialDur
+		}
+
 		return &LinkResolverResponse{
 			Status:  200,
-			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(clip.Title) + "</b><hr><b>Channel:</b> " + html.EscapeString(clip.Broadcaster.DisplayName) + "<br><b>Views:</b> " + insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3) + "</div>",
+			Tooltip: tooltip.String(),
 		}, nil, noSpecialDur
 	}
 
@@ -47,11 +88,11 @@ func init() {
 		check: func(url *url.URL) bool {
 			return strings.HasSuffix(url.Host, "clips.twitch.tv")
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		run: func(url *url.URL, options requestOptions) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[0]
 
-			apiResponse := cache.Get(clipSlug)
+			apiResponse := cache.Get(clipSlug, options)
 			return json.Marshal(apiResponse)
 		},
 	})
@@ -67,11 +108,11 @@ func init() {
 
 			return len(pathParts) >= 4 && pathParts[2] == "clip"
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		run: func(url *url.URL, options requestOptions) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[2]
 
-			apiResponse := cache.Get(clipSlug)
+			apiResponse := cache.Get(clipSlug, options)
 			return json.Marshal(apiResponse)
 		},
 	})

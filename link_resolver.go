@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -18,7 +20,6 @@ type LinkResolverResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 
-	Embed   string `json:"embed,omitempty"`
 	Tooltip string `json:"tooltip,omitempty"`
 	Link    string `json:"link,omitempty"`
 
@@ -28,7 +29,26 @@ type LinkResolverResponse struct {
 
 type customURLManager struct {
 	check func(url *url.URL) bool
-	run   func(url *url.URL) ([]byte, error)
+	run   func(url *url.URL, options requestOptions) ([]byte, error)
+}
+
+type requestOptions struct {
+	richTooltip bool
+}
+
+const tooltip = `<div style="text-align: left;">
+{{if .ImageSrc}}
+<img src="{{.ImageSrc}}"><br>
+{{end}}
+{{if .Title}}
+<b>{{.Title}}</b><hr>
+{{end}}
+<b>URL:</b> {{.URL}}</div>`
+
+type tooltipData struct {
+	URL      string
+	Title    string
+	ImageSrc string
 }
 
 var (
@@ -49,7 +69,7 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func doRequest(urlString string) (interface{}, error, time.Duration) {
+func doRequest(urlString string, options requestOptions) (interface{}, error, time.Duration) {
 	url, err := url.Parse(urlString)
 	if err != nil {
 		return rInvalidURL, nil, noSpecialDur
@@ -57,7 +77,7 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 
 	for _, m := range customURLManagers {
 		if m.check(url) {
-			data, err := m.run(url)
+			data, err := m.run(url, options)
 			return data, err, noSpecialDur
 		}
 	}
@@ -101,15 +121,35 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 		})
 	}
 
-	escapedTitle := doc.Find("title").First().Text()
-	if escapedTitle != "" {
-		escapedTitle = fmt.Sprintf("<b>%s</b><hr>", clean(escapedTitle))
+	tooltipTemplate, err := template.New("tooltip").Parse(tooltip)
+	if err != nil {
+		log.Println("Error initialization tooltip template:", err)
+		return marshalNoDur(&LinkResolverResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "template error " + clean(err.Error()),
+		})
+	}
+
+	data := tooltipData{
+		URL:   resp.Request.URL.String(),
+		Title: doc.Find("title").First().Text(),
+	}
+
+	if options.richTooltip && strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
+		data.ImageSrc = resp.Request.URL.String()
+	}
+
+	var tooltip bytes.Buffer
+	if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
+		return marshalNoDur(&LinkResolverResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "template error " + clean(err.Error()),
+		})
 	}
 
 	return marshalNoDur(&LinkResolverResponse{
 		Status:  resp.StatusCode,
-		Embed:   buildEmbed(resp, urlString),
-		Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", escapedTitle, clean(resp.Request.URL.String())),
+		Tooltip: tooltip.String(),
 		Link:    resp.Request.URL.String(),
 	})
 }
@@ -124,7 +164,9 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := linkResolverCache.Get(url)
+	_, rich := r.URL.Query()["rich"]
+
+	response := linkResolverCache.Get(url, requestOptions{richTooltip: rich})
 
 	_, err = w.Write(response.([]byte))
 	if err != nil {
@@ -140,12 +182,4 @@ func init() {
 
 func handleLinkResolver(router *mux.Router) {
 	router.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
-}
-
-func buildEmbed(resp *http.Response, urlString string) string {
-	if strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
-		return fmt.Sprintf("<img src=\"%s\" alt=\"link-preview\">", urlString)
-	}
-
-	return ""
 }

@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type loader func(key string) (interface{}, error, time.Duration)
+type loader func(key string, options requestOptions) (interface{}, error, time.Duration)
 
 var noSpecialDur time.Duration
 
@@ -21,8 +21,8 @@ type loadingCache struct {
 	prefix string
 }
 
-func (c *loadingCache) load(key string) {
-	value, err, overrideDuration := c.loader(key)
+func (c *loadingCache) load(key string, options requestOptions) {
+	value, err, overrideDuration := c.loader(key, options)
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {
@@ -46,9 +46,9 @@ func (c *loadingCache) load(key string) {
 	c.requestsMutex.Unlock()
 }
 
-func (c *loadingCache) Get(key string) (value interface{}) {
+func (c *loadingCache) Get(key string, options requestOptions) (value interface{}) {
 	var found bool
-	cacheKey := c.prefix + ":" + key
+	cacheKey := c.prefix + ":" + key + fmt.Sprintf("%v", options)
 
 	// If key is in cache, return value
 	if value, found = kvCache.Get(cacheKey); found {
@@ -66,7 +66,7 @@ func (c *loadingCache) Get(key string) (value interface{}) {
 	c.requestsMutex.Unlock()
 
 	if first {
-		go c.load(key)
+		go c.load(key, options)
 	}
 
 	value = <-responseChannel
