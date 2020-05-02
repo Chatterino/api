@@ -1,21 +1,41 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
-	"html"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"google.golang.org/api/option"
 	youtube "google.golang.org/api/youtube/v3"
 )
+
+const youtubeTooltip = `<div style="text-align: left;">
+<b>{{.Title}}</b>
+<br><b>Channel:</b> {{.ChannelTitle}}
+<br><b>Duration:</b> {{.Duration}}
+<br><b>Views:</b> {{.Views}}
+<br><span style="color: #2ecc71;">{{.LikeCount}} likes</span>&nbsp;•&nbsp;<span style="color: #e74c3c;">{{.DislikeCount}} dislikes</span>
+</div>
+`
+
+type youtubeTooltipData struct {
+	Title        string
+	ChannelTitle string
+	Duration     string
+	Views        string
+	LikeCount    string
+	DislikeCount string
+}
 
 func getYoutubeVideoIDFromURL(url *url.URL) string {
 	if strings.Contains(url.Path, "embed") {
@@ -43,7 +63,13 @@ func init() {
 		return
 	}
 
-	load := func(videoID string) (interface{}, error, time.Duration) {
+	tooltipTemplate, err := template.New("youtubeTooltip").Parse(youtubeTooltip)
+	if err != nil {
+		log.Println("Error initialization youtube tooltip template:", err)
+		return
+	}
+
+	load := func(videoID string, r *http.Request) (interface{}, error, time.Duration) {
 		log.Println("[YouTube] GET", videoID)
 		youtubeResponse, err := youtubeClient.Videos.List("statistics,snippet,contentDetails").Id(videoID).Do()
 		if err != nil {
@@ -63,15 +89,32 @@ func init() {
 			return &LinkResolverResponse{Status: 500, Message: "video unavailable"}, nil, noSpecialDur
 		}
 
+		data := youtubeTooltipData{
+			Title:        video.Snippet.Title,
+			ChannelTitle: video.Snippet.ChannelTitle,
+			Duration:     formatDuration(video.ContentDetails.Duration),
+			Views:        insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3),
+			LikeCount:    insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3),
+			DislikeCount: insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3),
+		}
+
+		var tooltip bytes.Buffer
+		if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
+			return &LinkResolverResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "youtube template error " + clean(err.Error()),
+			}, nil, noSpecialDur
+		}
+
+		thumbnail := video.Snippet.Thumbnails.Default.Url
+		if video.Snippet.Thumbnails.Standard != nil {
+			thumbnail = video.Snippet.Thumbnails.Standard.Url
+		}
+
 		return &LinkResolverResponse{
-			Status: 200,
-			Tooltip: "<div style=\"text-align: left;\"><b>" + html.EscapeString(video.Snippet.Title) +
-				"</b><br><b>Channel:</b> " + html.EscapeString(video.Snippet.ChannelTitle) +
-				"<br><b>Duration:</b> " + html.EscapeString(formatDuration(video.ContentDetails.Duration)) +
-				"<br><b>Views:</b> " + insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3) +
-				"<br><span style=\"color: #2ecc71;\">" + insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3) +
-				" likes</span> • <span style=\"color: #e74c3c;\">" + insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3) +
-				" dislikes</span></div>",
+			Status:    http.StatusOK,
+			Tooltip:   tooltip.String(),
+			Thumbnail: thumbnail,
 		}, nil, noSpecialDur
 	}
 
@@ -88,7 +131,7 @@ func init() {
 				return rNoLinkInfoFound, nil
 			}
 
-			apiResponse := cache.Get(videoID)
+			apiResponse := cache.Get(videoID, nil)
 			return json.Marshal(apiResponse)
 		},
 	})
@@ -104,7 +147,7 @@ func init() {
 				return rNoLinkInfoFound, nil
 			}
 
-			apiResponse := cache.Get(videoID)
+			apiResponse := cache.Get(videoID, nil)
 			return json.Marshal(apiResponse)
 		},
 	})

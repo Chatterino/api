@@ -1,6 +1,8 @@
 package main
 
-import "html"
+import (
+	"html"
+)
 
 func clean(in string) string {
 	if len(in) > 500 {

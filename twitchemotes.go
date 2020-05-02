@@ -77,7 +77,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 2. Cache a request from twitchemotes.com
-	response := twitchemotesCache.Get(setID)
+	response := twitchemotesCache.Get(setID, nil)
 
 	switch v := response.(type) {
 	case []byte:
@@ -102,7 +102,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func doTwitchemotesRequest(setID string) (interface{}, error, time.Duration) {
+func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, time.Duration) {
 	url := fmt.Sprintf("https://api.twitchemotes.com/api/v4/sets?id=%s", setID)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -149,9 +149,6 @@ func doTwitchemotesRequest(setID string) (interface{}, error, time.Duration) {
 	if len(emoteSets) > 1 {
 		log.Println("Unhandled long emote set for emote set", setID)
 	}
-
-	r := &emoteSets[0]
-	r.Type = "sub"
 
 	return marshalNoDur(&emoteSets[0])
 }

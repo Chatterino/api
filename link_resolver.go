@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -18,8 +20,9 @@ type LinkResolverResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 
-	Tooltip string `json:"tooltip,omitempty"`
-	Link    string `json:"link,omitempty"`
+	Thumbnail string `json:"thumbnail,omitempty"`
+	Tooltip   string `json:"tooltip,omitempty"`
+	Link      string `json:"link,omitempty"`
 
 	// Flag in the BTTV API to.. maybe signify that the link will download something? idk
 	// Download *bool  `json:"download,omitempty"`
@@ -28,6 +31,18 @@ type LinkResolverResponse struct {
 type customURLManager struct {
 	check func(url *url.URL) bool
 	run   func(url *url.URL) ([]byte, error)
+}
+
+const tooltip = `<div style="text-align: left;">
+{{if .Title}}
+<b>{{.Title}}</b><hr>
+{{end}}
+<b>URL:</b> {{.URL}}</div>`
+
+type tooltipData struct {
+	URL      string
+	Title    string
+	ImageSrc string
 }
 
 var (
@@ -48,20 +63,20 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func doRequest(urlString string) (interface{}, error, time.Duration) {
-	url, err := url.Parse(urlString)
+func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+	requestUrl, err := url.Parse(urlString)
 	if err != nil {
 		return rInvalidURL, nil, noSpecialDur
 	}
 
 	for _, m := range customURLManagers {
-		if m.check(url) {
-			data, err := m.run(url)
+		if m.check(requestUrl) {
+			data, err := m.run(requestUrl)
 			return data, err, noSpecialDur
 		}
 	}
 
-	resp, err := makeRequest(url.String())
+	resp, err := makeRequest(requestUrl.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
 			return rNoLinkInfoFound, nil, noSpecialDur
@@ -100,15 +115,43 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 		})
 	}
 
-	escapedTitle := doc.Find("title").First().Text()
-	if escapedTitle != "" {
-		escapedTitle = fmt.Sprintf("<b>%s</b><hr>", clean(escapedTitle))
+	tooltipTemplate, err := template.New("tooltip").Parse(tooltip)
+	if err != nil {
+		log.Println("Error initialization tooltip template:", err)
+		return marshalNoDur(&LinkResolverResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "template error " + clean(err.Error()),
+		})
 	}
-	return marshalNoDur(&LinkResolverResponse{
+
+	data := tooltipData{
+		URL:   clean(resp.Request.URL.String()),
+		Title: doc.Find("title").First().Text(),
+	}
+
+	var tooltip bytes.Buffer
+	if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
+		return marshalNoDur(&LinkResolverResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "template error " + clean(err.Error()),
+		})
+	}
+
+	response := &LinkResolverResponse{
 		Status:  resp.StatusCode,
-		Tooltip: fmt.Sprintf("<div style=\"text-align: left;\">%s<b>URL:</b> %s</div>", escapedTitle, clean(resp.Request.URL.String())),
+		Tooltip: tooltip.String(),
 		Link:    resp.Request.URL.String(),
-	})
+	}
+
+	if isSupportedThumbnail(resp.Header.Get("content-type")) {
+		scheme := "https://"
+		if r.TLS == nil {
+			scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
+		}
+		response.Thumbnail = fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(resp.Request.URL.String()))
+	}
+
+	return marshalNoDur(response)
 }
 
 func linkResolver(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +164,7 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := linkResolverCache.Get(url)
+	response := linkResolverCache.Get(url, r)
 
 	_, err = w.Write(response.([]byte))
 	if err != nil {
@@ -132,7 +175,7 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 var linkResolverCache *loadingCache
 
 func init() {
-	linkResolverCache = newLoadingCache("url", doRequest, 10*time.Minute)
+	linkResolverCache = newLoadingCache("linkResolver", doRequest, 10*time.Minute)
 }
 
 func handleLinkResolver(router *mux.Router) {
