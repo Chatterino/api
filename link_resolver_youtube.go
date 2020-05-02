@@ -20,9 +20,6 @@ import (
 )
 
 const youtubeTooltip = `<div style="text-align: left;">
-{{if .ThumbnailSrc}}
-<img src="{{.ThumbnailSrc}}"><br>
-{{end}}
 <b>{{.Title}}</b>
 <br><b>Channel:</b> {{.ChannelTitle}}
 <br><b>Duration:</b> {{.Duration}}
@@ -38,7 +35,6 @@ type youtubeTooltipData struct {
 	Views        string
 	LikeCount    string
 	DislikeCount string
-	ThumbnailSrc string
 }
 
 func getYoutubeVideoIDFromURL(url *url.URL) string {
@@ -73,7 +69,7 @@ func init() {
 		return
 	}
 
-	load := func(videoID string, options requestOptions) (interface{}, error, time.Duration) {
+	load := func(videoID string) (interface{}, error, time.Duration) {
 		log.Println("[YouTube] GET", videoID)
 		youtubeResponse, err := youtubeClient.Videos.List("statistics,snippet,contentDetails").Id(videoID).Do()
 		if err != nil {
@@ -102,10 +98,6 @@ func init() {
 			DislikeCount: insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3),
 		}
 
-		if options.richTooltip {
-			data.ThumbnailSrc = "tooltipSrc"
-		}
-
 		var tooltip bytes.Buffer
 		if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
 			return &LinkResolverResponse{
@@ -115,8 +107,9 @@ func init() {
 		}
 
 		return &LinkResolverResponse{
-			Status:  http.StatusOK,
-			Tooltip: tooltip.String(),
+			Status:    http.StatusOK,
+			Tooltip:   tooltip.String(),
+			Thumbnail: video.Snippet.Thumbnails.Default.Url,
 		}, nil, noSpecialDur
 	}
 
@@ -126,14 +119,14 @@ func init() {
 		check: func(url *url.URL) bool {
 			return strings.HasSuffix(url.Host, ".youtube.com") || url.Host == "youtube.com"
 		},
-		run: func(url *url.URL, options requestOptions) ([]byte, error) {
+		run: func(url *url.URL) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL(url)
 
 			if videoID == "" {
 				return rNoLinkInfoFound, nil
 			}
 
-			apiResponse := cache.Get(videoID, options)
+			apiResponse := cache.Get(videoID)
 			return json.Marshal(apiResponse)
 		},
 	})
@@ -142,14 +135,14 @@ func init() {
 		check: func(url *url.URL) bool {
 			return url.Host == "youtu.be"
 		},
-		run: func(url *url.URL, options requestOptions) ([]byte, error) {
+		run: func(url *url.URL) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL2(url)
 
 			if videoID == "" {
 				return rNoLinkInfoFound, nil
 			}
 
-			apiResponse := cache.Get(videoID, options)
+			apiResponse := cache.Get(videoID)
 			return json.Marshal(apiResponse)
 		},
 	})

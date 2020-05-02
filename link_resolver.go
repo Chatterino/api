@@ -20,8 +20,9 @@ type LinkResolverResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 
-	Tooltip string `json:"tooltip,omitempty"`
-	Link    string `json:"link,omitempty"`
+	Thumbnail string `json:"thumbnail"`
+	Tooltip   string `json:"tooltip,omitempty"`
+	Link      string `json:"link,omitempty"`
 
 	// Flag in the BTTV API to.. maybe signify that the link will download something? idk
 	// Download *bool  `json:"download,omitempty"`
@@ -29,7 +30,7 @@ type LinkResolverResponse struct {
 
 type customURLManager struct {
 	check func(url *url.URL) bool
-	run   func(url *url.URL, options requestOptions) ([]byte, error)
+	run   func(url *url.URL) ([]byte, error)
 }
 
 type requestOptions struct {
@@ -37,9 +38,6 @@ type requestOptions struct {
 }
 
 const tooltip = `<div style="text-align: left;">
-{{if .ImageSrc}}
-<img src="{{.ImageSrc}}"><br>
-{{end}}
 {{if .Title}}
 <b>{{.Title}}</b><hr>
 {{end}}
@@ -69,7 +67,7 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func doRequest(urlString string, options requestOptions) (interface{}, error, time.Duration) {
+func doRequest(urlString string) (interface{}, error, time.Duration) {
 	url, err := url.Parse(urlString)
 	if err != nil {
 		return rInvalidURL, nil, noSpecialDur
@@ -77,7 +75,7 @@ func doRequest(urlString string, options requestOptions) (interface{}, error, ti
 
 	for _, m := range customURLManagers {
 		if m.check(url) {
-			data, err := m.run(url, options)
+			data, err := m.run(url)
 			return data, err, noSpecialDur
 		}
 	}
@@ -135,10 +133,6 @@ func doRequest(urlString string, options requestOptions) (interface{}, error, ti
 		Title: doc.Find("title").First().Text(),
 	}
 
-	if options.richTooltip && strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
-		data.ImageSrc = resp.Request.URL.String()
-	}
-
 	var tooltip bytes.Buffer
 	if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
 		return marshalNoDur(&LinkResolverResponse{
@@ -147,11 +141,17 @@ func doRequest(urlString string, options requestOptions) (interface{}, error, ti
 		})
 	}
 
-	return marshalNoDur(&LinkResolverResponse{
+	response := &LinkResolverResponse{
 		Status:  resp.StatusCode,
 		Tooltip: tooltip.String(),
 		Link:    resp.Request.URL.String(),
-	})
+	}
+
+	if strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
+		response.Thumbnail = resp.Request.URL.String()
+	}
+
+	return marshalNoDur(response)
 }
 
 func linkResolver(w http.ResponseWriter, r *http.Request) {
@@ -164,9 +164,7 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, rich := r.URL.Query()["rich"]
-
-	response := linkResolverCache.Get(url, requestOptions{richTooltip: rich})
+	response := linkResolverCache.Get(url)
 
 	_, err = w.Write(response.([]byte))
 	if err != nil {
