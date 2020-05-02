@@ -131,7 +131,7 @@ func doRequest(urlString string, options requestOptions) (interface{}, error, ti
 	}
 
 	data := tooltipData{
-		URL:   resp.Request.URL.String(),
+		URL:   clean(resp.Request.URL.String()),
 		Title: doc.Find("title").First().Text(),
 	}
 
