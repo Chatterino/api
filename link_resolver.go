@@ -20,7 +20,7 @@ type LinkResolverResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 
-	Thumbnail string `json:"thumbnail"`
+	Thumbnail string `json:"thumbnail,omitempty"`
 	Tooltip   string `json:"tooltip,omitempty"`
 	Link      string `json:"link,omitempty"`
 
