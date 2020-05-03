@@ -26,7 +26,6 @@ func (c *loadingCache) load(key string) {
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {
-		fmt.Println("Overriding duration")
 		dur = overrideDuration
 	}
 

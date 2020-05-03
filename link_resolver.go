@@ -143,8 +143,8 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 		Link:    resp.Request.URL.String(),
 	}
 
-	if strings.HasPrefix(resp.Header.Get("content-type"), "image/") {
-		response.Thumbnail = resp.Request.URL.String()
+	if isSupportedThumbnail(resp.Header.Get("content-type")) {
+		response.Thumbnail = buildThumbnail(resp)
 	}
 
 	return marshalNoDur(response)
@@ -176,4 +176,8 @@ func init() {
 
 func handleLinkResolver(router *mux.Router) {
 	router.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
+}
+
+func buildThumbnail(resp *http.Response) string {
+	return fmt.Sprintf("/thumbnail/%s", url.QueryEscape(resp.Request.URL.String()))
 }

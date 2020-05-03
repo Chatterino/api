@@ -54,5 +54,7 @@ func main() {
 
 	handleLinkResolver(router)
 
+	handleThumbnail(router)
+
 	listen(*host, router)
 }
