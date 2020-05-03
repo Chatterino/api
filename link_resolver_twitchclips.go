@@ -46,7 +46,7 @@ func init() {
 		return
 	}
 
-	load := func(clipSlug string) (interface{}, error, time.Duration) {
+	load := func(clipSlug string, r *http.Request) (interface{}, error, time.Duration) {
 		log.Println("[TwitchClip] GET", clipSlug)
 		clip, _, err := v5API.GetClip(clipSlug)
 		if err != nil {
@@ -85,7 +85,7 @@ func init() {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[0]
 
-			apiResponse := cache.Get(clipSlug)
+			apiResponse := cache.Get(clipSlug, nil)
 			return json.Marshal(apiResponse)
 		},
 	})
@@ -105,7 +105,7 @@ func init() {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[2]
 
-			apiResponse := cache.Get(clipSlug)
+			apiResponse := cache.Get(clipSlug, nil)
 			return json.Marshal(apiResponse)
 		},
 	})

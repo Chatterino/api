@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"sync"
 	"time"
 )
 
-type loader func(key string) (interface{}, error, time.Duration)
+type loader func(key string, r *http.Request) (interface{}, error, time.Duration)
 
 var noSpecialDur time.Duration
 
@@ -21,8 +22,8 @@ type loadingCache struct {
 	prefix string
 }
 
-func (c *loadingCache) load(key string) {
-	value, err, overrideDuration := c.loader(key)
+func (c *loadingCache) load(key string, r *http.Request) {
+	value, err, overrideDuration := c.loader(key, r)
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {
@@ -45,7 +46,7 @@ func (c *loadingCache) load(key string) {
 	c.requestsMutex.Unlock()
 }
 
-func (c *loadingCache) Get(key string) (value interface{}) {
+func (c *loadingCache) Get(key string, r *http.Request) (value interface{}) {
 	var found bool
 	cacheKey := c.prefix + ":" + key
 
@@ -65,7 +66,7 @@ func (c *loadingCache) Get(key string) (value interface{}) {
 	c.requestsMutex.Unlock()
 
 	if first {
-		go c.load(key)
+		go c.load(key, r)
 	}
 
 	value = <-responseChannel
@@ -77,6 +78,7 @@ func (c *loadingCache) Get(key string) (value interface{}) {
 
 func newLoadingCache(prefix string, loader loader, cacheDuration time.Duration) *loadingCache {
 	return &loadingCache{
+		prefix:        prefix,
 		loader:        loader,
 		requests:      make(map[string][]chan interface{}),
 		cacheDuration: cacheDuration,

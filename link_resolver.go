@@ -63,20 +63,20 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func doRequest(urlString string) (interface{}, error, time.Duration) {
-	url, err := url.Parse(urlString)
+func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+	requestUrl, err := url.Parse(urlString)
 	if err != nil {
 		return rInvalidURL, nil, noSpecialDur
 	}
 
 	for _, m := range customURLManagers {
-		if m.check(url) {
-			data, err := m.run(url)
+		if m.check(requestUrl) {
+			data, err := m.run(requestUrl)
 			return data, err, noSpecialDur
 		}
 	}
 
-	resp, err := makeRequest(url.String())
+	resp, err := makeRequest(requestUrl.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
 			return rNoLinkInfoFound, nil, noSpecialDur
@@ -144,7 +144,11 @@ func doRequest(urlString string) (interface{}, error, time.Duration) {
 	}
 
 	if isSupportedThumbnail(resp.Header.Get("content-type")) {
-		response.Thumbnail = buildThumbnail(resp)
+		scheme := "https://"
+		if r.TLS == nil {
+			scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
+		}
+		response.Thumbnail = fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(resp.Request.URL.String()))
 	}
 
 	return marshalNoDur(response)
@@ -160,7 +164,7 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := linkResolverCache.Get(url)
+	response := linkResolverCache.Get(url, r)
 
 	_, err = w.Write(response.([]byte))
 	if err != nil {
@@ -171,13 +175,9 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 var linkResolverCache *loadingCache
 
 func init() {
-	linkResolverCache = newLoadingCache("url", doRequest, 10*time.Minute)
+	linkResolverCache = newLoadingCache("linkResolver", doRequest, 10*time.Minute)
 }
 
 func handleLinkResolver(router *mux.Router) {
 	router.HandleFunc("/link_resolver/{url:.*}", linkResolver).Methods("GET")
-}
-
-func buildThumbnail(resp *http.Response) string {
-	return fmt.Sprintf("/thumbnail/%s", url.QueryEscape(resp.Request.URL.String()))
 }

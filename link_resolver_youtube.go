@@ -69,7 +69,7 @@ func init() {
 		return
 	}
 
-	load := func(videoID string) (interface{}, error, time.Duration) {
+	load := func(videoID string, r *http.Request) (interface{}, error, time.Duration) {
 		log.Println("[YouTube] GET", videoID)
 		youtubeResponse, err := youtubeClient.Videos.List("statistics,snippet,contentDetails").Id(videoID).Do()
 		if err != nil {
@@ -109,7 +109,7 @@ func init() {
 		return &LinkResolverResponse{
 			Status:    http.StatusOK,
 			Tooltip:   tooltip.String(),
-			Thumbnail: video.Snippet.Thumbnails.Default.Url,
+			Thumbnail: video.Snippet.Thumbnails.Standard.Url,
 		}, nil, noSpecialDur
 	}
 
@@ -126,7 +126,7 @@ func init() {
 				return rNoLinkInfoFound, nil
 			}
 
-			apiResponse := cache.Get(videoID)
+			apiResponse := cache.Get(videoID, nil)
 			return json.Marshal(apiResponse)
 		},
 	})
@@ -142,7 +142,7 @@ func init() {
 				return rNoLinkInfoFound, nil
 			}
 
-			apiResponse := cache.Get(videoID)
+			apiResponse := cache.Get(videoID, nil)
 			return json.Marshal(apiResponse)
 		},
 	})

@@ -29,7 +29,7 @@ const (
 	maxThumbnailSize = 300
 )
 
-func doThumbnailRequest(urlString string) (interface{}, error, time.Duration) {
+func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
 	url, err := url.Parse(urlString)
 	if err != nil {
 		return rInvalidURL, nil, noSpecialDur
@@ -97,7 +97,7 @@ func thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := thumbnailCache.Get(url)
+	response := thumbnailCache.Get(url, r)
 
 	_, err = w.Write(response.([]byte))
 	if err != nil {
