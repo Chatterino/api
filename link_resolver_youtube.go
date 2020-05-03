@@ -106,10 +106,15 @@ func init() {
 			}, nil, noSpecialDur
 		}
 
+		thumbnail := video.Snippet.Thumbnails.Default.Url
+		if video.Snippet.Thumbnails.Standard != nil {
+			thumbnail = video.Snippet.Thumbnails.Standard.Url
+		}
+
 		return &LinkResolverResponse{
 			Status:    http.StatusOK,
 			Tooltip:   tooltip.String(),
-			Thumbnail: video.Snippet.Thumbnails.Standard.Url,
+			Thumbnail: thumbnail,
 		}, nil, noSpecialDur
 	}
 
