@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"image"
 	"image/gif"
-	_ "image/gif"
 	"image/jpeg"
-	_ "image/jpeg"
 	"image/png"
-	_ "image/png"
 	"log"
 	"net/http"
 	"net/url"
@@ -26,6 +23,7 @@ var (
 )
 
 const (
+	// max width or height the thumbnail will be resized to
 	maxThumbnailSize = 300
 )
 
