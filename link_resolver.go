@@ -148,7 +148,7 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 		if r.TLS == nil {
 			scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
 		}
-		response.Thumbnail = fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(resp.Request.URL.String()))
+		response.Thumbnail = fmt.Sprintf("%s%s/%sthumbnail/%s", scheme, r.Host, strings.TrimPrefix(*prefix, "/"), url.QueryEscape(resp.Request.URL.String()))
 	}
 
 	return marshalNoDur(response)
