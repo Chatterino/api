@@ -22,7 +22,7 @@ var (
 )
 
 var bind = flag.String("l", ":1234", "bind address")
-var baseURL = flag.String("b", "", "base url (useful if being proxied through nginx or some shit). value needs to be full url up to the application (e.g. https://braize.pajlada.com/chatterino/)")
+var baseURL = flag.String("b", "", "base url (useful if being proxied through nginx or some shit). value needs to be full url up to the application (e.g. https://braize.pajlada.com/chatterino)")
 
 var prefix string
 
