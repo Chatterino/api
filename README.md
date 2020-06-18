@@ -1,6 +1,6 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FChatterino%2Fapi%2Fbadge&style=flat)](https://actions-badge.atrox.dev/Chatterino/api/goto)
 
-# api
+# API
 
 Go web service that serves as a cache to APIs that each Chatterino client could use.
 
