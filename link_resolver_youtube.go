@@ -23,6 +23,7 @@ const youtubeTooltip = `<div style="text-align: left;">
 <b>{{.Title}}</b>
 <br><b>Channel:</b> {{.ChannelTitle}}
 <br><b>Duration:</b> {{.Duration}}
+<br><b>Published:</b> {{.PublishDate}}
 <br><b>Views:</b> {{.Views}}
 <br><span style="color: #2ecc71;">{{.LikeCount}} likes</span>&nbsp;•&nbsp;<span style="color: #e74c3c;">{{.DislikeCount}} dislikes</span>
 </div>
@@ -32,6 +33,7 @@ type youtubeTooltipData struct {
 	Title        string
 	ChannelTitle string
 	Duration     string
+	PublishDate  string
 	Views        string
 	LikeCount    string
 	DislikeCount string
@@ -93,6 +95,7 @@ func init() {
 			Title:        video.Snippet.Title,
 			ChannelTitle: video.Snippet.ChannelTitle,
 			Duration:     formatDuration(video.ContentDetails.Duration),
+			PublishDate:  formatDate("02 Jan 2006", video.Snippet.PublishedAt),
 			Views:        insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3),
 			LikeCount:    insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3),
 			DislikeCount: insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3),
