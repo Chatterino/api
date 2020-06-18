@@ -7,20 +7,20 @@ Go web service that serves as a cache to APIs that each Chatterino client could 
 Emote data is served cached from [twitchemotes.com](https://twitchemotes.com/).
 
 ## Routes
-`/twitchemotes/set/:setID`  
-returns information about a given twitch emote set. Example response:
+`/twitchemotes/set/:setID/`  
+Returns information about a given twitch emote set. Example response:
 ```
 {
     "channel_name": "forsen", // twitch user name
     "channel_id": "22484632", // twitch user id
     "type": "sub",            // string describing what type of emote set this is (e.g. "sub")
-    "custom": false           // indicates whether this is added/modified by us or straight passthrough from the twitchemotes api
+    "custom": false           // indicates whether this is added/modified by us or straight passthrough from the twitchemotes API
     "tier": 1,                // integer describing what tier the sub emote is part of
 }
 ```
 
 `link_resolver/:url`  
-resolve a url into a preview tooltip. Example response:
+Resolves a url into a preview tooltip. Example response:
 ```
 {
     "status": 200,                     // status code returned from the page
@@ -31,15 +31,24 @@ resolve a url into a preview tooltip. Example response:
 ```
 
 `health/uptime`  
-to be filled in
+Returns API service's uptime. Example response:
+```
+928h2m53.795354922s
+```
 
 `health/memory`  
-to be filled in
+Returns information about memory usage. Example response:
+```
+Alloc=505 MiB, TotalAlloc=17418866 MiB, Sys=3070 MiB, NumGC=111245
+```
 
 `health/combined`  
-to be filled in
+Returns both uptime and information about memory usage. Example response:
+```
+Uptime: 928h5m7.937821282s - Memory: Alloc=510 MiB, TotalAlloc=17419213 MiB, Sys=3070 MiB, NumGC=111246
+```
 
 ## Using your self-hosted version
-If you host your own version of this api, you can modify which url Chatterino2 uses to resolve links and to resolve twitch emote sets.  
+If you host your own version of this API, you can modify which url Chatterino2 uses to resolve links and to resolve twitch emote sets.  
 [Change link resolver](https://github.com/Chatterino/chatterino2/blob/master/docs/ENV.md#chatterino2_link_resolver_url)  
 [Change twitch emote resolver](https://github.com/Chatterino/chatterino2/blob/master/docs/ENV.md#chatterino2_twitch_emote_set_resolver_url)  
