@@ -57,6 +57,7 @@ func init() {
 
 func setsHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: Implement multiset-fetcher and in future version of Chatterino which sends a list of sets instead of one per request
+	w.Header().Set("Content-Type", "application/json")
 	_, err := w.Write([]byte("{\"error\": \"not implemented\"}"))
 	if err != nil {
 		log.Println("Error writing response:", err)
@@ -66,6 +67,7 @@ func setsHandler(w http.ResponseWriter, r *http.Request) {
 func setHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	setID := vars["setID"]
+	w.Header().Set("Content-Type", "application/json")
 
 	// 1. Check our "custom" responses
 	if v, ok := customEmoteSets[setID]; ok {

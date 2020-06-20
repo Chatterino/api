@@ -159,6 +159,7 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 }
 
 func linkResolver(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	url, err := unescapeURLArgument(r, "url")
 	if err != nil {
 		_, err = w.Write(rInvalidURL)
