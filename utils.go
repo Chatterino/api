@@ -48,6 +48,15 @@ func insertCommas(str string, n int) string {
 	return buffer.String()
 }
 
+func formatDate(format string, str string) string {
+	date, err := time.Parse(time.RFC3339, str)
+	if err != nil {
+		return ""
+	} else {
+		return date.Format(format)
+	}
+}
+
 func marshalNoDur(i interface{}) ([]byte, error, time.Duration) {
 	data, err := json.Marshal(i)
 	return data, err, noSpecialDur
