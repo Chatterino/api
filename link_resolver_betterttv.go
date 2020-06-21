@@ -135,7 +135,7 @@ func init() {
 	cache := newLoadingCache("betterttv_emotes", load, 1*time.Hour)
 	emotePathRegex := regexp.MustCompile(`/emotes/([a-f0-9]+)`)
 
-	// Find clips that look like https://clips.twitch.tv/SlugHere
+	// Find links matching the BetterTTV direct emote link (e.g. https://betterttv.com/emotes/566ca06065dbbdab32ec054e)
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(url *url.URL) bool {
 			if !strings.HasSuffix("."+url.Host, ".betterttv.com") {
