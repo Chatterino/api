@@ -124,11 +124,8 @@ func init() {
 				Message: "Track list api unmarshal error " + clean(err.Error()),
 			}, nil, noSpecialDur
 		}
-		if jsonResponse.Data.ID == 0 { // API responds with
-			return &LinkResolverResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("A track with ID %d doesn't exist.", trackID),
-			}, nil, noSpecialDur
+		if jsonResponse.Data.ID == 0 { // API responds with {..., "data": null} if nothing was found
+			return trackNotFoundResponse, nil, noSpecialDur
 		}
 
 		trackData := jsonResponse.Data
