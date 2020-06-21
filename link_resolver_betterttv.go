@@ -25,11 +25,13 @@ var (
 )
 
 const betterttvEmoteTooltip = `<div style="text-align: left;">
-<b>{{.Code}}</b><hr>
+<b>{{.Code}}</b><br>
+<b>{{.Type}} BetterTTV Emote</b><br>
 <b>By:</b> {{.Uploader}}</div>`
 
 type betterttvEmoteTooltipData struct {
 	Code     string
+	Type     string
 	Uploader string
 }
 
@@ -107,7 +109,12 @@ func init() {
 
 		data := betterttvEmoteTooltipData{
 			Code:     jsonResponse.Code,
+			Type:     "Shared",
 			Uploader: jsonResponse.User.DisplayName,
+		}
+
+		if jsonResponse.Global {
+			data.Type = "Global"
 		}
 
 		var tooltip bytes.Buffer
