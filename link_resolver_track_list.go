@@ -79,11 +79,8 @@ func init() {
 	}
 
 	load := func(rawTrackID string, r *http.Request) (interface{}, error, time.Duration) {
-		log.Printf("Raw Track ID: %s", rawTrackID)
 		trackID, _ := strconv.ParseInt(rawTrackID, 10, 32)
-		log.Printf("Track ID: %d", trackID)
 		apiURL := fmt.Sprintf(trackListAPIURL, trackID)
-		log.Printf("API URL: %s", apiURL)
 
 		// Create Track list API request
 		req, err := http.NewRequest("GET", apiURL, nil)
@@ -112,7 +109,6 @@ func init() {
 
 		// Read response into a string
 		body, err := ioutil.ReadAll(resp.Body)
-		log.Printf("API responce: %s", body)
 		if err != nil {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
