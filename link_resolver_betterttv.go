@@ -135,10 +135,18 @@ func init() {
 	cache := newLoadingCache("betterttv_emotes", load, 1*time.Hour)
 	emotePathRegex := regexp.MustCompile(`/emotes/([a-f0-9]+)`)
 
+	// BetterTTV hosts we're doing our smart things on
+	betterttvDomains := map[string]struct{}{
+		"betterttv.com":     {},
+		"www.betterttv.com": {},
+	}
+
 	// Find links matching the BetterTTV direct emote link (e.g. https://betterttv.com/emotes/566ca06065dbbdab32ec054e)
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(url *url.URL) bool {
-			if !strings.HasSuffix("."+url.Host, ".betterttv.com") {
+			host := strings.ToLower(url.Host)
+
+			if _, ok := betterttvDomains[host]; !ok {
 				return false
 			}
 
