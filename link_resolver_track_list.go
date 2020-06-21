@@ -54,7 +54,7 @@ func init() {
 		Name        string    `json:"name"`
 		VideoType   int       `json:"videoType"`
 		TrackType   string    `json:"trackType"`
-		Duration    int       `json:"duration"`
+		Duration    float32   `json:"duration"`
 		Available   bool      `json:"available"`
 		PublishedAt time.Time `json:"published"`
 		Notes       string    `json:"notes"`
