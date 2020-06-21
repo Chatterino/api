@@ -45,7 +45,7 @@ func init() {
 		Name       string
 		AuthorName string
 		Tags       string
-		Duration   time.Duration
+		Duration   string
 	}
 
 	type TrackData struct {
@@ -142,13 +142,21 @@ func init() {
 
 		}
 
+		// formatDuration() cannot be use here as that parses an ISO duration
+		duration := time.Duration(trackData.Duration) * time.Second
+		hours := duration / time.Hour
+		duration -= hours * time.Hour
+		minutes := duration / time.Minute
+		duration -= minutes * time.Minute
+		seconds := duration / time.Second
+
 		// Build tooltip data from the API response
 		data := TooltipData{
 			ID:         trackData.ID,
 			Name:       trackData.Name,
 			AuthorName: prettyAuthors,
 			Tags:       strings.Join(trackData.Tags, ", "),
-			Duration:   time.Duration(trackData.Duration) * time.Second,
+			Duration:   fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds),
 		}
 
 		// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
