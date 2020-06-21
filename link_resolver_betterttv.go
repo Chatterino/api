@@ -17,58 +17,62 @@ import (
 
 var (
 	errInvalidBTTVEmotePath = errors.New("invalid BetterTTV emote path")
-
-	noBetterTTVEmoteWithThisHashFound = &LinkResolverResponse{
-		Status:  http.StatusNotFound,
-		Message: "No BetterTTV emote with this hash found",
-	}
-)
-
-const betterttvEmoteTooltip = `<div style="text-align: left;">
-<b>{{.Code}}</b><br>
-<b>{{.Type}} BetterTTV Emote</b><br>
-<b>By:</b> {{.Uploader}}</div>`
-
-type betterttvEmoteTooltipData struct {
-	Code     string
-	Type     string
-	Uploader string
-}
-
-const (
-	betterttvThumbnailFormat = "https://cdn.betterttv.net/emote/%s/3x"
-	betterttvEmoteAPIURL     = "https://api.betterttv.net/3/emotes/%s"
 )
 
 func init() {
-	tooltipTemplate, err := template.New("betterttvEmoteTooltip").Parse(betterttvEmoteTooltip)
+	const (
+		emoteAPIURL = "https://api.betterttv.net/3/emotes/%s"
+
+		thumbnailFormat = "https://cdn.betterttv.net/emote/%s/3x"
+
+		tooltipTemplate = `<div style="text-align: left;">
+<b>{{.Code}}</b><br>
+<b>{{.Type}} BetterTTV Emote</b><br>
+<b>By:</b> {{.Uploader}}</div>`
+	)
+
+	var (
+		emoteNotFoundResponse = &LinkResolverResponse{
+			Status:  http.StatusNotFound,
+			Message: "No BetterTTV emote with this hash found",
+		}
+	)
+
+	type TooltipData struct {
+		Code     string
+		Type     string
+		Uploader string
+	}
+
+	type BetterTTVEmoteAPIResponse struct {
+		ID             string    `json:"id"`
+		Code           string    `json:"code"`
+		ImageType      string    `json:"imageType"`
+		CreatedAt      time.Time `json:"createdAt"`
+		UpdatedAt      time.Time `json:"updatedAt"`
+		Global         bool      `json:"global"`
+		Live           bool      `json:"live"`
+		Sharing        bool      `json:"sharing"`
+		ApprovalStatus string    `json:"approvalStatus"`
+		User           struct {
+			ID          string `json:"id"`
+			Name        string `json:"name"`
+			DisplayName string `json:"displayName"`
+			ProviderID  string `json:"providerId"`
+		} `json:"user"`
+	}
+
+	tmpl, err := template.New("betterttvEmoteTooltip").Parse(tooltipTemplate)
 	if err != nil {
 		log.Println("Error initialization BTTV Emotes tooltip template:", err)
 		return
 	}
 
 	load := func(emoteHash string, r *http.Request) (interface{}, error, time.Duration) {
-		type BTTVEmoteAPIResponse struct {
-			ID             string    `json:"id"`
-			Code           string    `json:"code"`
-			ImageType      string    `json:"imageType"`
-			CreatedAt      time.Time `json:"createdAt"`
-			UpdatedAt      time.Time `json:"updatedAt"`
-			Global         bool      `json:"global"`
-			Live           bool      `json:"live"`
-			Sharing        bool      `json:"sharing"`
-			ApprovalStatus string    `json:"approvalStatus"`
-			User           struct {
-				ID          string `json:"id"`
-				Name        string `json:"name"`
-				DisplayName string `json:"displayName"`
-				ProviderID  string `json:"providerId"`
-			} `json:"user"`
-		}
+		apiURL := fmt.Sprintf(emoteAPIURL, emoteHash)
+		thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteHash)
 
-		apiURL := fmt.Sprintf(betterttvEmoteAPIURL, emoteHash)
-		thumbnailURL := fmt.Sprintf(betterttvThumbnailFormat, emoteHash)
-
+		// Create BetterTTV API request
 		req, err := http.NewRequest("GET", apiURL, nil)
 		if err != nil {
 			return &LinkResolverResponse{
@@ -78,6 +82,7 @@ func init() {
 		}
 		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
 
+		// Execute BetterTTV API request
 		resp, err := httpClient.Do(req)
 		if err != nil {
 			return &LinkResolverResponse{
@@ -87,10 +92,12 @@ func init() {
 		}
 		defer resp.Body.Close()
 
+		// Error out if the emote isn't found or something else went wrong with the request
 		if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-			return noBetterTTVEmoteWithThisHashFound, nil, noSpecialDur
+			return emoteNotFoundResponse, nil, noSpecialDur
 		}
 
+		// Read response into a string
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return &LinkResolverResponse{
@@ -99,7 +106,8 @@ func init() {
 			}, nil, noSpecialDur
 		}
 
-		var jsonResponse BTTVEmoteAPIResponse
+		// Parse response into a predefined JSON blob (see BetterTTVEmoteAPIResponse struct above)
+		var jsonResponse BetterTTVEmoteAPIResponse
 		if err := json.Unmarshal(body, &jsonResponse); err != nil {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
@@ -107,7 +115,8 @@ func init() {
 			}, nil, noSpecialDur
 		}
 
-		data := betterttvEmoteTooltipData{
+		// Build tooltip data from the API response
+		data := TooltipData{
 			Code:     jsonResponse.Code,
 			Type:     "Shared",
 			Uploader: jsonResponse.User.DisplayName,
@@ -117,8 +126,9 @@ func init() {
 			data.Type = "Global"
 		}
 
+		// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 		var tooltip bytes.Buffer
-		if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
+		if err := tmpl.Execute(&tooltip, data); err != nil {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "youtube template error " + clean(err.Error()),
