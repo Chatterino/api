@@ -22,7 +22,7 @@ var (
 
 func init() {
 	const (
-		emoteAPIURL = "https://supinic.com/api/track/detail/%d"
+		trackListAPIURL = "https://supinic.com/api/track/detail/%d"
 
 		tooltipTemplate = `<div style="text-align: left;">
 <b>{{.Name}}</b><br>
@@ -34,7 +34,7 @@ func init() {
 	)
 
 	var (
-		emoteNotFoundResponse = &LinkResolverResponse{
+		trackNotFoundResponse = &LinkResolverResponse{
 			Status:  http.StatusNotFound,
 			Message: "No track with this ID found",
 		}
@@ -82,7 +82,7 @@ func init() {
 		log.Printf("Raw Track ID: %s", rawTrackID)
 		trackID, _ := strconv.ParseInt(rawTrackID, 10, 32)
 		log.Printf("Track ID: %d", trackID)
-		apiURL := fmt.Sprintf(emoteAPIURL, trackID)
+		apiURL := fmt.Sprintf(trackListAPIURL, trackID)
 		log.Printf("API URL: %s", apiURL)
 
 		// Create Track list API request
@@ -107,7 +107,7 @@ func init() {
 
 		// Error out if the track isn't found or something else went wrong with the request
 		if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-			return emoteNotFoundResponse, nil, noSpecialDur
+			return trackNotFoundResponse, nil, noSpecialDur
 		}
 
 		// Read response into a string
