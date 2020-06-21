@@ -138,7 +138,7 @@ func init() {
 			if i != 0 {
 				prettyAuthors += ", "
 			}
-			prettyAuthors += fmt.Sprintf("%s (%d; %s)", elem.Name, elem.ID, elem.Role)
+			prettyAuthors += fmt.Sprintf("%s (ID %d - %s)", elem.Name, elem.ID, elem.Role)
 
 		}
 
