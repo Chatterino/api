@@ -50,7 +50,7 @@ func init() {
 
 	r = &LinkResolverResponse{
 		Status:  http.StatusForbidden,
-		Message: "The url is forbidden by robots.txt",
+		Message: "This site blocks link previews",
 	}
 	rForbiddenByRobotsTxt, err = json.Marshal(r)
 	if err != nil {
