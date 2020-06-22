@@ -18,3 +18,7 @@ PuerkitoBio/goquery is licensed under the [**BSD 3-Clause "New" or "Revised" lic
 ## github.com/googleapis/google-api-go-client
 googleapis/google-api-go-client is used to optionally fetch smarter information about youtube links in chat.  
 googleapis/google-api-go-client is licensed under the [**BSD 3-Clause "New" or "Revised" license**](https://github.com/googleapis/google-api-go-client/blob/master/LICENSE).
+
+## github.com/temoto/robotstxt
+github.com/temoto/robotstxt is used for parsing robots.txt files on websites we crawl for the API. We make requests respecting robots.txt rules.
+github.com/temoto/robotstxt is licensed under the [**MIT License**](https://github.com/temoto/robotstxt/blob/master/LICENSE).

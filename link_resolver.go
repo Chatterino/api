@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,6 +16,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gorilla/mux"
+	"github.com/samclarke/robotstxt"
 )
 
 type LinkResolverResponse struct {
@@ -64,6 +67,13 @@ func makeRequest(url string) (response *http.Response, err error) {
 }
 
 func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+	isAllowed, err := isAllowedByRobotsTxt(urlString, r)
+	if err != nil {
+		log.Println("Error checking robots.txt", err)
+	} else if !isAllowed {
+		return rForbiddenByRobotsTxt, nil, noSpecialDur
+	}
+
 	requestUrl, err := url.Parse(urlString)
 	if err != nil {
 		return rInvalidURL, nil, noSpecialDur
@@ -177,10 +187,67 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func isAllowedByRobotsTxt(urlString string, r *http.Request) (bool, error) {
+	robotsTxtUrl, err := getRobotsTxtUrl(urlString)
+	if err != nil {
+		return false, err
+	}
+	robotsData := robotsTxtCache.Get(robotsTxtUrl, r)
+	if robotsData == nil {
+		return false, errors.New("no robots.txt data")
+	}
+	robots := robotsData.(*robotstxt.RobotsTxt)
+
+	isRouteAllowed, err := robots.IsAllowed("chatterino-api-cache/1.0 link-resolver", urlString)
+	if err != nil {
+		return false, err
+	}
+	return isRouteAllowed, nil
+}
+
+func getRobotsTxtUrl(urlString string) (string, error) {
+	requestUrl, err := url.Parse(urlString)
+	if err != nil {
+		return "", err
+	}
+
+	requestUrl.Path = "robots.txt"
+	requestUrl.Fragment = ""
+	requestUrl.RawQuery = ""
+
+	return requestUrl.String(), nil
+}
+
+func doRobotsTxtRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+	resp, err := makeRequest(urlString)
+	if err != nil {
+		return nil, err, noSpecialDur
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusOK && resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, errors.New("failed to get robots.txt data"), noSpecialDur
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, noSpecialDur
+	}
+
+	robots, err := robotstxt.Parse(string(body), urlString)
+	if err != nil {
+		return nil, nil, noSpecialDur
+	}
+
+	return robots, nil, noSpecialDur
+}
+
 var linkResolverCache *loadingCache
+var robotsTxtCache *loadingCache
 
 func init() {
 	linkResolverCache = newLoadingCache("linkResolver", doRequest, 10*time.Minute)
+	robotsTxtCache = newLoadingCache("robotsTxt", doRobotsTxtRequest, 10*time.Minute)
 }
 
 func handleLinkResolver(router *mux.Router) {

@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	rNoLinkInfoFound  []byte
-	rInvalidURL       []byte
-	rResponseTooLarge []byte
+	rNoLinkInfoFound      []byte
+	rInvalidURL           []byte
+	rResponseTooLarge     []byte
+	rForbiddenByRobotsTxt []byte
 )
 
 func init() {
@@ -42,6 +43,16 @@ func init() {
 		Message: fmt.Sprintf("Could not fetch link info: Response too large (>%dMB)", maxContentLength/1024/1024),
 	}
 	rResponseTooLarge, err = json.Marshal(r)
+	if err != nil {
+		log.Println("Error marshalling prebuilt response:", err)
+		os.Exit(1)
+	}
+
+	r = &LinkResolverResponse{
+		Status:  http.StatusForbidden,
+		Message: "The url is forbidden by robots.txt",
+	}
+	rForbiddenByRobotsTxt, err = json.Marshal(r)
 	if err != nil {
 		log.Println("Error marshalling prebuilt response:", err)
 		os.Exit(1)
