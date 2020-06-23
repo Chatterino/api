@@ -190,11 +190,7 @@ func init() {
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(url *url.URL) bool {
-			if !discordInviteURLRegex.MatchString(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path)) {
-				return false
-			}
-
-			return true
+			return discordInviteURLRegex.MatchString(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
 		},
 		run: func(url *url.URL) ([]byte, error) {
 			matches := discordInviteURLRegex.FindStringSubmatch(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
