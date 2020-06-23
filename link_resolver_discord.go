@@ -180,7 +180,7 @@ func init() {
 			Status:    200,
 			Tooltip:   tooltip.String(),
 			Thumbnail: fmt.Sprintf("https://cdn.discordapp.com/icons/%s/%s", jsonResponse.Guild.ID, jsonResponse.Guild.IconHash),
-			Link: fmt.Sprintf("https://discord.gg/%s", inviteCode)
+			Link:      fmt.Sprintf("https://discord.gg/%s", inviteCode),
 		}, nil, noSpecialDur
 	}
 
