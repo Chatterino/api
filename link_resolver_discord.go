@@ -143,7 +143,7 @@ func init() {
 
 		// Parsing only selected meaningful server perks
 		parsePerks := ""
-		accpetedPerks := []string{"PARTNERED", "PUBLIC", "ANIMATED_ICON", "BANNER", "INVITE_SPLASH", "VIP_REGIONS"}
+		accpetedPerks := []string{"PARTNERED", "PUBLIC", "ANIMATED_ICON", "BANNER", "INVITE_SPLASH", "VIP_REGIONS", "VANITY_URL"}
 		for _, elem := range jsonResponse.Guild.Features {
 			if contains(accpetedPerks, elem) {
 				if parsePerks != "" {
@@ -185,7 +185,7 @@ func init() {
 	}
 
 	cache := newLoadingCache("discord_invites", load, 6*time.Hour) // Often calls quickly result in 429's
-	discordInviteURLRegex := regexp.MustCompile(`^(www\.)?(discord\.gg|discord(app)?\.com\/invite)\/([a-zA-Z0-9]+)`)
+	discordInviteURLRegex := regexp.MustCompile(`^(www\.)?(discord\.gg|discord(app)?\.com\/invite)\/([a-zA-Z0-9-]+)`)
 
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
 	customURLManagers = append(customURLManagers, customURLManager{
