@@ -21,13 +21,13 @@ func init() {
 		discordInviteAPIURL = "https://discord.com/api/invite/%s?with_counts=true"
 
 		discordInviteTooltip = `<div style="text-align: left;">
-<b>Discord Invite to {{.ServerName}}</b>
+<b>{{.ServerName}}</b>
 <br>
-<br><b>Server Created At:</b> {{.ServerCreatedAt}}
-<br><b>Invite Channel:</b> {{.InviteChannel}}
+<br><b>Server Created:</b> {{.ServerCreated}}
+<br><b>Channel:</b> {{.InviteChannel}}
 {{.InviterTag}}
 {{.ServerPerks}}
-<br><b>Member Count:</b> <span style="color: #43b581;">{{.OnlineCount}} online</span>&nbsp;•&nbsp;<span style="color: #808892;">{{.TotalCount}} total</span>
+<br><b>Members:</b> <span style="color: #43b581;">{{.OnlineCount}} online</span>&nbsp;•&nbsp;<span style="color: #808892;">{{.TotalCount}} total</span>
 </div>
 `
 	)
@@ -42,13 +42,13 @@ func init() {
 	)
 
 	type TooltipData struct {
-		ServerName      string
-		ServerCreatedAt string
-		InviteChannel   string
-		InviterTag      string
-		ServerPerks     string
-		OnlineCount     string
-		TotalCount      string
+		ServerName    string
+		ServerCreated string
+		InviteChannel string
+		InviterTag    string
+		ServerPerks   string
+		OnlineCount   string
+		TotalCount    string
 	}
 
 	type DiscordInviteData struct {
@@ -128,7 +128,7 @@ func init() {
 			return inviteNotFoundResponse, nil, noSpecialDur
 		}
 
-		// Some dank utils
+		// Some dank utils (decided to keep those here, as they will be useless outside this file)
 		// Comverting Discord Snowflake to date string
 		// Reference https://discord.com/developers/docs/reference#snowflakes
 		snowflake, _ := strconv.ParseInt(jsonResponse.Guild.ID, 10, 64)
@@ -158,13 +158,13 @@ func init() {
 
 		// Build tooltip data from the API response
 		data := TooltipData{
-			ServerName:      jsonResponse.Guild.Name,
-			ServerCreatedAt: getDateFromSnowflake,
-			InviteChannel:   fmt.Sprintf("#%s", jsonResponse.Channel.Name),
-			InviterTag:      getInviter,
-			ServerPerks:     parsePerks,
-			OnlineCount:     insertCommas(strconv.FormatInt(jsonResponse.OnlineCount, 10), 3),
-			TotalCount:      insertCommas(strconv.FormatInt(jsonResponse.TotalCount, 10), 3),
+			ServerName:    jsonResponse.Guild.Name,
+			ServerCreated: getDateFromSnowflake,
+			InviteChannel: fmt.Sprintf("#%s", jsonResponse.Channel.Name),
+			InviterTag:    getInviter,
+			ServerPerks:   parsePerks,
+			OnlineCount:   insertCommas(strconv.FormatInt(jsonResponse.OnlineCount, 10), 3),
+			TotalCount:    insertCommas(strconv.FormatInt(jsonResponse.TotalCount, 10), 3),
 		}
 
 		// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
@@ -180,10 +180,11 @@ func init() {
 			Status:    200,
 			Tooltip:   tooltip.String(),
 			Thumbnail: fmt.Sprintf("https://cdn.discordapp.com/icons/%s/%s", jsonResponse.Guild.ID, jsonResponse.Guild.IconHash),
+			Link: fmt.Sprintf("https://discord.gg/%s", inviteCode)
 		}, nil, noSpecialDur
 	}
 
-	cache := newLoadingCache("discord_invites", load, 3*time.Hour)
+	cache := newLoadingCache("discord_invites", load, 6*time.Hour) // Often calls quickly result in 429's
 	discordInviteURLRegex := regexp.MustCompile(`^(www\.)?(discord\.gg|discord(app)?\.com\/invite)\/([a-zA-Z0-9]+)`)
 
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
