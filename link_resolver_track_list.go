@@ -175,8 +175,8 @@ func init() {
 	cache := newLoadingCache("tracklist_tracks", load, 1*time.Hour)
 	trackPathRegex := regexp.MustCompile(`/track/detail/([0-9]+)`)
 
-	// BetterTTV hosts we're doing our smart things on
-	tracklistdomains := map[string]struct{}{
+	// List of hosts that will be checked for track list paths
+	trackListDomains := map[string]struct{}{
 		"supinic.com": {},
 	}
 
@@ -185,7 +185,7 @@ func init() {
 		check: func(url *url.URL) bool {
 			host := strings.ToLower(url.Host)
 
-			if _, ok := tracklistdomains[host]; !ok {
+			if _, ok := trackListDomains[host]; !ok {
 				return false
 			}
 
