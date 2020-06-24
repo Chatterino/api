@@ -10,7 +10,6 @@ require (
 	github.com/pajlada/jsonapi v0.0.0-20181126225824-ff9660de882a // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/samclarke/robotstxt v0.0.0-20171127213916-2817654b7988
-	github.com/temoto/robotstxt v1.1.1
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
 	golang.org/x/sys v0.0.0-20200301040627-c5d0d7b4ec88 // indirect
 	google.golang.org/api v0.19.0
