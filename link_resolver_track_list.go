@@ -139,6 +139,11 @@ func init() {
 
 		}
 
+		// API returned no authors.
+		if prettyAuthors == "" {
+			prettyAuthors = "unknown"
+		}
+
 		// formatDuration() cannot be use here as that parses an ISO duration
 		duration := time.Duration(trackData.Duration) * time.Second
 		hours := duration / time.Hour
