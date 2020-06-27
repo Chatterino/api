@@ -57,6 +57,15 @@ func formatDate(format string, str string) string {
 	}
 }
 
+func contains(arr []string, str string) bool {
+	for _, a := range arr {
+		if a == str {
+			return true
+		}
+	}
+	return false
+}
+
 func marshalNoDur(i interface{}) ([]byte, error, time.Duration) {
 	data, err := json.Marshal(i)
 	return data, err, noSpecialDur
