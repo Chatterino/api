@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -18,7 +19,7 @@ import (
 
 func init() {
 	const (
-		discordInviteAPIURL = "https://discord.com/api/invite/%s?with_counts=true"
+		discordInviteAPIURL = "https://discord.com/api/v6/invites/%s?with_counts=true"
 
 		discordInviteTooltip = `<div style="text-align: left;">
 <b>{{.ServerName}}</b>
@@ -70,6 +71,13 @@ func init() {
 		TotalCount  int64 `json:"approximate_member_count,omitempty"`
 	}
 
+	// Bot authentication is required for higher ratelimit (250 requests/5s)
+	discordToken, exists := os.LookupEnv("CHATTERINO_API_DISCORD_TOKEN")
+	if !exists {
+		log.Println("No CHATTERINO_API_DISCORD_TOKEN specified, won't do special responses for Discord invites")
+		return
+	}
+
 	tmpl, err := template.New("discordInviteTooltip").Parse(discordInviteTooltip)
 	if err != nil {
 		log.Println("Error while initializing Discord invite tooltip template:", err)
@@ -89,6 +97,7 @@ func init() {
 			}, nil, noSpecialDur
 		}
 		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
+		req.Header.Set("Authorization", fmt.Sprintf("Bot %s", discordToken))
 
 		// Execute Discord API request
 		resp, err := httpClient.Do(req)
