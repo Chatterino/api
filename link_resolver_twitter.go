@@ -23,7 +23,7 @@ const tweeterTooltip = `<div style="text-align: left;">
 `
 
 var (
-    tweetRegexp = regexp.MustCompile("(?i)\\/.*\\/status(?:es)?\\/([^\\/\\?]+)")
+    tweetRegexp = regexp.MustCompile(`(?i)\/.*\/status(?:es)?\/([^\/\?]+)`)
 )
 
 type TweetApiResponse struct {
@@ -142,7 +142,10 @@ func getTweetByID(id, bearer string) (*TweetApiResponse, error) {
     }
 
     var tweet *TweetApiResponse
-    json.NewDecoder(resp.Body).Decode(&tweet)
+    err = json.NewDecoder(resp.Body).Decode(&tweet)
+    if err != nil {
+        return nil, errors.New("unable to process response")
+    }
 
     if len(tweet.Errors) > 0 {
         log.Println("twitter err:", tweet.Errors)
