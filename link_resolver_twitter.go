@@ -59,13 +59,13 @@ type tweetTooltipData struct {
 }
 
 func init() {
-    bearerKey, exists := os.LookupEnv("CHATTERINO_TWITTER_BEARER_KEY")
+    bearerKey, exists := os.LookupEnv("CHATTERINO_API_TWITTER_BEARER_TOKEN")
     if !exists {
-       log.Println("No CHATTERINO_TWITTER_BEARER_KEY specified, won't do special responses for twitter")
+       log.Println("No CHATTERINO_API_TWITTER_BEARER_TOKEN specified, won't do special responses for twitter")
        return
     }
 
-    tooltipTemplate, err := template.New("youtubeTooltip").Parse(tweeterTooltip)
+    tooltipTemplate, err := template.New("tweetTooltip").Parse(tweeterTooltip)
     if err != nil {
         log.Println("Error initialization tweeter tooltip template:", err)
         return
