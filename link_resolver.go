@@ -38,12 +38,16 @@ const tooltip = `<div style="text-align: left;">
 {{if .Title}}
 <b>{{.Title}}</b><hr>
 {{end}}
+{{if .Description}}
+<b>{{.Description}}</b><hr>
+{{end}}
 <b>URL:</b> {{.URL}}</div>`
 
 type tooltipData struct {
-	URL      string
-	Title    string
-	ImageSrc string
+	URL         string
+	Title       string
+	Description string
+	ImageSrc    string
 }
 
 var (
@@ -62,6 +66,35 @@ func makeRequest(url string) (response *http.Response, err error) {
 	req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
 
 	return httpClient.Do(req)
+}
+
+func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData {
+	data := tooltipData{
+		URL: clean(resp.Request.URL.String()),
+	}
+
+	/* Support for HTML Open Graph meta tags.
+	 * Will show Open Graph "Title", "Description", "Image" information of webpages.
+	 * More fields are available: https://ogp.me/
+	 */
+	metaFields := doc.Find("meta[property][content]")
+	if metaFields.Size() > 0 {
+		metaFields.Each(func(i int, s *goquery.Selection) {
+			prop, _ := s.Attr("property")
+			cont, _ := s.Attr("content")
+			if prop == "og:title" {
+				data.Title = cont
+			} else if prop == "og:description" {
+				data.Description = cont
+			} else if prop == "og:image" {
+				data.ImageSrc = cont
+			}
+		})
+	} else {
+		data.Title = doc.Find("title").First().Text()
+	}
+
+	return data
 }
 
 func doRequest(urlString string, r *http.Request) (interface{}, time.Duration, error) {
@@ -125,10 +158,7 @@ func doRequest(urlString string, r *http.Request) (interface{}, time.Duration, e
 		})
 	}
 
-	data := tooltipData{
-		URL:   clean(resp.Request.URL.String()),
-		Title: doc.Find("title").First().Text(),
-	}
+	data := defaultTooltipData(resp, doc)
 
 	var tooltip bytes.Buffer
 	if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
