@@ -13,3 +13,6 @@ api
 *.out
 
 cached/
+
+# dlv debug bin. Created when debugging with "go-delve".
+__debug_bin
