@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// LinkResolverResponse This should be explained.
 type LinkResolverResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`

@@ -12,16 +12,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// TwitchEmotesError This should be explained.
 type TwitchEmotesError struct {
 	Status int
 	Error  error
 }
 
+// TwitchEmotesErrorResponse This should be explained.
 type TwitchEmotesErrorResponse struct {
 	Status  int
 	Message string
 }
 
+// EmoteSet This should be explained.
 type EmoteSet struct {
 	ChannelName string `json:"channel_name"`
 	ChannelID   string `json:"channel_id"`
