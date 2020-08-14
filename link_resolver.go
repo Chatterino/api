@@ -64,23 +64,23 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
-	requestUrl, err := url.Parse(urlString)
+func doRequest(urlString string, r *http.Request) (interface{}, time.Duration, error) {
+	requestURL, err := url.Parse(urlString)
 	if err != nil {
-		return rInvalidURL, nil, noSpecialDur
+		return rInvalidURL, noSpecialDur, nil
 	}
 
 	for _, m := range customURLManagers {
-		if m.check(requestUrl) {
-			data, err := m.run(requestUrl)
-			return data, err, noSpecialDur
+		if m.check(requestURL) {
+			data, err := m.run(requestURL)
+			return data, noSpecialDur, err
 		}
 	}
 
-	resp, err := makeRequest(requestUrl.String())
+	resp, err := makeRequest(requestURL.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return rNoLinkInfoFound, nil, noSpecialDur
+			return rNoLinkInfoFound, noSpecialDur, nil
 		}
 
 		return marshalNoDur(&LinkResolverResponse{
@@ -94,16 +94,16 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, err, noSpecialDur
+			return nil, noSpecialDur, err
 		}
 		if contentLengthBytes > maxContentLength {
-			return rResponseTooLarge, nil, noSpecialDur
+			return rResponseTooLarge, noSpecialDur, nil
 		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
-		return rNoLinkInfoFound, nil, noSpecialDur
+		return rNoLinkInfoFound, noSpecialDur, nil
 	}
 
 	limiter := &WriteLimiter{Limit: maxContentLength}
