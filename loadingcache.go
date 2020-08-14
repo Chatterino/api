@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type loader func(key string, r *http.Request) (interface{}, error, time.Duration)
+type loader func(key string, r *http.Request) (interface{}, time.Duration, error)
 
 var noSpecialDur time.Duration
 
@@ -23,7 +23,7 @@ type loadingCache struct {
 }
 
 func (c *loadingCache) load(key string, r *http.Request) {
-	value, err, overrideDuration := c.loader(key, r)
+	value, overrideDuration, err := c.loader(key, r)
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {

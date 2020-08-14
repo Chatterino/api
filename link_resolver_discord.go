@@ -84,7 +84,7 @@ func init() {
 		return
 	}
 
-	load := func(inviteCode string, r *http.Request) (interface{}, error, time.Duration) {
+	load := func(inviteCode string, r *http.Request) (interface{}, time.Duration, error) {
 		log.Println("[DiscordInvite] GET", inviteCode)
 		apiURL := fmt.Sprintf(discordInviteAPIURL, inviteCode)
 
@@ -94,7 +94,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Discord API request creation error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
 		req.Header.Set("Authorization", fmt.Sprintf("Bot %s", discordToken))
@@ -105,13 +105,13 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Discord API request error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 		defer resp.Body.Close()
 
 		// Error out if the invite isn't found or something else went wrong with the request
 		if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-			return inviteNotFoundResponse, nil, noSpecialDur
+			return inviteNotFoundResponse, noSpecialDur, nil
 		}
 
 		// Read response into a string
@@ -120,7 +120,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Discord API http body read error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		// Parse response into a predefined JSON blob (see TrackListAPIResponse struct above)
@@ -129,12 +129,12 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Discord API unmarshal error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		// API doesn't include "approximate_member_count" if an invite was not found
 		if jsonResponse.TotalCount == 0 {
-			return inviteNotFoundResponse, nil, noSpecialDur
+			return inviteNotFoundResponse, noSpecialDur, nil
 		}
 
 		// Some dank utils (decided to keep those here, as they will be useless outside this file)
@@ -182,7 +182,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Discord Invite template error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		return &LinkResolverResponse{
@@ -190,7 +190,7 @@ func init() {
 			Tooltip:   tooltip.String(),
 			Thumbnail: fmt.Sprintf("https://cdn.discordapp.com/icons/%s/%s", jsonResponse.Guild.ID, jsonResponse.Guild.IconHash),
 			Link:      fmt.Sprintf("https://discord.gg/%s", inviteCode),
-		}, nil, noSpecialDur
+		}, noSpecialDur, nil
 	}
 
 	cache := newLoadingCache("discord_invites", load, 6*time.Hour) // Often calls quickly result in 429's

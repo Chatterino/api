@@ -68,7 +68,7 @@ func init() {
 		return
 	}
 
-	load := func(emoteHash string, r *http.Request) (interface{}, error, time.Duration) {
+	load := func(emoteHash string, r *http.Request) (interface{}, time.Duration, error) {
 		apiURL := fmt.Sprintf(emoteAPIURL, emoteHash)
 		thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteHash)
 
@@ -78,7 +78,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "betterttv http request creation error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
 
@@ -88,13 +88,13 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "betterttv http request error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 		defer resp.Body.Close()
 
 		// Error out if the emote isn't found or something else went wrong with the request
 		if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-			return emoteNotFoundResponse, nil, noSpecialDur
+			return emoteNotFoundResponse, noSpecialDur, nil
 		}
 
 		// Read response into a string
@@ -103,7 +103,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "betterttv http body read error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		// Parse response into a predefined JSON blob (see BetterTTVEmoteAPIResponse struct above)
@@ -112,7 +112,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "betterttv api unmarshal error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		// Build tooltip data from the API response
@@ -132,14 +132,14 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "youtube template error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		return &LinkResolverResponse{
 			Status:    200,
 			Tooltip:   tooltip.String(),
 			Thumbnail: thumbnailURL,
-		}, nil, noSpecialDur
+		}, noSpecialDur, nil
 	}
 
 	cache := newLoadingCache("betterttv_emotes", load, 1*time.Hour)

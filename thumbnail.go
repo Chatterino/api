@@ -27,16 +27,16 @@ const (
 	maxThumbnailSize = 300
 )
 
-func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+func doThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Duration, error) {
 	url, err := url.Parse(urlString)
 	if err != nil {
-		return rInvalidURL, nil, noSpecialDur
+		return rInvalidURL, noSpecialDur, nil
 	}
 
 	resp, err := makeRequest(url.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return rNoLinkInfoFound, nil, noSpecialDur
+			return rNoLinkInfoFound, noSpecialDur, nil
 		}
 
 		return marshalNoDur(&LinkResolverResponse{
@@ -50,29 +50,29 @@ func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, 
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, err, noSpecialDur
+			return nil, noSpecialDur, err
 		}
 		if contentLengthBytes > maxContentLength {
-			return rResponseTooLarge, nil, noSpecialDur
+			return rResponseTooLarge, noSpecialDur, nil
 		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
-		return rNoLinkInfoFound, nil, noSpecialDur
+		return rNoLinkInfoFound, noSpecialDur, nil
 	}
 
 	if !isSupportedThumbnail(resp.Header.Get("content-type")) {
-		return rNoLinkInfoFound, nil, noSpecialDur
+		return rNoLinkInfoFound, noSpecialDur, nil
 	}
 
 	image, err := buildThumbnailByteArray(resp)
 	if err != nil {
 		log.Println(err.Error())
-		return rNoLinkInfoFound, nil, noSpecialDur
+		return rNoLinkInfoFound, noSpecialDur, nil
 	}
 
-	return image, nil, 10 * time.Minute
+	return image, 10 * time.Minute, nil
 }
 
 func isSupportedThumbnail(contentType string) bool {

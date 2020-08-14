@@ -71,24 +71,24 @@ func init() {
 		return
 	}
 
-	load := func(videoID string, r *http.Request) (interface{}, error, time.Duration) {
+	load := func(videoID string, r *http.Request) (interface{}, time.Duration, error) {
 		log.Println("[YouTube] GET", videoID)
 		youtubeResponse, err := youtubeClient.Videos.List("statistics,snippet,contentDetails").Id(videoID).Do()
 		if err != nil {
 			return &LinkResolverResponse{
 				Status:  500,
 				Message: "youtube api error " + clean(err.Error()),
-			}, nil, 1 * time.Hour
+			}, 1 * time.Hour, nil
 		}
 
 		if len(youtubeResponse.Items) != 1 {
-			return nil, errors.New("Videos response is not size 1"), noSpecialDur
+			return nil, noSpecialDur, errors.New("Videos response is not size 1")
 		}
 
 		video := youtubeResponse.Items[0]
 
 		if video.ContentDetails == nil {
-			return &LinkResolverResponse{Status: 500, Message: "video unavailable"}, nil, noSpecialDur
+			return &LinkResolverResponse{Status: 500, Message: "video unavailable"}, noSpecialDur, nil
 		}
 
 		data := youtubeTooltipData{
@@ -106,7 +106,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "youtube template error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		thumbnail := video.Snippet.Thumbnails.Default.Url
@@ -118,7 +118,7 @@ func init() {
 			Status:    http.StatusOK,
 			Tooltip:   tooltip.String(),
 			Thumbnail: thumbnail,
-		}, nil, noSpecialDur
+		}, noSpecialDur, nil
 	}
 
 	cache := newLoadingCache("youtube", load, 24*time.Hour)

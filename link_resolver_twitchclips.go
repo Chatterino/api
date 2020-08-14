@@ -46,11 +46,11 @@ func init() {
 		return
 	}
 
-	load := func(clipSlug string, r *http.Request) (interface{}, error, time.Duration) {
+	load := func(clipSlug string, r *http.Request) (interface{}, time.Duration, error) {
 		log.Println("[TwitchClip] GET", clipSlug)
 		clip, _, err := v5API.GetClip(clipSlug)
 		if err != nil {
-			return noTwitchClipWithThisIDFound, nil, noSpecialDur
+			return noTwitchClipWithThisIDFound, noSpecialDur, nil
 		}
 
 		data := twitchClipsTooltipData{
@@ -64,14 +64,14 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "youtube template error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		return &LinkResolverResponse{
 			Status:    200,
 			Tooltip:   tooltip.String(),
 			Thumbnail: clip.Thumbnails.Medium,
-		}, nil, noSpecialDur
+		}, noSpecialDur, nil
 	}
 
 	cache := newLoadingCache("twitchclip", load, 1*time.Hour)

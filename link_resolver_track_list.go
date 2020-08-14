@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	invalidTrackPath = errors.New("invalid track list track path")
+	errInvalidTrackPath = errors.New("invalid track list track path")
 )
 
 func init() {
@@ -78,7 +78,7 @@ func init() {
 		return
 	}
 
-	load := func(rawTrackID string, r *http.Request) (interface{}, error, time.Duration) {
+	load := func(rawTrackID string, r *http.Request) (interface{}, time.Duration, error) {
 		trackID, _ := strconv.ParseInt(rawTrackID, 10, 32)
 		apiURL := fmt.Sprintf(trackListAPIURL, trackID)
 
@@ -88,7 +88,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Track list request creation error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
 
@@ -98,13 +98,13 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Track list http request error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 		defer resp.Body.Close()
 
 		// Error out if the track isn't found or something else went wrong with the request
 		if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-			return trackNotFoundResponse, nil, noSpecialDur
+			return trackNotFoundResponse, noSpecialDur, nil
 		}
 
 		// Read response into a string
@@ -113,7 +113,7 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Track list http body read error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		// Parse response into a predefined JSON blob (see TrackListAPIResponse struct above)
@@ -122,10 +122,10 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Track list api unmarshal error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 		if jsonResponse.Data.ID == 0 { // API responds with {..., "data": null} if nothing was found
-			return trackNotFoundResponse, nil, noSpecialDur
+			return trackNotFoundResponse, noSpecialDur, nil
 		}
 
 		trackData := jsonResponse.Data
@@ -167,14 +167,14 @@ func init() {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
 				Message: "Track list template error " + clean(err.Error()),
-			}, nil, noSpecialDur
+			}, noSpecialDur, nil
 		}
 
 		return &LinkResolverResponse{
 			Status:  200,
 			Tooltip: tooltip.String(),
 			//Thumbnail: thumbnailURL,
-		}, nil, noSpecialDur
+		}, noSpecialDur, nil
 	}
 
 	cache := newLoadingCache("tracklist_tracks", load, 1*time.Hour)
@@ -203,7 +203,7 @@ func init() {
 		run: func(url *url.URL) ([]byte, error) {
 			matches := trackPathRegex.FindStringSubmatch(url.Path)
 			if len(matches) != 2 {
-				return nil, invalidTrackPath
+				return nil, errInvalidTrackPath
 			}
 
 			trackID := matches[1]
