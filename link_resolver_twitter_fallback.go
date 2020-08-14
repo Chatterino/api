@@ -109,7 +109,7 @@ func init() {
 			})
 		}
 
-		// Build tooltip data from the API response
+		// Build tooltip data from the HTML
 		data := TooltipData{
 			Author: strings.TrimSpace(doc.Find(".main-tweet .user-info .fullname").Text()),
 			Tweet:  strings.TrimSpace(doc.Find(".main-tweet .tweet-content .tweet-text").Text()),
