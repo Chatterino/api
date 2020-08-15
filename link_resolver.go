@@ -96,23 +96,23 @@ func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData 
 	return data
 }
 
-func doRequest(urlString string, r *http.Request) (interface{}, time.Duration, error) {
-	requestURL, err := url.Parse(urlString)
+func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+	requestUrl, err := url.Parse(urlString)
 	if err != nil {
-		return rInvalidURL, noSpecialDur, nil
+		return rInvalidURL, nil, noSpecialDur
 	}
 
 	for _, m := range customURLManagers {
-		if m.check(requestURL) {
-			data, err := m.run(requestURL)
-			return data, noSpecialDur, err
+		if m.check(requestUrl) {
+			data, err := m.run(requestUrl)
+			return data, err, noSpecialDur
 		}
 	}
 
-	resp, err := makeRequest(requestURL.String())
+	resp, err := makeRequest(requestUrl.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return rNoLinkInfoFound, noSpecialDur, nil
+			return rNoLinkInfoFound, nil, noSpecialDur
 		}
 
 		return marshalNoDur(&LinkResolverResponse{
@@ -126,16 +126,16 @@ func doRequest(urlString string, r *http.Request) (interface{}, time.Duration, e
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, noSpecialDur, err
+			return nil, err, noSpecialDur
 		}
 		if contentLengthBytes > maxContentLength {
-			return rResponseTooLarge, noSpecialDur, nil
+			return rResponseTooLarge, nil, noSpecialDur
 		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
-		return rNoLinkInfoFound, noSpecialDur, nil
+		return rNoLinkInfoFound, nil, noSpecialDur
 	}
 
 	limiter := &WriteLimiter{Limit: maxContentLength}
