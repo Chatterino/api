@@ -16,7 +16,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// LinkResolverResponse is the structure of the JSON that is sent to the receiving end-point.
 type LinkResolverResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
