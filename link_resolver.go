@@ -72,10 +72,9 @@ func makeRequest(url string) (response *http.Response, err error) {
 	return httpClient.Do(req)
 }
 
-func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData {
+func defaultTooltipData(doc *goquery.Document, r *http.Request, resp *http.Response) tooltipData {
 	data := tooltipData{
-		URL:   clean(resp.Request.URL.String()),
-		Title: doc.Find("title").First().Text(),
+		URL: clean(resp.Request.URL.String()),
 	}
 
 	/* Support for HTML Open Graph meta tags.
@@ -92,9 +91,13 @@ func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData 
 			} else if prop == "og:description" {
 				data.Description = cont
 			} else if prop == "og:image" {
-				data.ImageSrc = cont
+				data.ImageSrc = formatThumbnailUrl(r, cont)
 			}
 		})
+	}
+
+	if data.Title == "" {
+		data.Title = doc.Find("title").First().Text()
 	}
 
 	return data
@@ -173,7 +176,7 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 		})
 	}
 
-	data := defaultTooltipData(resp, doc)
+	data := defaultTooltipData(doc, r, resp)
 
 	// Truncate title and description in case they're too long
 	data.Truncate()
@@ -190,7 +193,7 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 		Status:    resp.StatusCode,
 		Tooltip:   tooltip.String(),
 		Link:      resp.Request.URL.String(),
-		Thumbnail: formatThumbnailUrl(r, data.ImageSrc),
+		Thumbnail: data.ImageSrc,
 	}
 
 	if isSupportedThumbnail(resp.Header.Get("content-type")) {
