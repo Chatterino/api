@@ -169,9 +169,10 @@ func doRequest(urlString string, r *http.Request) (interface{}, time.Duration, e
 	}
 
 	response := &LinkResolverResponse{
-		Status:  resp.StatusCode,
-		Tooltip: tooltip.String(),
-		Link:    resp.Request.URL.String(),
+		Status:    resp.StatusCode,
+		Tooltip:   tooltip.String(),
+		Link:      resp.Request.URL.String(),
+		Thumbnail: data.ImageSrc,
 	}
 
 	if isSupportedThumbnail(resp.Header.Get("content-type")) {
