@@ -37,12 +37,16 @@ const tooltip = `<div style="text-align: left;">
 {{if .Title}}
 <b>{{.Title}}</b><hr>
 {{end}}
+{{if .Description}}
+<span>{{.Description}}</span><hr>
+{{end}}
 <b>URL:</b> {{.URL}}</div>`
 
 type tooltipData struct {
-	URL      string
-	Title    string
-	ImageSrc string
+	URL         string
+	Title       string
+	Description string
+	ImageSrc    string
 }
 
 var (
@@ -61,6 +65,46 @@ func makeRequest(url string) (response *http.Response, err error) {
 	req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
 
 	return httpClient.Do(req)
+}
+
+func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData {
+	data := tooltipData{
+		URL:   clean(resp.Request.URL.String()),
+		Title: doc.Find("title").First().Text(),
+	}
+
+	/* Support for HTML Open Graph meta tags.
+	 * Will show Open Graph "Title", "Description", "Image" information of webpages.
+	 * More fields are available: https://ogp.me/
+	 */
+	metaFields := doc.Find("meta[property][content]")
+	if metaFields.Size() > 0 {
+		metaFields.Each(func(i int, s *goquery.Selection) {
+			prop, _ := s.Attr("property")
+			cont, _ := s.Attr("content")
+			if prop == "og:title" {
+				data.Title = cont
+			} else if prop == "og:description" {
+				data.Description = cont
+			} else if prop == "og:image" {
+				data.ImageSrc = cont
+			}
+		})
+	}
+
+	return data
+}
+
+func formatThumbnailUrl(r *http.Request, urlString string) string {
+	if *baseURL == "" {
+		scheme := "https://"
+		if r.TLS == nil {
+			scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
+		}
+		return fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(urlString))
+	} else {
+		return fmt.Sprintf("%s/thumbnail/%s", strings.TrimSuffix(*baseURL, "/"), url.QueryEscape(urlString))
+	}
 }
 
 func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
@@ -124,10 +168,7 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 		})
 	}
 
-	data := tooltipData{
-		URL:   clean(resp.Request.URL.String()),
-		Title: doc.Find("title").First().Text(),
-	}
+	data := defaultTooltipData(resp, doc)
 
 	var tooltip bytes.Buffer
 	if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
@@ -138,21 +179,14 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 	}
 
 	response := &LinkResolverResponse{
-		Status:  resp.StatusCode,
-		Tooltip: tooltip.String(),
-		Link:    resp.Request.URL.String(),
+		Status:    resp.StatusCode,
+		Tooltip:   tooltip.String(),
+		Link:      resp.Request.URL.String(),
+		Thumbnail: formatThumbnailUrl(r, data.ImageSrc),
 	}
 
 	if isSupportedThumbnail(resp.Header.Get("content-type")) {
-		if *baseURL == "" {
-			scheme := "https://"
-			if r.TLS == nil {
-				scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
-			}
-			response.Thumbnail = fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(resp.Request.URL.String()))
-		} else {
-			response.Thumbnail = fmt.Sprintf("%s/thumbnail/%s", strings.TrimSuffix(*baseURL, "/"), url.QueryEscape(resp.Request.URL.String()))
-		}
+		response.Thumbnail = formatThumbnailUrl(r, resp.Request.URL.String())
 	}
 
 	return marshalNoDur(response)
