@@ -52,9 +52,9 @@ func formatDate(format string, str string) string {
 	date, err := time.Parse(time.RFC3339, str)
 	if err != nil {
 		return ""
+	} else {
+		return date.Format(format)
 	}
-
-	return date.Format(format)
 }
 
 func contains(arr []string, str string) bool {
@@ -66,7 +66,7 @@ func contains(arr []string, str string) bool {
 	return false
 }
 
-func marshalNoDur(i interface{}) ([]byte, time.Duration, error) {
+func marshalNoDur(i interface{}) ([]byte, error, time.Duration) {
 	data, err := json.Marshal(i)
-	return data, noSpecialDur, err
+	return data, err, noSpecialDur
 }
