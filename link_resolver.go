@@ -49,6 +49,11 @@ type tooltipData struct {
 	ImageSrc    string
 }
 
+func (d *tooltipData) Truncate() {
+	d.Title = truncateString(d.Title, MaxTitleLength)
+	d.Description = truncateString(d.Description, MaxDescriptionLength)
+}
+
 var (
 	customURLManagers []customURLManager
 )
@@ -169,6 +174,9 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 	}
 
 	data := defaultTooltipData(resp, doc)
+
+	// Truncate title and description in case they're too long
+	data.Truncate()
 
 	var tooltip bytes.Buffer
 	if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
