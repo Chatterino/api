@@ -70,7 +70,8 @@ func makeRequest(url string) (response *http.Response, err error) {
 
 func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData {
 	data := tooltipData{
-		URL: clean(resp.Request.URL.String()),
+		URL:   clean(resp.Request.URL.String()),
+		Title: doc.Find("title").First().Text(),
 	}
 
 	/* Support for HTML Open Graph meta tags.
@@ -90,8 +91,6 @@ func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData 
 				data.ImageSrc = cont
 			}
 		})
-	} else {
-		data.Title = doc.Find("title").First().Text()
 	}
 
 	return data
