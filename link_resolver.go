@@ -95,6 +95,18 @@ func defaultTooltipData(resp *http.Response, doc *goquery.Document) tooltipData 
 	return data
 }
 
+func formatThumbnailUrl(r *http.Request, urlString string) string {
+	if *baseURL == "" {
+		scheme := "https://"
+		if r.TLS == nil {
+			scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
+		}
+		return fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(urlString))
+	} else {
+		return fmt.Sprintf("%s/thumbnail/%s", strings.TrimSuffix(*baseURL, "/"), url.QueryEscape(urlString))
+	}
+}
+
 func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
 	requestUrl, err := url.Parse(urlString)
 	if err != nil {
@@ -170,19 +182,11 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 		Status:    resp.StatusCode,
 		Tooltip:   tooltip.String(),
 		Link:      resp.Request.URL.String(),
-		Thumbnail: data.ImageSrc,
+		Thumbnail: formatThumbnailUrl(r, data.ImageSrc),
 	}
 
 	if isSupportedThumbnail(resp.Header.Get("content-type")) {
-		if *baseURL == "" {
-			scheme := "https://"
-			if r.TLS == nil {
-				scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
-			}
-			response.Thumbnail = fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(resp.Request.URL.String()))
-		} else {
-			response.Thumbnail = fmt.Sprintf("%s/thumbnail/%s", strings.TrimSuffix(*baseURL, "/"), url.QueryEscape(resp.Request.URL.String()))
-		}
+		response.Thumbnail = formatThumbnailUrl(r, resp.Request.URL.String())
 	}
 
 	return marshalNoDur(response)
