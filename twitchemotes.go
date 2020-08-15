@@ -12,17 +12,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type twitchEmotesError struct {
+// TwitchEmotesError This should be explained.
+type TwitchEmotesError struct {
 	Status int
 	Error  error
 }
 
-type twitchEmotesErrorResponse struct {
+// TwitchEmotesErrorResponse This should be explained.
+type TwitchEmotesErrorResponse struct {
 	Status  int
 	Message string
 }
 
-type emoteSet struct {
+// EmoteSet This should be explained.
+type EmoteSet struct {
 	ChannelName string `json:"channel_name"`
 	ChannelID   string `json:"channel_id"`
 	Type        string `json:"type"`
@@ -39,7 +42,7 @@ var customEmoteSets map[string][]byte = make(map[string][]byte)
 var twitchemotesCache *loadingCache = newLoadingCache("twitchemotes", doTwitchemotesRequest, 30*time.Minute)
 
 func addEmoteSet(emoteSetID, channelName, channelID, setType string) {
-	b, err := json.Marshal(&emoteSet{
+	b, err := json.Marshal(&EmoteSet{
 		ChannelName: channelName,
 		ChannelID:   channelID,
 		Type:        setType,
@@ -88,9 +91,9 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Error writing response:", err)
 		}
 
-	case *twitchEmotesError:
+	case *TwitchEmotesError:
 		w.WriteHeader(v.Status)
-		data, err := json.Marshal(&twitchEmotesErrorResponse{
+		data, err := json.Marshal(&TwitchEmotesErrorResponse{
 			Status:  v.Status,
 			Message: v.Error.Error(),
 		})
@@ -109,7 +112,7 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return &twitchEmotesError{
+		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
 		}, nil, 0
@@ -119,7 +122,7 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return &twitchEmotesError{
+		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
 		}, nil, 0
@@ -127,22 +130,22 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return &twitchEmotesError{
+		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
 		}, nil, 0
 	}
-	var emoteSets []emoteSet
+	var emoteSets []EmoteSet
 	err = json.Unmarshal(body, &emoteSets)
 	if err != nil {
-		return &twitchEmotesError{
+		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
 		}, nil, 0
 	}
 
 	if len(emoteSets) == 0 {
-		return &twitchEmotesError{
+		return &TwitchEmotesError{
 			Error:  errInvalidEmoteID,
 			Status: 404,
 		}, nil, 0
