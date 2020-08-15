@@ -50,8 +50,8 @@ type tooltipData struct {
 }
 
 func (d *tooltipData) Truncate() {
-	d.Title = truncateString(d.Title, 60)
-	d.Description = truncateString(d.Description, 200)
+	d.Title = truncateString(d.Title, MaxTitleLength)
+	d.Description = truncateString(d.Description, MaxDescriptionLength)
 }
 
 var (
