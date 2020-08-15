@@ -39,7 +39,7 @@ const tooltip = `<div style="text-align: left;">
 <b>{{.Title}}</b><hr>
 {{end}}
 {{if .Description}}
-<b>{{.Description}}</b><hr>
+{{.Description}}<hr>
 {{end}}
 <b>URL:</b> {{.URL}}</div>`
 
