@@ -235,7 +235,11 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 func isAllowedByRobotsTxt(urlString string, r *http.Request) (bool, error) {
 	robotsTxtUrl, err := getRobotsTxtUrl(urlString)
 	if err != nil {
-		return false, err
+		log.Println("Get robots.txt url error:", err)
+
+		// suppress error for now
+		return true, nil
+		//return false, err
 	}
 	robotsData := robotsTxtCache.Get(robotsTxtUrl, r)
 	if robotsData == nil {
@@ -245,9 +249,18 @@ func isAllowedByRobotsTxt(urlString string, r *http.Request) (bool, error) {
 
 	isRouteAllowed, err := robots.IsAllowed("chatterino-api-cache/1.0 link-resolver", urlString)
 	if err != nil {
-		return false, err
+		log.Println("Error checking if url allowed by robots.txt:", err)
+
+		// suppress error for now
+		return true, nil
+		//return false, err
 	}
-	return isRouteAllowed, nil
+
+	//return isRouteAllowed, nil
+	if !isRouteAllowed {
+		log.Printf("url %s not allowed by robots.txt\n", urlString)
+	}
+	return true, nil
 }
 
 func getRobotsTxtUrl(urlString string) (string, error) {

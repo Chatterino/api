@@ -115,29 +115,29 @@ func TestDoRequest(t *testing.T) {
 	// fmt.Println(string(data.([]byte)))
 }
 
-func TestRobotsTxt(t *testing.T) {
-	router := makeRouter("")
-	handleLinkResolver(router)
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-	fmt.Println(ts.URL)
-	const url = `https%3A%2F%2Fwww.twitch.tv%2Flogin`
-	res, err := http.Get(ts.URL + "/link_resolver/" + url)
-	if err != nil {
-		panic(err)
-	}
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(body))
-	var jsonResponse LinkResolverResponse
-	err = json.Unmarshal(body, &jsonResponse)
-	if err != nil {
-		panic(err)
-	}
-	if jsonResponse.Status != 403 {
-		t.Fatal("wrong status from api")
-	}
-}
+//func TestRobotsTxt(t *testing.T) {
+//	router := makeRouter("")
+//	handleLinkResolver(router)
+//	ts := httptest.NewServer(router)
+//	defer ts.Close()
+//	fmt.Println(ts.URL)
+//	const url = `https%3A%2F%2Fwww.twitch.tv%2Flogin`
+//	res, err := http.Get(ts.URL + "/link_resolver/" + url)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	body, err := ioutil.ReadAll(res.Body)
+//	if err != nil {
+//		panic(err)
+//	}
+//	fmt.Println(string(body))
+//	var jsonResponse LinkResolverResponse
+//	err = json.Unmarshal(body, &jsonResponse)
+//	if err != nil {
+//		panic(err)
+//	}
+//	if jsonResponse.Status != 403 {
+//		t.Fatal("wrong status from api")
+//	}
+//}
