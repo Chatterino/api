@@ -83,7 +83,7 @@ func getTweetByID(id, bearer string) (*TweetApiResponse, error) {
     return tweet, nil
 }
 
-func tweet2Tooltip(tweet *TweetApiResponse) *tweetTooltipData {
+func buildTooltip(tweet *TweetApiResponse) *tweetTooltipData {
     data := &tweetTooltipData{}
     data.Text = tweet.Text
     data.Name = tweet.User.Name
