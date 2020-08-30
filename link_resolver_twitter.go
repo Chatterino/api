@@ -105,7 +105,7 @@ func init() {
 
     tooltipTemplate, err := template.New("tweetTooltip").Parse(tweeterTooltip)
     if err != nil {
-        log.Println("Error initialization tweeter tooltip template:", err)
+        log.Println("Error initializing Tweet tooltip template:", err)
         return
     }
 
