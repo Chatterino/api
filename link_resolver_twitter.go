@@ -25,7 +25,7 @@ const (
 <br>
 {{.Text}}
 <br>
-<span style="color: #808892;">{{.Timestamp}}</span>
+<span style="color: #808892;">{{.Likes}} likes&nbsp;•&nbsp;{{.Retweets}} retweets&nbsp;•&nbsp;{{.Timestamp}}</span>
 </div>
 `
 
@@ -48,6 +48,8 @@ type TweetApiResponse struct {
 	ID        string `json:"id_str"`
 	Text      string `json:"full_text"`
 	Timestamp string `json:"created_at"`
+	Likes     uint64 `json:"favorite_count"`
+	Retweets  uint64 `json:"retweet_count"`
 	User      struct {
 		Name            string `json:"name"`
 		Username        string `json:"screen_name"`
@@ -65,6 +67,8 @@ type tweetTooltipData struct {
 	Name      string
 	Username  string
 	Timestamp string
+	Likes     string
+	Retweets  string
 	Thumbnail string
 }
 
@@ -124,6 +128,8 @@ func buildTweetTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 	data.Text = tweet.Text
 	data.Name = tweet.User.Name
 	data.Username = tweet.User.Username
+	data.Likes = insertCommas(strconv.FormatUint(tweet.Likes, 10), 3)
+	data.Retweets = insertCommas(strconv.FormatUint(tweet.Retweets, 10), 3)
 
 	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Timestamp)
 	data.Timestamp = timestamp.Format(timestampFormat)
