@@ -48,6 +48,54 @@ type tweetTooltipData struct {
     Thumbnail string
 }
 
+func getTweetIDFromURL(url *url.URL) string {
+    match := tweetRegexp.FindAllStringSubmatch(url.Path, -1)
+    if len(match) > 0 && len(match[0]) == 2 {
+        return match[0][1]
+    }
+    return ""
+}
+
+func getTweetByID(id, bearer string) (*TweetApiResponse, error) {
+    endpointUrl := fmt.Sprintf("https://api.twitter.com/1.1/statuses/show.json?id=%s&tweet_mode=extended", id)
+    req, err := http.NewRequest("GET", endpointUrl, nil)
+    if err != nil {
+        return nil, err
+    }
+    req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", bearer))
+    resp, err := httpClient.Do(req)
+    if err != nil {
+        return nil, err
+    }
+
+    defer resp.Body.Close()
+
+    if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+        return nil, fmt.Errorf("%d", resp.StatusCode)
+    }
+
+    var tweet *TweetApiResponse
+    err = json.NewDecoder(resp.Body).Decode(&tweet)
+    if err != nil {
+        return nil, errors.New("unable to process response")
+    }
+
+    return tweet, nil
+}
+
+func tweet2Tooltip(tweet *TweetApiResponse) *tweetTooltipData {
+    data := &tweetTooltipData{}
+    data.Text = tweet.Text
+    data.Name = tweet.User.Name
+    data.Username = tweet.User.Username
+
+    if len(tweet.Entities.Media) > 0 {
+        data.Thumbnail = tweet.Entities.Media[0].URL
+    }
+
+    return data
+}
+
 func init() {
     bearerKey, exists := os.LookupEnv("CHATTERINO_API_TWITTER_BEARER_TOKEN")
     if !exists {
@@ -108,50 +156,3 @@ func init() {
     })
 }
 
-func getTweetIDFromURL(url *url.URL) string {
-    match := tweetRegexp.FindAllStringSubmatch(url.Path, -1)
-    if len(match) > 0 && len(match[0]) == 2 {
-        return match[0][1]
-    }
-    return ""
-}
-
-func getTweetByID(id, bearer string) (*TweetApiResponse, error) {
-    endpointUrl := fmt.Sprintf("https://api.twitter.com/1.1/statuses/show.json?id=%s&tweet_mode=extended", id)
-    req, err := http.NewRequest("GET", endpointUrl, nil)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", bearer))
-    resp, err := httpClient.Do(req)
-    if err != nil {
-        return nil, err
-    }
-
-    defer resp.Body.Close()
-
-    if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-        return nil, fmt.Errorf("%d", resp.StatusCode)
-    }
-
-    var tweet *TweetApiResponse
-    err = json.NewDecoder(resp.Body).Decode(&tweet)
-    if err != nil {
-        return nil, errors.New("unable to process response")
-    }
-
-    return tweet, nil
-}
-
-func tweet2Tooltip(tweet *TweetApiResponse) *tweetTooltipData {
-    data := &tweetTooltipData{}
-    data.Text = tweet.Text
-    data.Name = tweet.User.Name
-    data.Username = tweet.User.Username
-
-    if len(tweet.Entities.Media) > 0 {
-        data.Thumbnail = tweet.Entities.Media[0].URL
-    }
-
-    return data
-}
