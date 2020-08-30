@@ -122,7 +122,7 @@ func getTweetByID(id, bearer string) (*TweetApiResponse, error) {
     if err != nil {
         return nil, err
     }
-    req.Header.Set("Authorization", "Bearer "+bearer)
+    req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", bearer))
     resp, err := httpClient.Do(req)
     if err != nil {
         return nil, err
