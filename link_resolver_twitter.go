@@ -66,10 +66,12 @@ func init() {
 
         tweetResp, err := getTweetByID(tweetID, bearerKey)
         if err != nil {
-            return &LinkResolverResponse{
-                Status:  http.StatusInternalServerError,
-                Message: "twitter error: " + clean(err.Error()),
-            }, nil, 1 * time.Hour
+            if err.Error() == "404" {
+                var response LinkResolverResponse
+                json.Unmarshal(rNoLinkInfoFound, &response)
+
+                return &response, nil, 1 * time.Hour
+            }
         }
 
         tweetData := tweet2Tooltip(tweetResp)
@@ -129,7 +131,7 @@ func getTweetByID(id, bearer string) (*TweetApiResponse, error) {
     defer resp.Body.Close()
 
     if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-        return nil, fmt.Errorf("responded with status %d", resp.StatusCode)
+        return nil, fmt.Errorf("%d", resp.StatusCode)
     }
 
     var tweet *TweetApiResponse
