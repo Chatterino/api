@@ -16,35 +16,43 @@ import (
 	"text/template"
 )
 
-const tweeterTooltip = `<div style="text-align: left;">
+const (
+	timestampFormat = "Jan 2 2006 • 15:04 UTC"
+
+	tweeterTooltip = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
 <br>
 {{.Text}}
+<br>
+<span style="color: #808892;">{{.Timestamp}}</span>
 </div>
 `
+)
 
 var (
 	tweetRegexp = regexp.MustCompile(`(?i)\/.*\/status(?:es)?\/([^\/\?]+)`)
 )
 
 type TweetApiResponse struct {
-	ID       string `json:"id_str"`
-	Text     string `json:"full_text"`
+	ID        string `json:"id_str"`
+	Text      string `json:"full_text"`
+	Timestamp string `json:"created_at"`
+	User      struct {
+		Name     string `json:"name"`
+		Username string `json:"screen_name"`
+	} `json:"user"`
 	Entities struct {
 		Media []struct {
 			URL string `json:"media_url_https"`
 		} `json:"media"`
 	} `json:"entities"`
-	User struct {
-		Name     string `json:"name"`
-		Username string `json:"screen_name"`
-	} `json:"user"`
 }
 
 type tweetTooltipData struct {
 	Text      string
 	Name      string
 	Username  string
+	Timestamp string
 	Thumbnail string
 }
 
@@ -88,6 +96,13 @@ func buildTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 	data.Text = tweet.Text
 	data.Name = tweet.User.Name
 	data.Username = tweet.User.Username
+
+	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Timestamp)
+	data.Timestamp = timestamp.Format(timestampFormat)
+	if err != nil {
+		log.Println(err.Error())
+		data.Timestamp = ""
+	}
 
 	if len(tweet.Entities.Media) > 0 {
 		data.Thumbnail = tweet.Entities.Media[0].URL
