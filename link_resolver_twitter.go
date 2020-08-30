@@ -316,7 +316,9 @@ func init() {
 			}
 
 			if twitterUserRegexp.MatchString(url.String()) {
-				userName := getUserNameFromUrl(url)
+				// We always use the lowercase representation in order
+				// to avoid making redundant requests.
+				userName := strings.ToLower(getUserNameFromUrl(url))
 				if userName == "" {
 					return rNoLinkInfoFound, nil
 				}
