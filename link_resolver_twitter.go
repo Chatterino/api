@@ -131,7 +131,10 @@ func init() {
 		if err != nil {
 			if err.Error() == "404" {
 				var response LinkResolverResponse
-				json.Unmarshal(rNoLinkInfoFound, &response)
+				unmarshalErr := json.Unmarshal(rNoLinkInfoFound, &response)
+				if unmarshalErr != nil {
+					log.Println("Error unmarshalling prebuilt response:", unmarshalErr.Error())
+				}
 
 				return &response, nil, 1 * time.Hour
 			}
