@@ -122,7 +122,7 @@ func init() {
             }
         }
 
-        tweetData := tweet2Tooltip(tweetResp)
+        tweetData := buildTooltip(tweetResp)
         var tooltip bytes.Buffer
         if err := tooltipTemplate.Execute(&tooltip, tweetData); err != nil {
             return &LinkResolverResponse{
