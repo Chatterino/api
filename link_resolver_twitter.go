@@ -147,7 +147,9 @@ func init() {
 
 	customURLManagers = append(customURLManagers, customURLManager{
 		check: func(url *url.URL) bool {
-			return strings.HasSuffix(url.Host, ".twitter.com") || url.Host == "twitter.com"
+			// Additionally checking the regex to provide default link resolver response on non-status links
+			return (strings.HasSuffix(url.Host, ".twitter.com") || url.Host == "twitter.com") &&
+				tweetRegexp.MatchString(url.String())
 		},
 		run: func(url *url.URL) ([]byte, error) {
 			tweetID := getTweetIDFromURL(url)
