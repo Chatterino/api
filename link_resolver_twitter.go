@@ -123,7 +123,7 @@ func init() {
 
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
-                Message: "Error getting Tweet: " + clean(err.Error()),
+				Message: "Error getting Tweet: " + clean(err.Error()),
 			}, nil, noSpecialDur
 		}
 
@@ -132,7 +132,7 @@ func init() {
 		if err := tooltipTemplate.Execute(&tooltip, tweetData); err != nil {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
-                Message: "Tweet template error: " + clean(err.Error()),
+				Message: "Tweet template error: " + clean(err.Error()),
 			}, nil, noSpecialDur
 		}
 
