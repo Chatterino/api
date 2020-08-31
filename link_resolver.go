@@ -110,9 +110,8 @@ func formatThumbnailUrl(r *http.Request, urlString string) string {
 			scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
 		}
 		return fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(urlString))
-	} else {
-		return fmt.Sprintf("%s/thumbnail/%s", strings.TrimSuffix(*baseURL, "/"), url.QueryEscape(urlString))
 	}
+	return fmt.Sprintf("%s/thumbnail/%s", strings.TrimSuffix(*baseURL, "/"), url.QueryEscape(urlString))
 }
 
 func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
