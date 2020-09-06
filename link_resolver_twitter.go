@@ -22,9 +22,9 @@ const (
 
 	tweetTooltip = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
-<br>
+<span style="white-space: pre-wrap; word-wrap: break-word;">
 {{.Text}}
-<br>
+</span>
 <span style="color: #808892;">{{.Likes}} likes&nbsp;•&nbsp;{{.Retweets}} retweets&nbsp;•&nbsp;{{.Timestamp}}</span>
 </div>
 `
