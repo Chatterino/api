@@ -88,6 +88,15 @@ type twitterUserTooltipData struct {
 	Thumbnail   string
 }
 
+func humanizeNumber(number uint64) string {
+	if number < 1_000_000 {
+		return insertCommas(strconv.FormatUint(number, 10), 3)
+	}
+
+	inMillions := float64(number) / 1_000_000
+	return fmt.Sprintf("%.1fM", inMillions)
+}
+
 func getTweetIDFromURL(url *url.URL) string {
 	match := tweetRegexp.FindAllStringSubmatch(url.Path, -1)
 	if len(match) > 0 && len(match[0]) == 2 {
@@ -128,8 +137,8 @@ func buildTweetTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 	data.Text = tweet.Text
 	data.Name = tweet.User.Name
 	data.Username = tweet.User.Username
-	data.Likes = insertCommas(strconv.FormatUint(tweet.Likes, 10), 3)
-	data.Retweets = insertCommas(strconv.FormatUint(tweet.Retweets, 10), 3)
+	data.Likes = humanizeNumber(tweet.Likes)
+	data.Retweets = humanizeNumber(tweet.Retweets)
 
 	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Timestamp)
 	data.Timestamp = timestamp.Format(timestampFormat)
@@ -186,7 +195,7 @@ func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipDa
 	data.Name = user.Name
 	data.Username = user.Username
 	data.Description = user.Description
-	data.Followers = insertCommas(strconv.FormatUint(user.Followers, 10), 3)
+	data.Followers = humanizeNumber(user.Followers)
 	data.Thumbnail = user.ProfileImageUrl
 
 	return data
