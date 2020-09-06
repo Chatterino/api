@@ -31,9 +31,9 @@ const (
 
 	twitterUserTooltip = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
-<br>
+<span style="white-space: pre-wrap; word-wrap: break-word;">
 {{.Description}}
-<br>
+</span>
 <span style="color: #808892;">{{.Followers}} followers</span>
 </div>
 `
