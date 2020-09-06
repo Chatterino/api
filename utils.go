@@ -52,9 +52,8 @@ func formatDate(format string, str string) string {
 	date, err := time.Parse(time.RFC3339, str)
 	if err != nil {
 		return ""
-	} else {
-		return date.Format(format)
 	}
+	return date.Format(format)
 }
 
 func contains(arr []string, str string) bool {
