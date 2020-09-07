@@ -141,6 +141,19 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 
 	defer resp.Body.Close()
 
+	// If the initial request URL is different from the response's apparent request URL,
+	// we likely followed a redirect. Re-check the custom URL managers to see if the
+	// page we were redirected to supports rich content. If not, continue with the
+	// default tooltip.
+	if requestUrl.String() != resp.Request.URL.String() {
+		for _, m := range customURLManagers {
+			if m.check(resp.Request.URL) {
+				data, err := m.run(resp.Request.URL)
+				return data, err, noSpecialDur
+			}
+		}
+	}
+
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
