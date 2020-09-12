@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -22,18 +21,18 @@ const (
 
 	tweetTooltip = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
-<br>
+<span style="white-space: pre-wrap; word-wrap: break-word;">
 {{.Text}}
-<br>
+</span>
 <span style="color: #808892;">{{.Likes}} likes&nbsp;•&nbsp;{{.Retweets}} retweets&nbsp;•&nbsp;{{.Timestamp}}</span>
 </div>
 `
 
 	twitterUserTooltip = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
-<br>
+<span style="white-space: pre-wrap; word-wrap: break-word;">
 {{.Description}}
-<br>
+</span>
 <span style="color: #808892;">{{.Followers}} followers</span>
 </div>
 `
@@ -128,8 +127,8 @@ func buildTweetTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 	data.Text = tweet.Text
 	data.Name = tweet.User.Name
 	data.Username = tweet.User.Username
-	data.Likes = insertCommas(strconv.FormatUint(tweet.Likes, 10), 3)
-	data.Retweets = insertCommas(strconv.FormatUint(tweet.Retweets, 10), 3)
+	data.Likes = humanizeNumber(tweet.Likes)
+	data.Retweets = humanizeNumber(tweet.Retweets)
 
 	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Timestamp)
 	data.Timestamp = timestamp.Format(timestampFormat)
@@ -186,7 +185,7 @@ func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipDa
 	data.Name = user.Name
 	data.Username = user.Username
 	data.Description = user.Description
-	data.Followers = insertCommas(strconv.FormatUint(user.Followers, 10), 3)
+	data.Followers = humanizeNumber(user.Followers)
 	data.Thumbnail = user.ProfileImageUrl
 
 	return data
