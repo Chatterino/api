@@ -52,6 +52,12 @@ func getYoutubeVideoIDFromURL2(url *url.URL) string {
 }
 
 func init() {
+	youtubeVideoParts := []string{
+		"statistics",
+		"snippet",
+		"contentDetails",
+	}
+
 	apiKey, exists := os.LookupEnv("YOUTUBE_API_KEY")
 	if !exists {
 		log.Println("No YOUTUBE_API_KEY specified, won't do special responses for youtube")
@@ -73,7 +79,7 @@ func init() {
 
 	load := func(videoID string, r *http.Request) (interface{}, error, time.Duration) {
 		log.Println("[YouTube] GET", videoID)
-		youtubeResponse, err := youtubeClient.Videos.List("statistics,snippet,contentDetails").Id(videoID).Do()
+		youtubeResponse, err := youtubeClient.Videos.List(youtubeVideoParts).Id(videoID).Do()
 		if err != nil {
 			return &LinkResolverResponse{
 				Status:  500,
