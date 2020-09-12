@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,6 +47,15 @@ func insertCommas(str string, n int) string {
 		}
 	}
 	return buffer.String()
+}
+
+func humanizeNumber(number uint64) string {
+	if number < 1_000_000 {
+		return insertCommas(strconv.FormatUint(number, 10), 3)
+	}
+
+	inMillions := float64(number) / 1_000_000
+	return fmt.Sprintf("%.1fM", inMillions)
 }
 
 func formatDate(format string, str string) string {

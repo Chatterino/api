@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -86,15 +85,6 @@ type twitterUserTooltipData struct {
 	Description string
 	Followers   string
 	Thumbnail   string
-}
-
-func humanizeNumber(number uint64) string {
-	if number < 1_000_000 {
-		return insertCommas(strconv.FormatUint(number, 10), 3)
-	}
-
-	inMillions := float64(number) / 1_000_000
-	return fmt.Sprintf("%.1fM", inMillions)
 }
 
 func getTweetIDFromURL(url *url.URL) string {
