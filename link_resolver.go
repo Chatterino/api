@@ -118,13 +118,6 @@ func formatThumbnailUrl(r *http.Request, urlString string) string {
 }
 
 func doRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
-	isAllowed, err := isAllowedByRobotsTxt(urlString, r)
-	if err != nil {
-		log.Println("Error checking robots.txt", err)
-	} else if !isAllowed {
-		return rForbiddenByRobotsTxt, nil, noSpecialDur
-	}
-
 	requestUrl, err := url.Parse(urlString)
 	if err != nil {
 		return rInvalidURL, nil, noSpecialDur
@@ -135,6 +128,13 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 			data, err := m.run(requestUrl)
 			return data, err, noSpecialDur
 		}
+	}
+
+	isAllowed, err := isAllowedByRobotsTxt(urlString, r)
+	if err != nil {
+		log.Println("Error checking robots.txt", err)
+	} else if !isAllowed {
+		return rForbiddenByRobotsTxt, nil, noSpecialDur
 	}
 
 	resp, err := makeRequest(requestUrl.String())
