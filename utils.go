@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -48,13 +49,21 @@ func insertCommas(str string, n int) string {
 	return buffer.String()
 }
 
+func humanizeNumber(number uint64) string {
+	if number < 1_000_000 {
+		return insertCommas(strconv.FormatUint(number, 10), 3)
+	}
+
+	inMillions := float64(number) / 1_000_000
+	return fmt.Sprintf("%.1fM", inMillions)
+}
+
 func formatDate(format string, str string) string {
 	date, err := time.Parse(time.RFC3339, str)
 	if err != nil {
 		return ""
-	} else {
-		return date.Format(format)
 	}
+	return date.Format(format)
 }
 
 func contains(arr []string, str string) bool {

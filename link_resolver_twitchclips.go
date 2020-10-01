@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -23,12 +24,16 @@ var noTwitchClipWithThisIDFound = &LinkResolverResponse{
 const twitchClipsTooltip = `<div style="text-align: left;">
 <b>{{.Title}}</b><hr>
 <b>Channel:</b> {{.ChannelName}}<br>
+<b>Duration:</b> {{.Duration}}<br>
+<b>Created:</b> {{.CreationDate}}<br>
 <b>Views: </b> {{.Views}}</div>`
 
 type twitchClipsTooltipData struct {
-	Title       string
-	ChannelName string
-	Views       string
+	Title        string
+	ChannelName  string
+	Duration     string
+	CreationDate string
+	Views        string
 }
 
 func init() {
@@ -54,16 +59,18 @@ func init() {
 		}
 
 		data := twitchClipsTooltipData{
-			Title:       clip.Title,
-			ChannelName: clip.Broadcaster.DisplayName,
-			Views:       insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3),
+			Title:        clip.Title,
+			ChannelName:  clip.Broadcaster.DisplayName,
+			Duration:     fmt.Sprintf("%g%s", clip.Duration, "s"),
+			CreationDate: clip.CreatedAt.Format("02 Jan 2006"),
+			Views:        insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3),
 		}
 
 		var tooltip bytes.Buffer
 		if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
-				Message: "youtube template error " + clean(err.Error()),
+				Message: "twitch clip template error " + clean(err.Error()),
 			}, nil, noSpecialDur
 		}
 
