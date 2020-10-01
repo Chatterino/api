@@ -242,7 +242,7 @@ func init() {
 
 		return &LinkResolverResponse{
 			Status:    http.StatusOK,
-			Tooltip:   tooltip.String(),
+			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: tweetData.Thumbnail,
 		}, nil, noSpecialDur
 	}
@@ -279,7 +279,7 @@ func init() {
 
 		return &LinkResolverResponse{
 			Status:    http.StatusOK,
-			Tooltip:   tooltip.String(),
+			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: userData.Thumbnail,
 		}, nil, noSpecialDur
 	}

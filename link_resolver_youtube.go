@@ -122,7 +122,7 @@ func init() {
 
 		return &LinkResolverResponse{
 			Status:    http.StatusOK,
-			Tooltip:   tooltip.String(),
+			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: thumbnail,
 		}, nil, noSpecialDur
 	}

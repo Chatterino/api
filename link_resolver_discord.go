@@ -187,7 +187,7 @@ func init() {
 
 		return &LinkResolverResponse{
 			Status:    200,
-			Tooltip:   tooltip.String(),
+			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: fmt.Sprintf("https://cdn.discordapp.com/icons/%s/%s", jsonResponse.Guild.ID, jsonResponse.Guild.IconHash),
 			Link:      fmt.Sprintf("https://discord.gg/%s", inviteCode),
 		}, nil, noSpecialDur
