@@ -23,10 +23,11 @@ Returns information about a given twitch emote set. Example response:
 Resolves a url into a preview tooltip. Example response:
 ```
 {
-    "status": 200,                     // status code returned from the page
-    "message": "",                     // used to forward errors in case the website e.g. couldn't load
-    "tooltip": "<div>tooltip</div>",   // HTML tooltip used in Chatterino
-    "link": "http://final.url.com/asd" // final url, after any redirects
+    "status": 200,                                // status code returned from the page
+    "thumbnail": "/thumbnail/url.com%2Fimage.png" // proxied thumbnail url if there's an image
+    "message": "",                                // used to forward errors in case the website e.g. couldn't load
+    "tooltip": "<div>tooltip</div>",              // HTML tooltip used in Chatterino
+    "link": "http://final.url.com/asd"            // final url, after any redirects
 }
 ```
 
