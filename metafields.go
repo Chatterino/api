@@ -22,13 +22,10 @@ func tooltipMetaFields(doc *goquery.Document, r *http.Request, resp *http.Respon
 			 */
 			case (prop == "og:title" || prop == "twitter:title") && data.Title == "":
 				data.Title = cont
-				break
 			case (prop == "og:description" || prop == "twitter:description") && data.Description == "":
 				data.Description = cont
-				break
 			case (prop == "og:image" || prop == "twitter:image") && data.ImageSrc == "":
 				data.ImageSrc = formatThumbnailUrl(r, cont)
-				break
 			}
 		})
 	}
