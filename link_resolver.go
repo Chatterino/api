@@ -73,28 +73,9 @@ func makeRequest(url string) (response *http.Response, err error) {
 }
 
 func defaultTooltipData(doc *goquery.Document, r *http.Request, resp *http.Response) tooltipData {
-	data := tooltipData{
+	data := metaFields(doc, r, resp, tooltipData{
 		URL: clean(resp.Request.URL.String()),
-	}
-
-	/* Support for HTML Open Graph meta tags.
-	 * Will show Open Graph "Title", "Description", "Image" information of webpages.
-	 * More fields are available: https://ogp.me/
-	 */
-	metaFields := doc.Find("meta[property][content]")
-	if metaFields.Size() > 0 {
-		metaFields.Each(func(i int, s *goquery.Selection) {
-			prop, _ := s.Attr("property")
-			cont, _ := s.Attr("content")
-			if prop == "og:title" {
-				data.Title = cont
-			} else if prop == "og:description" {
-				data.Description = cont
-			} else if prop == "og:image" {
-				data.ImageSrc = formatThumbnailUrl(r, cont)
-			}
-		})
-	}
+	})
 
 	if data.Title == "" {
 		data.Title = doc.Find("title").First().Text()
