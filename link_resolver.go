@@ -73,7 +73,7 @@ func makeRequest(url string) (response *http.Response, err error) {
 }
 
 func defaultTooltipData(doc *goquery.Document, r *http.Request, resp *http.Response) tooltipData {
-	data := metaFields(doc, r, resp, tooltipData{
+	data := tooltipMetaFields(doc, r, resp, tooltipData{
 		URL: clean(resp.Request.URL.String()),
 	})
 

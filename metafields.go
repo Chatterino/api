@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func metaFields(doc *goquery.Document, r *http.Request, resp *http.Response, data tooltipData) tooltipData {
+func tooltipMetaFields(doc *goquery.Document, r *http.Request, resp *http.Response, data tooltipData) tooltipData {
 	fields := doc.Find("meta[property][content]")
 
 	if fields.Size() > 0 {
@@ -14,28 +14,21 @@ func metaFields(doc *goquery.Document, r *http.Request, resp *http.Response, dat
 			prop, _ := s.Attr("property")
 			cont, _ := s.Attr("content")
 
-			/* Support for HTML Open Graph meta tags.
-			 * Will show Open Graph "Title", "Description", "Image" information of webpages.
-			 * More fields & information: https://ogp.me/
+			switch {
+			/* Support for HTML Open Graph & Twitter meta tags.
+			 * Will show Open Graph & Twitter "Title", "Description", "Image" information of webpages.
+			 * More OG fields & information: https://ogp.me/
+			 * More Twitter fields & information: https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/markup
 			 */
-			if prop == "og:title" {
+			case (prop == "og:title" || prop == "twitter:title") && data.Title == "":
 				data.Title = cont
-			} else if prop == "og:description" {
+				break
+			case (prop == "og:description" || prop == "twitter:description") && data.Description == "":
 				data.Description = cont
-			} else if prop == "og:image" {
+				break
+			case (prop == "og:image" || prop == "twitter:image") && data.ImageSrc == "":
 				data.ImageSrc = formatThumbnailUrl(r, cont)
-
-				/* Support for HTML Twitter meta tags.
-				 * Will show Twitter "Title", "Description", "Image", information of webpages.
-				 * More fields & information: https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/markup
-				 * OG meta tags should override these.
-				 */
-			} else if prop == "twitter:title" && data.Title == "" {
-				data.Title = cont
-			} else if prop == "twitter:description" && data.Description == "" {
-				data.Description = cont
-			} else if prop == "twitter:image" && data.ImageSrc == "" {
-				data.ImageSrc = formatThumbnailUrl(r, cont)
+				break
 			}
 		})
 	}
