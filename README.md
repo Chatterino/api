@@ -50,5 +50,5 @@ Uptime: 928h5m7.937821282s - Memory: Alloc=510 MiB, TotalAlloc=17419213 MiB, Sys
 
 ## Using your self-hosted version
 If you host your own version of this API, you can modify which url Chatterino2 uses to resolve links and to resolve twitch emote sets.  
-[Change link resolver](https://github.com/Chatterino/chatterino2/blob/master/docs/ENV.md#chatterino2_link_resolver_url)  
-[Change twitch emote resolver](https://github.com/Chatterino/chatterino2/blob/master/docs/ENV.md#chatterino2_twitch_emote_set_resolver_url)  
+[Change link resolver](https://wiki.chatterino.com/Environment%20Variables/#chatterino2_link_resolver_url)  
+[Change Twitch emote resolver](https://wiki.chatterino.com/Environment%20Variables/#chatterino2_twitch_emote_set_resolver_url)
