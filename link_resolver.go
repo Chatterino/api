@@ -203,7 +203,7 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 
 	response := &LinkResolverResponse{
 		Status:    resp.StatusCode,
-		Tooltip:   tooltip.String(),
+		Tooltip:   url.PathEscape(tooltip.String()),
 		Link:      resp.Request.URL.String(),
 		Thumbnail: data.ImageSrc,
 	}

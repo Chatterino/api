@@ -137,7 +137,7 @@ func init() {
 
 		return &LinkResolverResponse{
 			Status:    200,
-			Tooltip:   tooltip.String(),
+			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: thumbnailURL,
 		}, nil, noSpecialDur
 	}
