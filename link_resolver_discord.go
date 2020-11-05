@@ -19,7 +19,7 @@ import (
 
 func init() {
 	const (
-		discordInviteAPIURL = "https://discord.com/api/v6/invites/%s?with_counts=true"
+		discordInviteAPIURL = "https://discord.com/api/v8/invites/%s?with_counts=true"
 
 		discordInviteTooltip = `<div style="text-align: left;">
 <b>{{.ServerName}}</b>
