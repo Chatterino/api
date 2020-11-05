@@ -194,7 +194,7 @@ func init() {
 	}
 
 	cache := newLoadingCache("discord_invites", load, 6*time.Hour) // Often calls quickly result in 429's
-	discordInviteURLRegex := regexp.MustCompile(`^(www\.)?(discord\.gg|discord(app)?\.com\/invite)\/([a-zA-Z0-9-]+)`)
+	discordInviteURLRegex := regexp.MustCompile(`^(www\.)?discord\.(gg|com\/invite)\/([a-zA-Z0-9-]+)`)
 
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
 	customURLManagers = append(customURLManagers, customURLManager{
@@ -203,11 +203,11 @@ func init() {
 		},
 		run: func(url *url.URL) ([]byte, error) {
 			matches := discordInviteURLRegex.FindStringSubmatch(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
-			if len(matches) != 5 {
+			if len(matches) != 4 {
 				return nil, invalidDiscordInvite
 			}
 
-			inviteCode := matches[4]
+			inviteCode := matches[3]
 
 			apiResponse := cache.Get(inviteCode, nil)
 			return json.Marshal(apiResponse)
