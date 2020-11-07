@@ -80,17 +80,7 @@ func init() {
 		thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteID)
 
 		// Create FFZ API request
-		req, err := http.NewRequest("GET", apiURL, nil)
-		if err != nil {
-			return &LinkResolverResponse{
-				Status:  http.StatusInternalServerError,
-				Message: "ffz http request creation error " + clean(err.Error()),
-			}, nil, noSpecialDur
-		}
-		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
-
-		// Execute FFZ API request
-		resp, err := httpClient.Do(req)
+		resp, err := makeRequest(apiURL)
 		if err != nil {
 			return &LinkResolverResponse{
 				Status:  http.StatusInternalServerError,
