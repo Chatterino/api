@@ -14,6 +14,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 var (
@@ -34,7 +36,7 @@ func init() {
 	)
 
 	var (
-		trackNotFoundResponse = &LinkResolverResponse{
+		trackNotFoundResponse = &resolver.Response{
 			Status:  http.StatusNotFound,
 			Message: "No track with this ID found",
 		}
@@ -85,9 +87,9 @@ func init() {
 		// Create Track list API request
 		req, err := http.NewRequest("GET", apiURL, nil)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Track list request creation error " + clean(err.Error()),
+				Message: "Track list request creation error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
@@ -95,9 +97,9 @@ func init() {
 		// Execute Track list API request
 		resp, err := httpClient.Do(req)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Track list http request error " + clean(err.Error()),
+				Message: "Track list http request error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		defer resp.Body.Close()
@@ -110,18 +112,18 @@ func init() {
 		// Read response into a string
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Track list http body read error " + clean(err.Error()),
+				Message: "Track list http body read error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
 		// Parse response into a predefined JSON blob (see TrackListAPIResponse struct above)
 		var jsonResponse TrackListAPIResponse
 		if err := json.Unmarshal(body, &jsonResponse); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Track list api unmarshal error " + clean(err.Error()),
+				Message: "Track list api unmarshal error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		if jsonResponse.Data.ID == 0 { // API responds with {..., "data": null} if nothing was found
@@ -164,13 +166,13 @@ func init() {
 		// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 		var tooltip bytes.Buffer
 		if err := tmpl.Execute(&tooltip, data); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Track list template error " + clean(err.Error()),
+				Message: "Track list template error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
-		return &LinkResolverResponse{
+		return &resolver.Response{
 			Status:  200,
 			Tooltip: url.PathEscape(tooltip.String()),
 			//Thumbnail: thumbnailURL,
@@ -186,8 +188,8 @@ func init() {
 	}
 
 	// Find links matching the Track list link (e.g. https://supinic.com/track/detail/1883)
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			host := strings.ToLower(url.Host)
 
 			if _, ok := trackListDomains[host]; !ok {
@@ -200,7 +202,7 @@ func init() {
 
 			return true
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			matches := trackPathRegex.FindStringSubmatch(url.Path)
 			if len(matches) != 2 {
 				return nil, invalidTrackPath

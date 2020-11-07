@@ -8,15 +8,16 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
 
+	"github.com/Chatterino/api/pkg/humanize"
+	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/dankeroni/gotwitch"
 )
 
-var noTwitchClipWithThisIDFound = &LinkResolverResponse{
+var noTwitchClipWithThisIDFound = &resolver.Response{
 	Status:  http.StatusNotFound,
 	Message: "No Twitch Clip with this ID found",
 }
@@ -63,18 +64,18 @@ func init() {
 			ChannelName:  clip.Broadcaster.DisplayName,
 			Duration:     fmt.Sprintf("%g%s", clip.Duration, "s"),
 			CreationDate: clip.CreatedAt.Format("02 Jan 2006"),
-			Views:        insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3),
+			Views:        humanize.Number(uint64(clip.Views)),
 		}
 
 		var tooltip bytes.Buffer
 		if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "twitch clip template error " + clean(err.Error()),
+				Message: "twitch clip template error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
-		return &LinkResolverResponse{
+		return &resolver.Response{
 			Status:    200,
 			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: clip.Thumbnails.Medium,
@@ -84,11 +85,11 @@ func init() {
 	cache := newLoadingCache("twitchclip", load, 1*time.Hour)
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			return strings.HasSuffix(url.Host, "clips.twitch.tv")
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[0]
 
@@ -98,8 +99,8 @@ func init() {
 	})
 
 	// Find clips that look like https://twitch.tv/StreamerName/clip/SlugHere
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			if !strings.HasSuffix(url.Host, "twitch.tv") {
 				return false
 			}
@@ -108,7 +109,7 @@ func init() {
 
 			return len(pathParts) >= 4 && pathParts[2] == "clip"
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[2]
 

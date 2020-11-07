@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 func TestResolveTwitchClip(t *testing.T) {
@@ -26,7 +28,7 @@ func TestResolveTwitchClip(t *testing.T) {
 		panic(err)
 	}
 	fmt.Println(string(body))
-	var jsonResponse LinkResolverResponse
+	var jsonResponse resolver.Response
 	err = json.Unmarshal(body, &jsonResponse)
 	if err != nil {
 		panic(err)
@@ -52,7 +54,7 @@ func TestResolveTwitchClip2(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	var jsonResponse LinkResolverResponse
+	var jsonResponse resolver.Response
 	err = json.Unmarshal(body, &jsonResponse)
 	if err != nil {
 		panic(err)
