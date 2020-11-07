@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 var (
@@ -16,7 +18,7 @@ var (
 
 func init() {
 	var err error
-	r := &LinkResolverResponse{
+	r := &resolver.Response{
 		Status:  404,
 		Message: "Could not fetch link info: No link info found",
 	}
@@ -27,7 +29,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	r = &LinkResolverResponse{
+	r = &resolver.Response{
 		Status:  500,
 		Message: "Could not fetch link info: Invalid URL",
 	}
@@ -37,7 +39,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	r = &LinkResolverResponse{
+	r = &resolver.Response{
 		Status:  http.StatusInternalServerError,
 		Message: fmt.Sprintf("Could not fetch link info: Response too large (>%dMB)", maxContentLength/1024/1024),
 	}

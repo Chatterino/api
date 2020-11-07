@@ -13,6 +13,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 var (
@@ -32,7 +34,7 @@ func init() {
 	)
 
 	var (
-		emoteNotFoundResponse = &LinkResolverResponse{
+		emoteNotFoundResponse = &resolver.Response{
 			Status:  http.StatusNotFound,
 			Message: "No FrankerFaceZ emote with this id found",
 		}
@@ -112,9 +114,9 @@ func init() {
 		// Create FFZ API request
 		resp, err := makeRequest(apiURL)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "ffz http request error " + clean(err.Error()),
+				Message: "ffz http request error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		defer resp.Body.Close()
@@ -127,9 +129,9 @@ func init() {
 		// Read response into a string
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "ffz http body read error " + clean(err.Error()),
+				Message: "ffz http body read error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
@@ -139,24 +141,24 @@ func init() {
 		}
 
 		if err := json.Unmarshal(body, &temp); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "ffz api unmarshal error " + clean(err.Error()),
+				Message: "ffz api unmarshal error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		jsonResponse := temp.Emote
 		jsonResponse.CreatedAt, err = time.Parse(time.RFC1123, jsonResponse.CreatedAtRaw)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "ffz api created at time unmarshal error " + clean(err.Error()),
+				Message: "ffz api created at time unmarshal error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		jsonResponse.UpdatedAt, err = time.Parse(time.RFC1123, jsonResponse.UpdatedAtRaw)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "ffz api updated at time unmarshal error " + clean(err.Error()),
+				Message: "ffz api updated at time unmarshal error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
@@ -169,13 +171,13 @@ func init() {
 		// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 		var tooltip bytes.Buffer
 		if err := tmpl.Execute(&tooltip, data); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "ffz template error " + clean(err.Error()),
+				Message: "ffz template error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
-		return &LinkResolverResponse{
+		return &resolver.Response{
 			Status:    200,
 			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: thumbnailURL,
@@ -192,8 +194,8 @@ func init() {
 	}
 
 	// Find links matching the FFZ direct emote link (e.g. https://www.frankerfacez.com/emoticon/490944-PAJAP)
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			host := strings.ToLower(url.Host)
 
 			if _, ok := ffzDomains[host]; !ok {
@@ -206,7 +208,7 @@ func init() {
 
 			return true
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			matches := emotePathRegex.FindStringSubmatch(url.Path)
 			if len(matches) != 2 {
 				return nil, errInvalidFFZEmotePath

@@ -14,6 +14,8 @@ import (
 	"net/url"
 	"regexp"
 	"text/template"
+
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 const (
@@ -216,7 +218,7 @@ func init() {
 		tweetResp, err := getTweetByID(tweetID, bearerKey)
 		if err != nil {
 			if err.Error() == "404" {
-				var response LinkResolverResponse
+				var response resolver.Response
 				unmarshalErr := json.Unmarshal(rNoLinkInfoFound, &response)
 				if unmarshalErr != nil {
 					log.Println("Error unmarshalling prebuilt response:", unmarshalErr.Error())
@@ -225,22 +227,22 @@ func init() {
 				return &response, nil, 1 * time.Hour
 			}
 
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Error getting Tweet: " + clean(err.Error()),
+				Message: "Error getting Tweet: " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
 		tweetData := buildTweetTooltip(tweetResp)
 		var tooltip bytes.Buffer
 		if err := tweetTooltipTemplate.Execute(&tooltip, tweetData); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Tweet template error: " + clean(err.Error()),
+				Message: "Tweet template error: " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
-		return &LinkResolverResponse{
+		return &resolver.Response{
 			Status:    http.StatusOK,
 			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: tweetData.Thumbnail,
@@ -253,7 +255,7 @@ func init() {
 		userResp, err := getUserByName(userName, bearerKey)
 		if err != nil {
 			if err.Error() == "50" {
-				var response LinkResolverResponse
+				var response resolver.Response
 				unmarshalErr := json.Unmarshal(rNoLinkInfoFound, &response)
 				if unmarshalErr != nil {
 					log.Println("Error unmarshalling prebuilt response:", unmarshalErr.Error())
@@ -262,22 +264,22 @@ func init() {
 				return &response, nil, 1 * time.Hour
 			}
 
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Error getting Twitter user: " + clean(err.Error()),
+				Message: "Error getting Twitter user: " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
 		userData := buildTwitterUserTooltip(userResp)
 		var tooltip bytes.Buffer
 		if err := twitterUserTooltipTemplate.Execute(&tooltip, userData); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Twitter user template error: " + clean(err.Error()),
+				Message: "Twitter user template error: " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
-		return &LinkResolverResponse{
+		return &resolver.Response{
 			Status:    http.StatusOK,
 			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: userData.Thumbnail,
@@ -287,8 +289,8 @@ func init() {
 	tweetCache := newLoadingCache("tweets", loadTweet, 24*time.Hour)
 	twitterUserCache := newLoadingCache("twitterUsers", loadTwitterUser, 24*time.Hour)
 
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			isTwitter := (strings.HasSuffix(url.Host, ".twitter.com") || url.Host == "twitter.com")
 
 			if !isTwitter {
@@ -303,7 +305,7 @@ func init() {
 			isTwitterUser := twitterUserRegexp.MatchString(url.String())
 			return isTwitterUser
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			if tweetRegexp.MatchString(url.String()) {
 				tweetID := getTweetIDFromURL(url)
 				if tweetID == "" {

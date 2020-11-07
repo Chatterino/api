@@ -1,10 +1,8 @@
-package main
+package resolver
 
-import (
-	"html"
-)
+import "html"
 
-func clean(in string) string {
+func CleanResponse(in string) string {
 	if len(in) > 500 {
 		in = in[:500]
 	}

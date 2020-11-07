@@ -15,6 +15,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 func init() {
@@ -34,7 +36,7 @@ func init() {
 	)
 
 	var (
-		inviteNotFoundResponse = &LinkResolverResponse{
+		inviteNotFoundResponse = &resolver.Response{
 			Status:  http.StatusNotFound,
 			Message: "No Discord invite with this code found",
 		}
@@ -91,9 +93,9 @@ func init() {
 		// Create Discord API request
 		req, err := http.NewRequest("GET", apiURL, nil)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Discord API request creation error " + clean(err.Error()),
+				Message: "Discord API request creation error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
@@ -102,9 +104,9 @@ func init() {
 		// Execute Discord API request
 		resp, err := httpClient.Do(req)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Discord API request error " + clean(err.Error()),
+				Message: "Discord API request error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 		defer resp.Body.Close()
@@ -117,18 +119,18 @@ func init() {
 		// Read response into a string
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Discord API http body read error " + clean(err.Error()),
+				Message: "Discord API http body read error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
 		// Parse response into a predefined JSON blob (see TrackListAPIResponse struct above)
 		var jsonResponse DiscordInviteData
 		if err := json.Unmarshal(body, &jsonResponse); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Discord API unmarshal error " + clean(err.Error()),
+				Message: "Discord API unmarshal error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
@@ -179,13 +181,13 @@ func init() {
 		// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 		var tooltip bytes.Buffer
 		if err := tmpl.Execute(&tooltip, data); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "Discord Invite template error " + clean(err.Error()),
+				Message: "Discord Invite template error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
-		return &LinkResolverResponse{
+		return &resolver.Response{
 			Status:    200,
 			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: fmt.Sprintf("https://cdn.discordapp.com/icons/%s/%s", jsonResponse.Guild.ID, jsonResponse.Guild.IconHash),
@@ -197,11 +199,11 @@ func init() {
 	discordInviteURLRegex := regexp.MustCompile(`^(www\.)?discord\.(gg|com\/invite)\/([a-zA-Z0-9-]+)`)
 
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			return discordInviteURLRegex.MatchString(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			matches := discordInviteURLRegex.FindStringSubmatch(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
 			if len(matches) != 4 {
 				return nil, invalidDiscordInvite

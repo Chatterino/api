@@ -12,26 +12,13 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gorilla/mux"
+
+	"github.com/Chatterino/api/internal/resolvers/betterttv"
+	"github.com/Chatterino/api/pkg/resolver"
 )
-
-type LinkResolverResponse struct {
-	Status  int    `json:"status"`
-	Message string `json:"message,omitempty"`
-
-	Thumbnail string `json:"thumbnail,omitempty"`
-	Tooltip   string `json:"tooltip,omitempty"`
-	Link      string `json:"link,omitempty"`
-
-	// Flag in the BTTV API to.. maybe signify that the link will download something? idk
-	// Download *bool  `json:"download,omitempty"`
-}
-
-type customURLManager struct {
-	check func(url *url.URL) bool
-	run   func(url *url.URL) ([]byte, error)
-}
 
 const tooltip = `<div style="text-align: left;">
 {{if .Title}}
@@ -55,26 +42,16 @@ func (d *tooltipData) Truncate() {
 }
 
 var (
-	customURLManagers []customURLManager
+	customURLManagers []resolver.CustomURLManager
 )
 
 func makeRequest(url string) (response *http.Response, err error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	// ensures websites return pages in english (e.g. twitter would return french preview
-	// when the request came from a french IP.)
-	req.Header.Add("Accept-Language", "en-US, en;q=0.9, *;q=0.5")
-	req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
-
-	return httpClient.Do(req)
+	return resolver.RequestGET(url)
 }
 
 func defaultTooltipData(doc *goquery.Document, r *http.Request, resp *http.Response) tooltipData {
 	data := tooltipMetaFields(doc, r, resp, tooltipData{
-		URL: clean(resp.Request.URL.String()),
+		URL: resolver.CleanResponse(resp.Request.URL.String()),
 	})
 
 	if data.Title == "" {
@@ -102,8 +79,8 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 	}
 
 	for _, m := range customURLManagers {
-		if m.check(requestUrl) {
-			data, err := m.run(requestUrl)
+		if m.Check(requestUrl) {
+			data, err := m.Run(requestUrl)
 			return data, err, noSpecialDur
 		}
 	}
@@ -114,9 +91,9 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 			return rNoLinkInfoFound, nil, noSpecialDur
 		}
 
-		return marshalNoDur(&LinkResolverResponse{
+		return marshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
-			Message: clean(err.Error()),
+			Message: resolver.CleanResponse(err.Error()),
 		})
 	}
 
@@ -128,8 +105,8 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 	// default tooltip.
 	if requestUrl.String() != resp.Request.URL.String() {
 		for _, m := range customURLManagers {
-			if m.check(resp.Request.URL) {
-				data, err := m.run(resp.Request.URL)
+			if m.Check(resp.Request.URL) {
+				data, err := m.Run(resp.Request.URL)
 				return data, err, noSpecialDur
 			}
 		}
@@ -154,18 +131,18 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 
 	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
 	if err != nil {
-		return marshalNoDur(&LinkResolverResponse{
+		return marshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
-			Message: "html parser error (or download) " + clean(err.Error()),
+			Message: "html parser error (or download) " + resolver.CleanResponse(err.Error()),
 		})
 	}
 
 	tooltipTemplate, err := template.New("tooltip").Parse(tooltip)
 	if err != nil {
 		log.Println("Error initialization tooltip template:", err)
-		return marshalNoDur(&LinkResolverResponse{
+		return marshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
-			Message: "template error " + clean(err.Error()),
+			Message: "template error " + resolver.CleanResponse(err.Error()),
 		})
 	}
 
@@ -176,13 +153,13 @@ func doRequest(urlString string, r *http.Request) (interface{}, error, time.Dura
 
 	var tooltip bytes.Buffer
 	if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
-		return marshalNoDur(&LinkResolverResponse{
+		return marshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
-			Message: "template error " + clean(err.Error()),
+			Message: "template error " + resolver.CleanResponse(err.Error()),
 		})
 	}
 
-	response := &LinkResolverResponse{
+	response := &resolver.Response{
 		Status:    resp.StatusCode,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Link:      resp.Request.URL.String(),
@@ -215,10 +192,15 @@ func linkResolver(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var linkResolverCache *loadingCache
+var linkResolverCache = cache.New("linkResolver", doRequest, time.Duration(10)*time.Minute)
+
+func register(managers []resolver.CustomURLManager) {
+	customURLManagers = append(customURLManagers, managers...)
+}
 
 func init() {
-	linkResolverCache = newLoadingCache("linkResolver", doRequest, 10*time.Minute)
+	// Register Link Resolvers from internal/resolvers/
+	register(betterttv.New())
 }
 
 func handleLinkResolver(router *mux.Router) {

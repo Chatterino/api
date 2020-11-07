@@ -15,6 +15,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Chatterino/api/pkg/resolver"
 	"google.golang.org/api/option"
 	youtube "google.golang.org/api/youtube/v3"
 )
@@ -81,9 +82,9 @@ func init() {
 		log.Println("[YouTube] GET", videoID)
 		youtubeResponse, err := youtubeClient.Videos.List(youtubeVideoParts).Id(videoID).Do()
 		if err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  500,
-				Message: "youtube api error " + clean(err.Error()),
+				Message: "youtube api error " + resolver.CleanResponse(err.Error()),
 			}, nil, 1 * time.Hour
 		}
 
@@ -94,7 +95,7 @@ func init() {
 		video := youtubeResponse.Items[0]
 
 		if video.ContentDetails == nil {
-			return &LinkResolverResponse{Status: 500, Message: "video unavailable"}, nil, noSpecialDur
+			return &resolver.Response{Status: 500, Message: "video unavailable"}, nil, noSpecialDur
 		}
 
 		data := youtubeTooltipData{
@@ -109,9 +110,9 @@ func init() {
 
 		var tooltip bytes.Buffer
 		if err := tooltipTemplate.Execute(&tooltip, data); err != nil {
-			return &LinkResolverResponse{
+			return &resolver.Response{
 				Status:  http.StatusInternalServerError,
-				Message: "youtube template error " + clean(err.Error()),
+				Message: "youtube template error " + resolver.CleanResponse(err.Error()),
 			}, nil, noSpecialDur
 		}
 
@@ -120,7 +121,7 @@ func init() {
 			thumbnail = video.Snippet.Thumbnails.Standard.Url
 		}
 
-		return &LinkResolverResponse{
+		return &resolver.Response{
 			Status:    http.StatusOK,
 			Tooltip:   url.PathEscape(tooltip.String()),
 			Thumbnail: thumbnail,
@@ -129,11 +130,11 @@ func init() {
 
 	cache := newLoadingCache("youtube", load, 24*time.Hour)
 
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			return strings.HasSuffix(url.Host, ".youtube.com") || url.Host == "youtube.com"
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL(url)
 
 			if videoID == "" {
@@ -145,11 +146,11 @@ func init() {
 		},
 	})
 
-	customURLManagers = append(customURLManagers, customURLManager{
-		check: func(url *url.URL) bool {
+	customURLManagers = append(customURLManagers, resolver.CustomURLManager{
+		Check: func(url *url.URL) bool {
 			return url.Host == "youtu.be"
 		},
-		run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL2(url)
 
 			if videoID == "" {

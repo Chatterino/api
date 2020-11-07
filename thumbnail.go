@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/gorilla/mux"
 	"github.com/nfnt/resize"
 )
@@ -39,9 +40,9 @@ func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, 
 			return rNoLinkInfoFound, nil, noSpecialDur
 		}
 
-		return marshalNoDur(&LinkResolverResponse{
+		return marshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
-			Message: clean(err.Error()),
+			Message: resolver.CleanResponse(err.Error()),
 		})
 	}
 
