@@ -17,6 +17,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/Chatterino/api/internal/resolvers/betterttv"
+	"github.com/Chatterino/api/internal/resolvers/frankerfacez"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -201,6 +202,7 @@ func register(managers []resolver.CustomURLManager) {
 func init() {
 	// Register Link Resolvers from internal/resolvers/
 	register(betterttv.New())
+	register(frankerfacez.New())
 }
 
 func handleLinkResolver(router *mux.Router) {
