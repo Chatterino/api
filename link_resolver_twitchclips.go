@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
 
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/dankeroni/gotwitch"
 )
@@ -64,7 +64,7 @@ func init() {
 			ChannelName:  clip.Broadcaster.DisplayName,
 			Duration:     fmt.Sprintf("%g%s", clip.Duration, "s"),
 			CreationDate: clip.CreatedAt.Format("02 Jan 2006"),
-			Views:        insertCommas(strconv.FormatInt(int64(clip.Views), 10), 3),
+			Views:        humanize.Number(uint64(clip.Views)),
 		}
 
 		var tooltip bytes.Buffer

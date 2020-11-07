@@ -18,6 +18,7 @@ import (
 
 	"github.com/Chatterino/api/internal/resolvers/betterttv"
 	"github.com/Chatterino/api/internal/resolvers/frankerfacez"
+	"github.com/Chatterino/api/internal/resolvers/twitter"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -203,6 +204,7 @@ func init() {
 	// Register Link Resolvers from internal/resolvers/
 	register(betterttv.New())
 	register(frankerfacez.New())
+	register(twitter.New())
 }
 
 func handleLinkResolver(router *mux.Router) {

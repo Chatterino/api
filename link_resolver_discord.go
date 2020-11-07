@@ -16,6 +16,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -69,8 +70,8 @@ func init() {
 			Username      string `json:"username"`
 			Discriminator string `json:"discriminator"`
 		} `json:"inviter,omitempty"`
-		OnlineCount int64 `json:"approximate_presence_count,omitempty"`
-		TotalCount  int64 `json:"approximate_member_count,omitempty"`
+		OnlineCount uint64 `json:"approximate_presence_count,omitempty"`
+		TotalCount  uint64 `json:"approximate_member_count,omitempty"`
 	}
 
 	// Bot authentication is required for higher ratelimit (250 requests/5s)
@@ -174,8 +175,8 @@ func init() {
 			InviteChannel: fmt.Sprintf("#%s", jsonResponse.Channel.Name),
 			InviterTag:    getInviter,
 			ServerPerks:   parsePerks,
-			OnlineCount:   insertCommas(strconv.FormatInt(jsonResponse.OnlineCount, 10), 3),
-			TotalCount:    insertCommas(strconv.FormatInt(jsonResponse.TotalCount, 10), 3),
+			OnlineCount:   humanize.Number(jsonResponse.OnlineCount),
+			TotalCount:    humanize.Number(jsonResponse.TotalCount),
 		}
 
 		// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above

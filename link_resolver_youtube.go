@@ -10,11 +10,11 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
 
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 	"google.golang.org/api/option"
 	youtube "google.golang.org/api/youtube/v3"
@@ -103,9 +103,9 @@ func init() {
 			ChannelTitle: video.Snippet.ChannelTitle,
 			Duration:     formatDuration(video.ContentDetails.Duration),
 			PublishDate:  formatDate("02 Jan 2006", video.Snippet.PublishedAt),
-			Views:        insertCommas(strconv.FormatUint(video.Statistics.ViewCount, 10), 3),
-			LikeCount:    insertCommas(strconv.FormatUint(video.Statistics.LikeCount, 10), 3),
-			DislikeCount: insertCommas(strconv.FormatUint(video.Statistics.DislikeCount, 10), 3),
+			Views:        humanize.Number(video.Statistics.ViewCount),
+			LikeCount:    humanize.Number(video.Statistics.LikeCount),
+			DislikeCount: humanize.Number(video.Statistics.DislikeCount),
 		}
 
 		var tooltip bytes.Buffer

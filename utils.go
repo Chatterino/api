@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -34,28 +32,6 @@ func formatDuration(dur string) string {
 	d -= m * time.Minute
 	s := d / time.Second
 	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
-}
-
-func insertCommas(str string, n int) string {
-	var buffer bytes.Buffer
-	var remainder = n - 1
-	var lenght = len(str) - 2
-	for i, rune := range str {
-		buffer.WriteRune(rune)
-		if (lenght-i)%n == remainder {
-			buffer.WriteRune(',')
-		}
-	}
-	return buffer.String()
-}
-
-func humanizeNumber(number uint64) string {
-	if number < 1_000_000 {
-		return insertCommas(strconv.FormatUint(number, 10), 3)
-	}
-
-	inMillions := float64(number) / 1_000_000
-	return fmt.Sprintf("%.1fM", inMillions)
 }
 
 func formatDate(format string, str string) string {
