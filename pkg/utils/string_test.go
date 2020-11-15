@@ -1,8 +1,6 @@
-package main
+package utils
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestTruncateString(t *testing.T) {
 	type tType struct {
@@ -45,7 +43,7 @@ func TestTruncateString(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := truncateString(test.input, test.maxLength)
+		output := TruncateString(test.input, test.maxLength)
 		if output != test.expectedOutput {
 			t.Fatalf("got output '%s', expected '%s'", output, test.expectedOutput)
 		}

@@ -8,11 +8,6 @@ import (
 	"os"
 )
 
-const (
-	// TODO: Find home for this
-	maxContentLength = 1024 * 1024 * 5 // 5MB
-)
-
 var (
 	NoLinkInfoFound  []byte
 	InvalidURL       []byte
@@ -44,7 +39,7 @@ func init() {
 
 	r = &Response{
 		Status:  http.StatusInternalServerError,
-		Message: fmt.Sprintf("Could not fetch link info: Response too large (>%dMB)", maxContentLength/1024/1024),
+		Message: fmt.Sprintf("Could not fetch link info: Response too large (>%dMB)", MaxContentLength/1024/1024),
 	}
 	ResponseTooLarge, err = json.Marshal(r)
 	if err != nil {

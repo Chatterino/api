@@ -7,11 +7,8 @@ import (
 	"net/url"
 	"time"
 
+	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/gorilla/mux"
-)
-
-const (
-	maxContentLength = 1024 * 1024 * 5 // 5MB
 )
 
 var (
@@ -68,9 +65,9 @@ func main() {
 
 	handleHealth(router)
 
-	handleLinkResolver(router)
+	defaultresolver.Initialize(router, *baseURL)
 
-	handleThumbnail(router)
+	defaultresolver.InitializeThumbnail(router)
 
 	listen(*bind, router)
 }
