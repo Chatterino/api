@@ -8,5 +8,8 @@ jobs:
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2.3.4
+
       - name: golangci-lint
-        uses: pajlada/golangci-lint-action@master
+        uses: golangci/golangci-lint-action@v2.3.0
+        with:
+          version: v1.29
