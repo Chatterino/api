@@ -19,6 +19,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/betterttv"
 	"github.com/Chatterino/api/internal/resolvers/discord"
 	"github.com/Chatterino/api/internal/resolvers/frankerfacez"
+	"github.com/Chatterino/api/internal/resolvers/supinic"
 	"github.com/Chatterino/api/internal/resolvers/twitter"
 	"github.com/Chatterino/api/internal/resolvers/youtube"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -209,6 +210,7 @@ func init() {
 	register(twitter.New())
 	register(discord.New())
 	register(youtube.New())
+	register(supinic.New())
 }
 
 func handleLinkResolver(router *mux.Router) {
