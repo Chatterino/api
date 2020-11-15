@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -36,7 +38,7 @@ var (
 
 var customEmoteSets map[string][]byte = make(map[string][]byte)
 
-var twitchemotesCache *loadingCache = newLoadingCache("twitchemotes", doTwitchemotesRequest, 30*time.Minute)
+var twitchemotesCache = cache.New("twitchemotes", doTwitchemotesRequest, time.Duration(30)*time.Minute)
 
 func addEmoteSet(emoteSetID, channelName, channelID, setType string) {
 	b, err := json.Marshal(&EmoteSet{
@@ -152,7 +154,7 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 		log.Println("Unhandled long emote set for emote set", setID)
 	}
 
-	return marshalNoDur(&emoteSets[0])
+	return utils.MarshalNoDur(&emoteSets[0])
 }
 
 func handleTwitchEmotes(router *mux.Router) {

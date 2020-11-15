@@ -1,4 +1,5 @@
-package main
+// TODO: this should potentially be split out into its own file
+package defaultresolver
 
 import (
 	"bytes"
@@ -14,7 +15,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 	"github.com/gorilla/mux"
 	"github.com/nfnt/resize"
 )
@@ -31,16 +34,16 @@ const (
 func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
 	url, err := url.Parse(urlString)
 	if err != nil {
-		return rInvalidURL, nil, noSpecialDur
+		return resolver.InvalidURL, nil, cache.NoSpecialDur
 	}
 
-	resp, err := makeRequest(url.String())
+	resp, err := resolver.RequestGET(url.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return rNoLinkInfoFound, nil, noSpecialDur
+			return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
 		}
 
-		return marshalNoDur(&resolver.Response{
+		return utils.MarshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: resolver.CleanResponse(err.Error()),
 		})
@@ -51,26 +54,26 @@ func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, 
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, err, noSpecialDur
+			return nil, err, cache.NoSpecialDur
 		}
-		if contentLengthBytes > maxContentLength {
-			return rResponseTooLarge, nil, noSpecialDur
+		if contentLengthBytes > resolver.MaxContentLength {
+			return resolver.ResponseTooLarge, nil, cache.NoSpecialDur
 		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
-		return rNoLinkInfoFound, nil, noSpecialDur
+		return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
 	}
 
 	if !isSupportedThumbnail(resp.Header.Get("content-type")) {
-		return rNoLinkInfoFound, nil, noSpecialDur
+		return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
 	}
 
 	image, err := buildThumbnailByteArray(resp)
 	if err != nil {
 		log.Println(err.Error())
-		return rNoLinkInfoFound, nil, noSpecialDur
+		return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
 	}
 
 	return image, nil, 10 * time.Minute
@@ -87,9 +90,9 @@ func isSupportedThumbnail(contentType string) bool {
 }
 
 func thumbnail(w http.ResponseWriter, r *http.Request) {
-	url, err := unescapeURLArgument(r, "url")
+	url, err := utils.UnescapeURLArgument(r, "url")
 	if err != nil {
-		_, err = w.Write(rInvalidURL)
+		_, err = w.Write(resolver.InvalidURL)
 		if err != nil {
 			log.Println("Error writing response:", err)
 		}
@@ -104,13 +107,11 @@ func thumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var thumbnailCache *loadingCache
+var (
+	thumbnailCache = cache.New("thumbnail", doThumbnailRequest, 10*time.Minute)
+)
 
-func init() {
-	thumbnailCache = newLoadingCache("thumbnail", doThumbnailRequest, 10*time.Minute)
-}
-
-func handleThumbnail(router *mux.Router) {
+func InitializeThumbnail(router *mux.Router) {
 	router.HandleFunc("/thumbnail/{url:.*}", thumbnail).Methods("GET")
 }
 

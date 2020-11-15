@@ -8,12 +8,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
 func TestResolveTwitchClip(t *testing.T) {
 	router := makeRouter("")
-	handleLinkResolver(router)
+	defaultresolver.Initialize(router, "")
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	fmt.Println(ts.URL)
@@ -40,7 +41,7 @@ func TestResolveTwitchClip(t *testing.T) {
 
 func TestResolveTwitchClip2(t *testing.T) {
 	router := makeRouter("")
-	handleLinkResolver(router)
+	defaultresolver.Initialize(router, "")
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	const url = `https%3A%2F%2Ftwitch.tv%2Fpajlada%2Fclip%2FGorgeousAntsyPizzaSaltBae`

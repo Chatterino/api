@@ -1,12 +1,13 @@
-package main
+package defaultresolver
 
 import (
 	"net/http"
 
+	"github.com/Chatterino/api/pkg/utils"
 	"github.com/PuerkitoBio/goquery"
 )
 
-func tooltipMetaFields(doc *goquery.Document, r *http.Request, resp *http.Response, data tooltipData) tooltipData {
+func tooltipMetaFields(baseURL string, doc *goquery.Document, r *http.Request, resp *http.Response, data tooltipData) tooltipData {
 	fields := doc.Find("meta[property][content]")
 
 	if fields.Size() > 0 {
@@ -25,7 +26,7 @@ func tooltipMetaFields(doc *goquery.Document, r *http.Request, resp *http.Respon
 			case (prop == "og:description" || prop == "twitter:description") && data.Description == "":
 				data.Description = cont
 			case (prop == "og:image" || prop == "twitter:image") && data.ImageSrc == "":
-				data.ImageSrc = formatThumbnailUrl(r, cont)
+				data.ImageSrc = utils.FormatThumbnailURL(baseURL, r, cont)
 			}
 		})
 	}
