@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,26 +19,6 @@ func unescapeURLArgument(r *http.Request, key string) (string, error) {
 	}
 
 	return url, nil
-}
-
-func formatDuration(dur string) string {
-	dur = strings.ToLower(dur)
-	dur = strings.Replace(dur, "pt", "", 1)
-	d, _ := time.ParseDuration(dur)
-	h := d / time.Hour
-	d -= h * time.Hour
-	m := d / time.Minute
-	d -= m * time.Minute
-	s := d / time.Second
-	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
-}
-
-func formatDate(format string, str string) string {
-	date, err := time.Parse(time.RFC3339, str)
-	if err != nil {
-		return ""
-	}
-	return date.Format(format)
 }
 
 func marshalNoDur(i interface{}) ([]byte, error, time.Duration) {
