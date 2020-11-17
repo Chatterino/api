@@ -53,20 +53,6 @@ func load(emoteID string, r *http.Request) (interface{}, error, time.Duration) {
 		}, nil, cache.NoSpecialDur
 	}
 	jsonResponse := temp.Emote
-	jsonResponse.CreatedAt, err = time.Parse(time.RFC1123, jsonResponse.CreatedAtRaw)
-	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ffz api created at time unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
-	}
-	jsonResponse.UpdatedAt, err = time.Parse(time.RFC1123, jsonResponse.UpdatedAtRaw)
-	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ffz api updated at time unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
-	}
 
 	// Build tooltip data from the API response
 	data := TooltipData{
