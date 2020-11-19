@@ -22,7 +22,7 @@ const (
 <br><b>Server Created:</b> {{.ServerCreated}}
 <br><b>Channel:</b> {{.InviteChannel}}
 {{ if .InviterTag}}<br><b>Inviter:</b> {{.InviterTag}}{{end}}
-{{ if .ServerPerks}}<br><b>Server perks:</b> {{.ServerPerks}}{{end}}
+{{ if .ServerPerks}}<br><b>Server Perks:</b> {{.ServerPerks}}{{end}}
 <br><b>Members:</b> <span style="color: #43b581;">{{.OnlineCount}} online</span>&nbsp;•&nbsp;<span style="color: #808892;">{{.TotalCount}} total</span>
 </div>
 `
