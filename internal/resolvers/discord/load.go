@@ -67,37 +67,34 @@ func load(inviteCode string, r *http.Request) (interface{}, error, time.Duration
 	// Comverting Discord Snowflake to date string
 	// Reference https://discord.com/developers/docs/reference#snowflakes
 	snowflake, _ := strconv.ParseInt(jsonResponse.Guild.ID, 10, 64)
-	getDateFromSnowflake := time.Unix(snowflake>>22/1000+1420066800, 0).Format("02 Jan 2006")
+	dateFromSnowflake := time.Unix(snowflake>>22/1000+1420066800, 0).Format("02 Jan 2006")
 
 	// Adding row with inviter's user tag if present
-	getInviter := ""
+	userTag := ""
 	if jsonResponse.Inviter.Username != "" {
-		userTag := fmt.Sprintf("%s#%s", jsonResponse.Inviter.Username, jsonResponse.Inviter.Discriminator)
-		getInviter = fmt.Sprintf("<br><b>Inviter:</b> %s", userTag)
+		userTag = fmt.Sprintf("%s#%s", jsonResponse.Inviter.Username, jsonResponse.Inviter.Discriminator)
 	}
 
 	// Parsing only selected meaningful server perks
-	parsePerks := ""
-	accpetedPerks := []string{"PARTNERED", "PUBLIC", "ANIMATED_ICON", "BANNER", "INVITE_SPLASH", "VIP_REGIONS", "VANITY_URL"}
+	// An example of a server that has pretty much all the perks: https://discord.com/api/invites/test
+	parsedPerks := ""
+	accpetedPerks := []string{"PARTNERED", "PUBLIC", "ANIMATED_ICON", "BANNER", "INVITE_SPLASH", "VIP_REGIONS", "VANITY_URL", "COMMUNITY"}
 	for _, elem := range jsonResponse.Guild.Features {
 		if utils.Contains(accpetedPerks, elem) {
-			if parsePerks != "" {
-				parsePerks += ", "
+			if parsedPerks != "" {
+				parsedPerks += ", "
 			}
-			parsePerks += strings.ToLower(strings.Replace(elem, "_", " ", -1))
+			parsedPerks += strings.ToLower(strings.Replace(elem, "_", " ", -1))
 		}
-	}
-	if parsePerks != "" {
-		parsePerks = fmt.Sprintf("<br><b>Server Perks:</b> %s", parsePerks)
 	}
 
 	// Build tooltip data from the API response
 	data := TooltipData{
 		ServerName:    jsonResponse.Guild.Name,
-		ServerCreated: getDateFromSnowflake,
+		ServerCreated: dateFromSnowflake,
 		InviteChannel: fmt.Sprintf("#%s", jsonResponse.Channel.Name),
-		InviterTag:    getInviter,
-		ServerPerks:   parsePerks,
+		InviterTag:    userTag,
+		ServerPerks:   parsedPerks,
 		OnlineCount:   humanize.Number(jsonResponse.OnlineCount),
 		TotalCount:    humanize.Number(jsonResponse.TotalCount),
 	}
