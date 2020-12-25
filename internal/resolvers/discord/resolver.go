@@ -31,7 +31,7 @@ const (
 var (
 	discordInviteURLRegex = regexp.MustCompile(`^(www\.)?discord\.(gg|com\/invite)\/([a-zA-Z0-9-]+)`)
 
-	inviteCache = cache.New("discord_invites", load, 6*time.Hour) // Often calls quickly result in 429's
+	inviteCache = cache.New("discord_invites", load, 1*time.Minute) // Often calls quickly result in 429's
 
 	inviteNotFoundResponse = &resolver.Response{
 		Status:  http.StatusNotFound,
