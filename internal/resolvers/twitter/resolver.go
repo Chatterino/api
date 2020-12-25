@@ -44,8 +44,8 @@ var (
 
 	bearerKey string
 
-	tweetCache       = cache.New("tweets", loadTweet, 24*time.Hour)
-	twitterUserCache = cache.New("twitterUsers", loadTwitterUser, 24*time.Hour)
+	tweetCache       = cache.New("tweets", loadTweet, 1*time.Minute)
+	twitterUserCache = cache.New("twitterUsers", loadTwitterUser, 1*time.Minute)
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
