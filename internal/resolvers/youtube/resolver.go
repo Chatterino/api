@@ -30,7 +30,7 @@ const (
 )
 
 var (
-	videoCache = cache.New("youtube_videos", load, 1*time.Minute)
+	videoCache = cache.New("youtube_videos", load, 30*time.Minute)
 
 	youtubeClient *youtubeAPI.Service
 
