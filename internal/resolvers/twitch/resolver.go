@@ -26,7 +26,7 @@ const (
 var (
 	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
 
-	clipCache = cache.New("twitchclip", load, 1*time.Hour)
+	clipCache = cache.New("twitchclip", load, 1*time.Minute)
 
 	v5API *gotwitch.TwitchAPI
 )
