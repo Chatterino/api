@@ -1,0 +1,16 @@
+[Unit]
+Description=Chatterino 2 API
+DefaultDependencies=no
+
+[Service]
+User=billy
+ExecStart=/path/to/api/binary -l "127.0.0.1:1234" -b "https://domain.for.api"
+Restart=always
+RestartSec=5s
+Environment="CHATTERINO_API_DISCORD_TOKEN=XXXXXXXXXXXXXXX.XXXXX.XXXXXXXXXXXXXX"
+Environment="CHATTERINO_API_CACHE_TWITCH_CLIENT_ID=XXXXXXXXXXXXXXXXXXXXXXXX"
+Environment="YOUTUBE_API_KEY=XXXXXXXXXXXXXXX"
+Environment="CHATTERINO_API_TWITTER_BEARER_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+[Install]
+WantedBy=default.target
