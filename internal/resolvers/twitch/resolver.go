@@ -19,7 +19,6 @@ const (
 	twitchClipsTooltipString = `<div style="text-align: left;">
 <b>{{.Title}}</b><hr>
 <b>Channel:</b> {{.ChannelName}}<br>
-<b>Duration:</b> {{.Duration}}<br>
 <b>Created:</b> {{.CreationDate}}<br>
 <b>Views: </b> {{.Views}}</div>`
 )
@@ -28,8 +27,6 @@ var (
 	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
 
 	clipCache = cache.New("twitchclip", load, 1*time.Hour)
-
-	// v5API *gotwitch.TwitchAPI
 
 	helixAPI *helix.Client
 )
@@ -48,38 +45,40 @@ func New() (resolvers []resolver.CustomURLManager) {
 		return
 	}
 
-	// v5API = gotwitch.NewV5(clientID)
-	helixAPI, err := helix.NewClient(&helix.Options{
+	helixAPIlol, err := helix.NewClient(&helix.Options{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 	})
 
+	helixAPI = helixAPIlol // weird workaround for now, maybe pajlada can fix this
+
 	if err != nil {
-		log.Fatalf("[HELIX] Error initializing API client: %s", err.Error())
+		log.Fatalf("[Helix] Error initializing API client: %s", err.Error())
 	}
 
+	// Request app access token
 	response, err := helixAPI.RequestAppAccessToken([]string{})
 
 	if err != nil {
-		log.Fatalf("[HELIX] Error requesting app access token: %s , \n %s", err.Error(), response.Error)
+		log.Fatalf("[Helix] Error requesting app access token: %s , \n %s", err.Error(), response.Error)
 	}
 
-	log.Printf("Requested access token %s response: %d, expires in: %d", response.Data.AccessToken, response.StatusCode, response.Data.ExpiresIn)
+	log.Printf("[Helix] Requested access token, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
 	helixAPI.SetAppAccessToken(response.Data.AccessToken)
 
-	// // Refresh app access token every 24 hours
-	// ticker := time.NewTicker(24 * time.Hour)
+	// Refresh app access token every 24 hours
+	ticker := time.NewTicker(24 * time.Hour)
 
-	// for range ticker.C {
-	// 	response, err := helixAPI.RequestAppAccessToken([]string{})
-	// 	if err != nil {
-	// 		log.Print(err.Error())
-	// 		continue
-	// 	}
-	// 	log.Printf("Requested access token from routine, response: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
+	for range ticker.C {
+		response, err := helixAPI.RequestAppAccessToken([]string{})
+		if err != nil {
+			log.Printf("[Helix] Failed to refresh app access token, status: %d", response.StatusCode)
+			continue
+		}
+		log.Printf("[Helix] Requested access token from ticker, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
 
-	// 	helixAPI.SetAppAccessToken(response.Data.AccessToken)
-	// }
+		helixAPI.SetAppAccessToken(response.Data.AccessToken)
+	}
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
