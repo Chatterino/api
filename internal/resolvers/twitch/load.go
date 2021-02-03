@@ -28,6 +28,7 @@ func load(clipSlug string, r *http.Request) (interface{}, error, time.Duration) 
 
 	data := twitchClipsTooltipData{
 		Title:       clipHelix.Title,
+		AuthorName:  clipHelix.CreatorName,
 		ChannelName: clipHelix.BroadcasterName,
 		// Duration: // fmt.Sprintf("%g%s", clip.Duration, "s")
 		CreationDate: createdData.Format("02 Jan 2006"),

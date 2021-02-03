@@ -18,9 +18,10 @@ import (
 const (
 	twitchClipsTooltipString = `<div style="text-align: left;">
 <b>{{.Title}}</b><hr>
+<b>Clipped by:</b> {{.AuthorName}}<br>
 <b>Channel:</b> {{.ChannelName}}<br>
 <b>Created:</b> {{.CreationDate}}<br>
-<b>Views: </b> {{.Views}}</div>`
+<b>Views:</b> {{.Views}}</div>`
 )
 
 var (
