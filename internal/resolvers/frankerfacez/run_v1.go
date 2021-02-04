@@ -7,7 +7,7 @@ import (
 
 func run(url *url.URL) ([]byte, error) {
 	matches := emotePathRegex.FindStringSubmatch(url.Path)
-	if len(matches) != 2 {
+	if len(matches) != 4 {
 		return nil, errInvalidFrankerFaceZEmotePath
 	}
 

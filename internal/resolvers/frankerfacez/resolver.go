@@ -28,7 +28,7 @@ var (
 		"www.frankerfacez.com": {},
 	}
 
-	emotePathRegex = regexp.MustCompile(`/emoticon/([0-9]+)-.+?`)
+	emotePathRegex = regexp.MustCompile(`/emoticon/([0-9]+)(-(.+)?)?$`)
 
 	emoteCache = cache.New("ffz_emotes", load, 1*time.Hour)
 
