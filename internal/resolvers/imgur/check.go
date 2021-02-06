@@ -10,9 +10,5 @@ func check(url *url.URL) bool {
 	// helpers.IsSubdomainOf(url.Host, "imgur.com")
 	isImgur := strings.HasSuffix(url.Host, ".imgur.com") || url.Host == "imgur.com"
 
-	if !isImgur {
-		return false
-	}
-
-	return true
+	return isImgur
 }
