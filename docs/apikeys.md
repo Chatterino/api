@@ -34,3 +34,10 @@
 4. On the left navigation menu, click `Credentials`; then `CREATE CREDENTIALS`; then `API key`
 5. Click on the button at the end of the API key box to copy to the clipboard
 6. Click close
+
+## Imgur
+
+1. Head here: https://api.imgur.com/oauth2/addclient
+2. Select "Anonymous usage without user authorization"
+3. Fill in the rest of the information
+4. Copy the Client ID value (which is what we need)
