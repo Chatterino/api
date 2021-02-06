@@ -9,6 +9,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/betterttv"
 	"github.com/Chatterino/api/internal/resolvers/discord"
 	"github.com/Chatterino/api/internal/resolvers/frankerfacez"
+	"github.com/Chatterino/api/internal/resolvers/imgur"
 	"github.com/Chatterino/api/internal/resolvers/supinic"
 	"github.com/Chatterino/api/internal/resolvers/twitch"
 	"github.com/Chatterino/api/internal/resolvers/twitter"
@@ -82,6 +83,7 @@ func New(baseURL string) *R {
 	r.customResolvers = append(r.customResolvers, youtube.New()...)
 	r.customResolvers = append(r.customResolvers, supinic.New()...)
 	r.customResolvers = append(r.customResolvers, twitch.New()...)
+	r.customResolvers = append(r.customResolvers, imgur.New()...)
 
 	return r
 }
