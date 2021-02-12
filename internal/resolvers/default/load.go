@@ -2,6 +2,7 @@ package defaultresolver
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -25,6 +26,11 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, error, time.D
 	for _, m := range dr.customResolvers {
 		if m.Check(requestUrl) {
 			data, err := m.Run(requestUrl)
+
+			if errors.Is(err, resolver.ErrDontHandle) {
+				break
+			}
+
 			return data, err, cache.NoSpecialDur
 		}
 	}
@@ -51,6 +57,11 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, error, time.D
 		for _, m := range dr.customResolvers {
 			if m.Check(resp.Request.URL) {
 				data, err := m.Run(resp.Request.URL)
+
+				if errors.Is(err, resolver.ErrDontHandle) {
+					break
+				}
+
 				return data, err, cache.NoSpecialDur
 			}
 		}

@@ -42,3 +42,7 @@ func RequestGETWithHeaders(url string, extraHeaders map[string]string) (response
 
 	return httpClient.Do(req)
 }
+
+func HTTPClient() *http.Client {
+	return httpClient
+}
