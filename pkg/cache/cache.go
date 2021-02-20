@@ -15,7 +15,7 @@ func init() {
 	kvCache = pCache.New(30*time.Minute, 10*time.Minute)
 }
 
-type Loader func(key string, r *http.Request) (interface{}, error, time.Duration)
+type Loader func(key string, r *http.Request) (interface{}, time.Duration, error)
 
 var NoSpecialDur time.Duration
 
@@ -31,7 +31,7 @@ type Cache struct {
 }
 
 func (c *Cache) load(key string, r *http.Request) {
-	value, err, overrideDuration := c.loader(key, r)
+	value, overrideDuration, err := c.loader(key, r)
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {

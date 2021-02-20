@@ -13,11 +13,11 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(clipSlug string, r *http.Request) (interface{}, error, time.Duration) {
+func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) {
 	log.Println("[TwitchClip] GET", clipSlug)
 	clip, _, err := v5API.GetClip(clipSlug)
 	if err != nil {
-		return noTwitchClipWithThisIDFound, nil, cache.NoSpecialDur
+		return noTwitchClipWithThisIDFound, cache.NoSpecialDur, nil
 	}
 
 	data := twitchClipsTooltipData{
@@ -34,12 +34,12 @@ func load(clipSlug string, r *http.Request) (interface{}, error, time.Duration) 
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "twitch clip template error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return &resolver.Response{
 		Status:    200,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: clip.Thumbnails.Medium,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }
