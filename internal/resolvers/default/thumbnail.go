@@ -118,7 +118,7 @@ func InitializeThumbnail(router *mux.Router) {
 func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
 	image, _, err := image.Decode(resp.Body)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Could not decode image from url: %s", resp.Request.URL)
+		return []byte{}, fmt.Errorf("could not decode image from url: %s", resp.Request.URL)
 	}
 
 	resized := resize.Thumbnail(maxThumbnailSize, maxThumbnailSize, image, resize.Bilinear)
@@ -131,7 +131,7 @@ func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
 		err = jpeg.Encode(buffer, resized, nil)
 	}
 	if err != nil {
-		return []byte{}, fmt.Errorf("Could not encode image from url: %s", resp.Request.URL)
+		return []byte{}, fmt.Errorf("could not encode image from url: %s", resp.Request.URL)
 	}
 
 	return buffer.Bytes(), nil

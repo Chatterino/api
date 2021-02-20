@@ -44,7 +44,7 @@ func load(videoID string, r *http.Request) (interface{}, time.Duration, error) {
 	}
 
 	if len(youtubeResponse.Items) != 1 {
-		return nil, cache.NoSpecialDur, errors.New("Videos response is not size 1")
+		return nil, cache.NoSpecialDur, errors.New("videos response is not size 1")
 	}
 
 	video := youtubeResponse.Items[0]
