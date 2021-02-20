@@ -13,7 +13,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(emoteID string, r *http.Request) (interface{}, error, time.Duration) {
+func load(emoteID string, r *http.Request) (interface{}, time.Duration, error) {
 	apiURL := fmt.Sprintf(emoteAPIURL, emoteID)
 	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteID)
 
@@ -23,13 +23,13 @@ func load(emoteID string, r *http.Request) (interface{}, error, time.Duration) {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "ffz http request error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 	defer resp.Body.Close()
 
 	// Error out if the emote isn't found or something else went wrong with the request
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-		return emoteNotFoundResponse, nil, cache.NoSpecialDur
+		return emoteNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
 	// Read response into a string
@@ -38,7 +38,7 @@ func load(emoteID string, r *http.Request) (interface{}, error, time.Duration) {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "ffz http body read error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	// Parse response into a predefined JSON blob (see FrankerFaceZEmoteAPIResponse struct above)
@@ -50,7 +50,7 @@ func load(emoteID string, r *http.Request) (interface{}, error, time.Duration) {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "ffz api unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 	jsonResponse := temp.Emote
 
@@ -66,12 +66,12 @@ func load(emoteID string, r *http.Request) (interface{}, error, time.Duration) {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "ffz template error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return &resolver.Response{
 		Status:    200,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: thumbnailURL,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }

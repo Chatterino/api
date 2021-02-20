@@ -15,7 +15,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(rawTrackID string, r *http.Request) (interface{}, error, time.Duration) {
+func load(rawTrackID string, r *http.Request) (interface{}, time.Duration, error) {
 	trackID, _ := strconv.ParseInt(rawTrackID, 10, 32)
 	apiURL := fmt.Sprintf(trackListAPIURL, trackID)
 
@@ -25,13 +25,13 @@ func load(rawTrackID string, r *http.Request) (interface{}, error, time.Duration
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Track list http request error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 	defer resp.Body.Close()
 
 	// Error out if the track isn't found or something else went wrong with the request
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-		return trackNotFoundResponse, nil, cache.NoSpecialDur
+		return trackNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
 	// Read response into a string
@@ -40,7 +40,7 @@ func load(rawTrackID string, r *http.Request) (interface{}, error, time.Duration
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Track list http body read error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	// Parse response into a predefined JSON blob (see TrackListAPIResponse struct above)
@@ -49,10 +49,10 @@ func load(rawTrackID string, r *http.Request) (interface{}, error, time.Duration
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Track list api unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 	if jsonResponse.Data.ID == 0 { // API responds with {..., "data": null} if nothing was found
-		return trackNotFoundResponse, nil, cache.NoSpecialDur
+		return trackNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
 	trackData := jsonResponse.Data
@@ -94,12 +94,12 @@ func load(rawTrackID string, r *http.Request) (interface{}, error, time.Duration
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Track list template error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return &resolver.Response{
 		Status:  200,
 		Tooltip: url.PathEscape(tooltip.String()),
 		//Thumbnail: thumbnailURL,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }

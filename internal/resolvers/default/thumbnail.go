@@ -31,16 +31,16 @@ const (
 	maxThumbnailSize = 300
 )
 
-func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+func doThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Duration, error) {
 	url, err := url.Parse(urlString)
 	if err != nil {
-		return resolver.InvalidURL, nil, cache.NoSpecialDur
+		return resolver.InvalidURL, cache.NoSpecialDur, nil
 	}
 
 	resp, err := resolver.RequestGET(url.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
+			return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 		}
 
 		return utils.MarshalNoDur(&resolver.Response{
@@ -54,29 +54,29 @@ func doThumbnailRequest(urlString string, r *http.Request) (interface{}, error, 
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, err, cache.NoSpecialDur
+			return nil, cache.NoSpecialDur, err
 		}
 		if contentLengthBytes > resolver.MaxContentLength {
-			return resolver.ResponseTooLarge, nil, cache.NoSpecialDur
+			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
-		return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
+		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
 	if !isSupportedThumbnail(resp.Header.Get("content-type")) {
-		return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
+		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
 	image, err := buildThumbnailByteArray(resp)
 	if err != nil {
 		log.Println(err.Error())
-		return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
+		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
-	return image, nil, 10 * time.Minute
+	return image, 10 * time.Minute, nil
 }
 
 func isSupportedThumbnail(contentType string) bool {
@@ -118,7 +118,7 @@ func InitializeThumbnail(router *mux.Router) {
 func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
 	image, _, err := image.Decode(resp.Body)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Could not decode image from url: %s", resp.Request.URL)
+		return []byte{}, fmt.Errorf("could not decode image from url: %s", resp.Request.URL)
 	}
 
 	resized := resize.Thumbnail(maxThumbnailSize, maxThumbnailSize, image, resize.Bilinear)
@@ -131,7 +131,7 @@ func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
 		err = jpeg.Encode(buffer, resized, nil)
 	}
 	if err != nil {
-		return []byte{}, fmt.Errorf("Could not encode image from url: %s", resp.Request.URL)
+		return []byte{}, fmt.Errorf("could not encode image from url: %s", resp.Request.URL)
 	}
 
 	return buffer.Bytes(), nil

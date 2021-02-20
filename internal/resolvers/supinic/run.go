@@ -8,7 +8,7 @@ import (
 func run(url *url.URL) ([]byte, error) {
 	matches := trackPathRegex.FindStringSubmatch(url.Path)
 	if len(matches) != 2 {
-		return nil, invalidTrackPath
+		return nil, errInvalidTrackPath
 	}
 
 	trackID := matches[1]

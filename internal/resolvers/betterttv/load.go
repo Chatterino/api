@@ -12,7 +12,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(emoteHash string, r *http.Request) (interface{}, error, time.Duration) {
+func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error) {
 	apiURL := fmt.Sprintf(emoteAPIURL, emoteHash)
 	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteHash)
 
@@ -22,13 +22,13 @@ func load(emoteHash string, r *http.Request) (interface{}, error, time.Duration)
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "betterttv http request error " + resolver.CleanResponse(err.Error()),
-		}, nil, resolver.NoSpecialDur
+		}, resolver.NoSpecialDur, nil
 	}
 	defer resp.Body.Close()
 
 	// Error out if the emote isn't found or something else went wrong with the request
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-		return emoteNotFoundResponse, nil, resolver.NoSpecialDur
+		return emoteNotFoundResponse, resolver.NoSpecialDur, nil
 	}
 
 	// Read response into a string
@@ -37,7 +37,7 @@ func load(emoteHash string, r *http.Request) (interface{}, error, time.Duration)
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "betterttv http body read error " + resolver.CleanResponse(err.Error()),
-		}, nil, resolver.NoSpecialDur
+		}, resolver.NoSpecialDur, nil
 	}
 
 	// Parse response into a predefined JSON blob (see EmoteAPIResponse struct in model.go)
@@ -46,7 +46,7 @@ func load(emoteHash string, r *http.Request) (interface{}, error, time.Duration)
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "betterttv api unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, nil, resolver.NoSpecialDur
+		}, resolver.NoSpecialDur, nil
 	}
 
 	// Build tooltip data from the API response
@@ -66,12 +66,12 @@ func load(emoteHash string, r *http.Request) (interface{}, error, time.Duration)
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "youtube template error " + resolver.CleanResponse(err.Error()),
-		}, nil, resolver.NoSpecialDur
+		}, resolver.NoSpecialDur, nil
 	}
 
 	return &resolver.Response{
 		Status:    200,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: thumbnailURL,
-	}, nil, resolver.NoSpecialDur
+	}, resolver.NoSpecialDur, nil
 }

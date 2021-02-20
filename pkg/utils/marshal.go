@@ -7,7 +7,7 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 )
 
-func MarshalNoDur(i interface{}) ([]byte, error, time.Duration) {
+func MarshalNoDur(i interface{}) ([]byte, time.Duration, error) {
 	data, err := json.Marshal(i)
-	return data, err, cache.NoSpecialDur
+	return data, cache.NoSpecialDur, err
 }

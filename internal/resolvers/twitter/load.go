@@ -12,7 +12,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func loadTweet(tweetID string, r *http.Request) (interface{}, error, time.Duration) {
+func loadTweet(tweetID string, r *http.Request) (interface{}, time.Duration, error) {
 	log.Println("[Twitter] GET", tweetID)
 
 	tweetResp, err := getTweetByID(tweetID, bearerKey)
@@ -24,13 +24,13 @@ func loadTweet(tweetID string, r *http.Request) (interface{}, error, time.Durati
 				log.Println("Error unmarshalling prebuilt response:", unmarshalErr.Error())
 			}
 
-			return &response, nil, 1 * time.Hour
+			return &response, 1 * time.Hour, nil
 		}
 
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Error getting Tweet: " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	tweetData := buildTweetTooltip(tweetResp)
@@ -39,17 +39,17 @@ func loadTweet(tweetID string, r *http.Request) (interface{}, error, time.Durati
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Tweet template error: " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return &resolver.Response{
 		Status:    http.StatusOK,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: tweetData.Thumbnail,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }
 
-func loadTwitterUser(userName string, r *http.Request) (interface{}, error, time.Duration) {
+func loadTwitterUser(userName string, r *http.Request) (interface{}, time.Duration, error) {
 	log.Println("[Twitter] GET", userName)
 
 	userResp, err := getUserByName(userName, bearerKey)
@@ -61,13 +61,13 @@ func loadTwitterUser(userName string, r *http.Request) (interface{}, error, time
 				log.Println("Error unmarshalling prebuilt response:", unmarshalErr.Error())
 			}
 
-			return &response, nil, 1 * time.Hour
+			return &response, 1 * time.Hour, nil
 		}
 
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Error getting Twitter user: " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	userData := buildTwitterUserTooltip(userResp)
@@ -76,12 +76,12 @@ func loadTwitterUser(userName string, r *http.Request) (interface{}, error, time
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Twitter user template error: " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return &resolver.Response{
 		Status:    http.StatusOK,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: userData.Thumbnail,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }

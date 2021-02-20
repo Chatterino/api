@@ -27,7 +27,7 @@ var (
 
 	trackListCache = cache.New("supinic_track_list_tracks", load, 1*time.Hour)
 
-	invalidTrackPath = errors.New("invalid track list track path")
+	errInvalidTrackPath = errors.New("invalid track list track path")
 
 	// List of hosts that will be checked for track list paths
 	trackListDomains = map[string]struct{}{

@@ -10,14 +10,14 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func buildTooltip(miniData miniImage) (interface{}, error, time.Duration) {
+func buildTooltip(miniData miniImage) (interface{}, time.Duration, error) {
 	var tooltip bytes.Buffer
 
 	if err := imageTooltipTemplate.Execute(&tooltip, &miniData); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "imgur image template error: " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return response{
@@ -27,7 +27,7 @@ func buildTooltip(miniData miniImage) (interface{}, error, time.Duration) {
 			Thumbnail: miniData.Link,
 		},
 		err: nil,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }
 
 type response struct {
@@ -35,7 +35,7 @@ type response struct {
 	err              error
 }
 
-func load(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+func load(urlString string, r *http.Request) (interface{}, time.Duration, error) {
 	genericInfo, _, err := apiClient.GetInfoFromURL(urlString)
 	if err != nil {
 		return response{
@@ -44,7 +44,7 @@ func load(urlString string, r *http.Request) (interface{}, error, time.Duration)
 				Tooltip: "Error getting imgur API information for URL",
 			},
 			err: resolver.ErrDontHandle,
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	var miniData miniImage
@@ -62,7 +62,7 @@ func load(urlString string, r *http.Request) (interface{}, error, time.Duration)
 					Tooltip: "Empty album",
 				},
 				err: nil,
-			}, nil, cache.NoSpecialDur
+			}, cache.NoSpecialDur, nil
 		}
 
 		miniData = makeMiniImage(ptr.Images[0])
@@ -79,7 +79,7 @@ func load(urlString string, r *http.Request) (interface{}, error, time.Duration)
 					Tooltip: "Empty album",
 				},
 				err: nil,
-			}, nil, cache.NoSpecialDur
+			}, cache.NoSpecialDur, nil
 		}
 
 		miniData = makeMiniImage(ptr.Images[0])
@@ -94,7 +94,7 @@ func load(urlString string, r *http.Request) (interface{}, error, time.Duration)
 				Tooltip: "Error getting imgur API information for URL",
 			},
 			err: nil,
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return buildTooltip(miniData)
