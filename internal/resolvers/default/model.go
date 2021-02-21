@@ -1,6 +1,7 @@
 package defaultresolver
 
 import (
+	"html"
 	"net/http"
 
 	"github.com/Chatterino/api/pkg/resolver"
@@ -18,6 +19,11 @@ type tooltipData struct {
 func (d *tooltipData) Truncate() {
 	d.Title = utils.TruncateString(d.Title, MaxTitleLength)
 	d.Description = utils.TruncateString(d.Description, MaxDescriptionLength)
+}
+
+func (d *tooltipData) Sanitize() {
+	d.Title = html.EscapeString(d.Title)
+	d.Description = html.EscapeString(d.Description)
 }
 
 // does this really fit in model?
