@@ -97,6 +97,9 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 	// Truncate title and description in case they're too long
 	data.Truncate()
 
+	// Sanitize potential html values
+	data.Sanitize()
+
 	var tooltip bytes.Buffer
 	if err := defaultTooltip.Execute(&tooltip, data); err != nil {
 		return utils.MarshalNoDur(&resolver.Response{
