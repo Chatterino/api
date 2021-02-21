@@ -23,7 +23,7 @@ func (d *tooltipData) Truncate() {
 
 func (d *tooltipData) Sanitize() {
 	d.Title = html.EscapeString(d.Title)
-	d.Description = html.EscapeString(d.Title)
+	d.Description = html.EscapeString(d.Description)
 }
 
 // does this really fit in model?
