@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html"
 	"net/http"
 	"net/url"
 	"time"
@@ -56,11 +57,15 @@ func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
 	// Transform API response into our tooltip model for Wikipedia links
 	tooltipData := &wikipediaTooltipData{}
 
-	tooltipData.Title = utils.TruncateString(pageInfo.Titles.Display, maxTitleLength)
-	tooltipData.Extract = utils.TruncateString(pageInfo.Extract, maxExtractLength)
+	sanitizedTitle := html.EscapeString(pageInfo.Titles.Display)
+	tooltipData.Title = utils.TruncateString(sanitizedTitle, maxTitleLength)
+
+	sanitizedExtract := html.EscapeString(pageInfo.Extract)
+	tooltipData.Extract = utils.TruncateString(sanitizedExtract, maxExtractLength)
 
 	if pageInfo.Description != nil {
-		tooltipData.Description = utils.TruncateString(*pageInfo.Description, maxDescriptionLength)
+		sanitizedDescription := html.EscapeString(*pageInfo.Description)
+		tooltipData.Description = utils.TruncateString(sanitizedDescription, maxDescriptionLength)
 	}
 
 	if pageInfo.Thumbnail != nil {
