@@ -75,13 +75,15 @@ func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
 	return tooltipData, nil
 }
 
-func buildTooltip(pageInfo *wikipediaTooltipData) (interface{}, time.Duration, error) {
+func buildTooltip(pageInfo *wikipediaTooltipData) (response, time.Duration, error) {
 	var tooltip bytes.Buffer
 
 	if err := wikipediaTooltipTemplate.Execute(&tooltip, pageInfo); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Wikipedia template error: " + resolver.CleanResponse(err.Error()),
+		return response{
+			resolverResponse: &resolver.Response{
+				Status:  http.StatusInternalServerError,
+				Message: "Wikipedia template error: " + resolver.CleanResponse(err.Error()),
+			}, err: nil,
 		}, cache.NoSpecialDur, nil
 	}
 
