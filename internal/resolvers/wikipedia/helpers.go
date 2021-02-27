@@ -61,8 +61,6 @@ func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
 
 	if pageInfo.Description != nil {
 		tooltipData.Description = utils.TruncateString(*pageInfo.Description, maxDescriptionLength)
-	} else {
-		tooltipData.Description = ""
 	}
 
 	if pageInfo.Thumbnail != nil {
