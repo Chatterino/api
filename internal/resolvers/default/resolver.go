@@ -13,6 +13,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/supinic"
 	"github.com/Chatterino/api/internal/resolvers/twitch"
 	"github.com/Chatterino/api/internal/resolvers/twitter"
+	"github.com/Chatterino/api/internal/resolvers/wikipedia"
 	"github.com/Chatterino/api/internal/resolvers/youtube"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -84,6 +85,7 @@ func New(baseURL string) *R {
 	r.customResolvers = append(r.customResolvers, supinic.New()...)
 	r.customResolvers = append(r.customResolvers, twitch.New()...)
 	r.customResolvers = append(r.customResolvers, imgur.New()...)
+	r.customResolvers = append(r.customResolvers, wikipedia.New()...)
 
 	return r
 }
