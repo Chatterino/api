@@ -22,7 +22,7 @@ type wikipediaTooltipData struct {
 }
 
 const wikipediaTooltip = `<div style="text-align: left;">
-<b>{{.Title}}{{ if .Description }}&nbsp;•&nbsp;{{.Description}}{{ end }}</b><br />
+<b>{{.Title}}{{ if .Description }}&nbsp;•&nbsp;{{.Description}}{{ end }}</b><br>
 {{.Extract}}
 </div>
 `
