@@ -9,7 +9,7 @@ require (
 	github.com/pajlada/jsonapi v0.0.0-20181126225824-ff9660de882a // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	google.golang.org/api v0.40.0
-	honnef.co/go/tools v0.1.2
+	honnef.co/go/tools v0.1.3
 )
 
 go 1.13
