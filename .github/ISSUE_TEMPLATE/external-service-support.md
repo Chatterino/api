@@ -2,7 +2,7 @@
 name: External service support
 about: Suggest a service you would like rich thumbnail data from
 title: ""
-labels: enhancement, external service support, needs triage
+labels: enhancement, external service support
 assignees: ""
 ---
 
