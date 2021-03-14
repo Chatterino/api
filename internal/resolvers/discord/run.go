@@ -10,7 +10,7 @@ import (
 func run(url *url.URL) ([]byte, error) {
 	matches := discordInviteURLRegex.FindStringSubmatch(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
 	if len(matches) != 4 {
-		return nil, invalidDiscordInvite
+		return nil, errInvalidDiscordInvite
 	}
 
 	inviteCode := matches[3]

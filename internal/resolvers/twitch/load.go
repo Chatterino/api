@@ -13,13 +13,13 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
-func load(clipSlug string, r *http.Request) (interface{}, error, time.Duration) {
+func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) {
 	log.Println("[TwitchClip] GET", clipSlug)
 
 	response, err := helixAPI.GetClips(&helix.ClipsParams{IDs: []string{clipSlug}})
 
 	if err != nil {
-		return noTwitchClipWithThisIDFound, nil, cache.NoSpecialDur
+		return noTwitchClipWithThisIDFound, cache.NoSpecialDur, nil
 	}
 
 	var clipHelix = response.Data.Clips[0]
@@ -40,12 +40,12 @@ func load(clipSlug string, r *http.Request) (interface{}, error, time.Duration) 
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "twitch clip template error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	return &resolver.Response{
 		Status:    200,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: clipHelix.ThumbnailURL,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }

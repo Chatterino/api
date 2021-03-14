@@ -32,6 +32,7 @@ import "time"
   }
 }
 */
+
 type FrankerFaceZEmoteAPIResponse struct {
 	Height    int16     `json:"height"`
 	Modifier  bool      `json:"modifier"`

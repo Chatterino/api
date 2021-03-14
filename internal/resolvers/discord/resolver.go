@@ -38,7 +38,7 @@ var (
 		Message: "No Discord invite with this code found",
 	}
 
-	invalidDiscordInvite = errors.New("Invalid Discord invite Path")
+	errInvalidDiscordInvite = errors.New("invalid Discord invite Path")
 
 	discordInviteTemplate = template.Must(template.New("discordInviteTooltip").Parse(discordInviteTooltip))
 

@@ -27,7 +27,7 @@ func parseDuration(dur string) string {
 	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }
 
-func load(videoID string, r *http.Request) (interface{}, error, time.Duration) {
+func load(videoID string, r *http.Request) (interface{}, time.Duration, error) {
 	youtubeVideoParts := []string{
 		"statistics",
 		"snippet",
@@ -40,17 +40,17 @@ func load(videoID string, r *http.Request) (interface{}, error, time.Duration) {
 		return &resolver.Response{
 			Status:  500,
 			Message: "youtube api error " + resolver.CleanResponse(err.Error()),
-		}, nil, 1 * time.Hour
+		}, 1 * time.Hour, nil
 	}
 
 	if len(youtubeResponse.Items) != 1 {
-		return nil, errors.New("Videos response is not size 1"), cache.NoSpecialDur
+		return nil, cache.NoSpecialDur, errors.New("videos response is not size 1")
 	}
 
 	video := youtubeResponse.Items[0]
 
 	if video.ContentDetails == nil {
-		return &resolver.Response{Status: 500, Message: "video unavailable"}, nil, cache.NoSpecialDur
+		return &resolver.Response{Status: 500, Message: "video unavailable"}, cache.NoSpecialDur, nil
 	}
 
 	data := youtubeTooltipData{
@@ -68,7 +68,7 @@ func load(videoID string, r *http.Request) (interface{}, error, time.Duration) {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "youtube template error " + resolver.CleanResponse(err.Error()),
-		}, nil, cache.NoSpecialDur
+		}, cache.NoSpecialDur, nil
 	}
 
 	thumbnail := video.Snippet.Thumbnails.Default.Url
@@ -80,5 +80,5 @@ func load(videoID string, r *http.Request) (interface{}, error, time.Duration) {
 		Status:    http.StatusOK,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: thumbnail,
-	}, nil, cache.NoSpecialDur
+	}, cache.NoSpecialDur, nil
 }

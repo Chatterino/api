@@ -2,6 +2,7 @@ package defaultresolver
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,23 +17,28 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (dr *R) load(urlString string, r *http.Request) (interface{}, error, time.Duration) {
+func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration, error) {
 	requestUrl, err := url.Parse(urlString)
 	if err != nil {
-		return resolver.InvalidURL, nil, cache.NoSpecialDur
+		return resolver.InvalidURL, cache.NoSpecialDur, nil
 	}
 
 	for _, m := range dr.customResolvers {
 		if m.Check(requestUrl) {
 			data, err := m.Run(requestUrl)
-			return data, err, cache.NoSpecialDur
+
+			if errors.Is(err, resolver.ErrDontHandle) {
+				break
+			}
+
+			return data, cache.NoSpecialDur, err
 		}
 	}
 
 	resp, err := resolver.RequestGET(requestUrl.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
+			return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 		}
 
 		return utils.MarshalNoDur(&resolver.Response{
@@ -51,7 +57,12 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, error, time.D
 		for _, m := range dr.customResolvers {
 			if m.Check(resp.Request.URL) {
 				data, err := m.Run(resp.Request.URL)
-				return data, err, cache.NoSpecialDur
+
+				if errors.Is(err, resolver.ErrDontHandle) {
+					break
+				}
+
+				return data, cache.NoSpecialDur, err
 			}
 		}
 	}
@@ -59,16 +70,16 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, error, time.D
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, err, cache.NoSpecialDur
+			return nil, cache.NoSpecialDur, err
 		}
 		if contentLengthBytes > resolver.MaxContentLength {
-			return resolver.ResponseTooLarge, nil, cache.NoSpecialDur
+			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
-		return resolver.NoLinkInfoFound, nil, cache.NoSpecialDur
+		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
 	limiter := &resolver.WriteLimiter{Limit: resolver.MaxContentLength}
@@ -85,6 +96,9 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, error, time.D
 
 	// Truncate title and description in case they're too long
 	data.Truncate()
+
+	// Sanitize potential html values
+	data.Sanitize()
 
 	var tooltip bytes.Buffer
 	if err := defaultTooltip.Execute(&tooltip, data); err != nil {

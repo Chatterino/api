@@ -106,7 +106,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, time.Duration) {
+func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Duration, error) {
 	url := fmt.Sprintf("https://api.twitchemotes.com/api/v4/sets?id=%s", setID)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -114,7 +114,7 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
-		}, nil, 0
+		}, 0, nil
 	}
 
 	req.Header.Set("User-Agent", "chatterino-api-cache/1.0 link-resolver")
@@ -124,7 +124,7 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
-		}, nil, 0
+		}, 0, nil
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -132,7 +132,7 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
-		}, nil, 0
+		}, 0, nil
 	}
 	var emoteSets []EmoteSet
 	err = json.Unmarshal(body, &emoteSets)
@@ -140,14 +140,14 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, error, t
 		return &TwitchEmotesError{
 			Error:  err,
 			Status: 500,
-		}, nil, 0
+		}, 0, nil
 	}
 
 	if len(emoteSets) == 0 {
 		return &TwitchEmotesError{
 			Error:  errInvalidEmoteID,
 			Status: 404,
-		}, nil, 0
+		}, 0, nil
 	}
 
 	if len(emoteSets) > 1 {
