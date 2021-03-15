@@ -1,5 +1,6 @@
 # Unreleased
 
+- Added support for Livestreamfails clip links. (#98)
 - Added support for Wikipedia article links. (#92)
 - Fixed an issue where OpenGraph descriptions were not HTML-sanitized. (#90)
 - Added support for imgur image links. (#81)
