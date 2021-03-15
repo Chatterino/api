@@ -18,7 +18,7 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/nfnt/resize"
 )
 
@@ -111,8 +111,8 @@ var (
 	thumbnailCache = cache.New("thumbnail", doThumbnailRequest, 10*time.Minute)
 )
 
-func InitializeThumbnail(router *mux.Router) {
-	router.HandleFunc("/thumbnail/{url:.*}", thumbnail).Methods("GET")
+func InitializeThumbnail(router *chi.Mux) {
+	router.Get("/thumbnail/{url}", thumbnail)
 }
 
 func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
