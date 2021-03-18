@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	livestreamfailsAPIURL = "https://api.livestreamfails.com/clip/%d"
+	livestreamfailsAPIURL = "https://api.livestreamfails.com/clip/%s"
 
 	thumbnailCDNFormat = "https://d2ek7gt5lc50t6.cloudfront.net/image/%s" // Hardcoded(?) cloudfront end-point
 	thumbnailFormat    = "https://alpinecdn.com/v1/%s"
@@ -22,9 +22,10 @@ const (
 	livestreamfailsTooltipString = `<div style="text-align: left;">
 {{ if .NSFW }}<li><b><span style="color: red">NSFW</span></b></li>{{ end }}
 <b>{{.Title}}</b><hr>
-<b>Reddit score:</b> {{.RedditScore}}<br>
-<b>Platform:</b> {{.Platform}}<br>
 <b>Streamer:</b> {{.StreamerName}}<br>
+<b>Category:</b> {{.Category}}<br>
+<b>Platform:</b> {{.Platform}}<br>
+<b>Reddit score:</b> {{.RedditScore}}<br>
 <b>Created:</b> {{.CreationDate}}
 </div>`
 )

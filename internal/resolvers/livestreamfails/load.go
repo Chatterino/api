@@ -8,15 +8,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(rawClipId string, r *http.Request) (interface{}, time.Duration, error) {
-	clipID, _ := strconv.ParseInt(rawClipId, 10, 32)
+func load(clipID string, r *http.Request) (interface{}, time.Duration, error) {
 	apiURL := fmt.Sprintf(livestreamfailsAPIURL, clipID)
 
 	// Execute Livestreamfails API request
@@ -56,8 +55,9 @@ func load(rawClipId string, r *http.Request) (interface{}, time.Duration, error)
 	data := TooltipData{
 		NSFW:         clipData.IsNSFW,
 		Title:        clipData.Label,
+		Category:     clipData.Category.Label,
 		RedditScore:  clipData.RedditScore,
-		Platform:     clipData.SourcePlatform,
+		Platform:     strings.Title(strings.ToLower(clipData.SourcePlatform)),
 		StreamerName: clipData.Streamer.Label,
 		CreationDate: clipData.CreatedAt.Format("02 Jan 2006"),
 	}
@@ -88,16 +88,12 @@ func load(rawClipId string, r *http.Request) (interface{}, time.Duration, error)
 		Output{Format: "png"},                             // Livestreamfails API uses "webp", but here we use "png".
 	}
 
-	thumbnailRequestJSON, err := json.Marshal(thumbnailRequest)
+	thumbnailRequestJSON, _ := json.Marshal(thumbnailRequest)
+	// Livestreamfails' CDN requests that the url is a base64 encoded JSON string that has the output & resize data.
+	thumbnailRequestJSONToBase64 := base64.StdEncoding.EncodeToString([]byte(thumbnailRequestJSON))
+	thumbnailURL := fmt.Sprintf(thumbnailFormat, thumbnailRequestJSONToBase64)
 
-	if err == nil {
-		// Livestreamfails' CDN requests that the url is a base64 encoded JSON string that has the output & resize data.
-		thumbnailRequestJSONToBase64 := base64.StdEncoding.EncodeToString([]byte(thumbnailRequestJSON))
-
-		thumbnailURL := fmt.Sprintf(thumbnailFormat, thumbnailRequestJSONToBase64)
-
-		resolverResponse.Thumbnail = thumbnailURL
-	}
+	resolverResponse.Thumbnail = thumbnailURL
 
 	return &resolverResponse, cache.NoSpecialDur, nil
 }
