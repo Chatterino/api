@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 func uptimeString() string {
@@ -24,19 +24,19 @@ func memoryString() string {
 }
 
 func healthUptime(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "%s", uptimeString())
+	w.Write([]byte(uptimeString()))
 }
 
 func healthMemory(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "%s", memoryString())
+	w.Write([]byte(memoryString()))
 }
 
 func healthCombined(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Uptime: %s - Memory: %s", uptimeString(), memoryString())
+	w.Write([]byte(fmt.Sprintf("Uptime: %s - Memory: %s", uptimeString(), memoryString())))
 }
 
-func handleHealth(router *mux.Router) {
-	router.HandleFunc("/health/uptime", healthUptime).Methods("GET")
-	router.HandleFunc("/health/memory", healthMemory).Methods("GET")
-	router.HandleFunc("/health/combined", healthCombined).Methods("GET")
+func handleHealth(router *chi.Mux) {
+	router.Get("/health/uptime", healthUptime)
+	router.Get("/health/memory", healthMemory)
+	router.Get("/health/combined", healthCombined)
 }

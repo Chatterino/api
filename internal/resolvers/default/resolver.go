@@ -19,7 +19,7 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 const (
@@ -92,8 +92,8 @@ func New(baseURL string) *R {
 	return r
 }
 
-func Initialize(router *mux.Router, baseURL string) {
+func Initialize(router *chi.Mux, baseURL string) {
 	defaultLinkResolver := New(baseURL)
 
-	router.HandleFunc("/link_resolver/{url:.*}", defaultLinkResolver.HandleRequest).Methods("GET")
+	router.Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
 }
