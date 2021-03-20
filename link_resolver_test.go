@@ -10,10 +10,11 @@ import (
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/go-chi/chi/v5"
 )
 
 func TestResolveTwitchClip(t *testing.T) {
-	router := makeRouter("")
+	router := chi.NewRouter()
 	defaultresolver.Initialize(router, "")
 	ts := httptest.NewServer(router)
 	defer ts.Close()
@@ -40,7 +41,7 @@ func TestResolveTwitchClip(t *testing.T) {
 }
 
 func TestResolveTwitchClip2(t *testing.T) {
-	router := makeRouter("")
+	router := chi.NewRouter()
 	defaultresolver.Initialize(router, "")
 	ts := httptest.NewServer(router)
 	defer ts.Close()

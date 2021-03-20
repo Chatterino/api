@@ -3,9 +3,9 @@
 dankeroni/gotwitch is used for interacting with the Twitch API.  
 dankeroni/gotwitch is licensed under the [**MIT License**](https://github.com/dankeroni/gotwitch/blob/master/LICENSE).
 
-## github.com/gorilla/mux
-gorilla/mux is used for routing for the api we serve.  
-gorilla/mux is licensed under the [**BSD 3-Clause "New" or "Revised" license**](https://github.com/gorilla/mux/blob/master/LICENSE).
+## github.com/go-chi/chi
+go-chi/chi is used for routing for the api we serve.  
+go-chi/chi is licensed under the [**MIT license**](https://github.com/go-chi/chi/blob/master/LICENSE).
 
 ## github.com/patrickmn/go-cache
 patrickmn/go-cache is an in-memory key:value store with easy expirations. We use this for caching most things we serve.  

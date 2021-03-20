@@ -8,7 +8,7 @@ import (
 	"time"
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 var (
@@ -16,22 +16,37 @@ var (
 		Timeout: 15 * time.Second,
 	}
 	startTime = time.Now()
+
+	bind    = flag.String("l", ":1234", "bind address")
+	baseURL = flag.String("b", "", "base url (useful if being proxied through something like nginx). Value needs to be full url up to the application (e.g. https://braize.pajlada.com/chatterino)")
+
+	prefix string
 )
 
-var bind = flag.String("l", ":1234", "bind address")
-var baseURL = flag.String("b", "", "base url (useful if being proxied through nginx or some shit). value needs to be full url up to the application (e.g. https://braize.pajlada.com/chatterino)")
+func mountRouter(r *chi.Mux) *chi.Mux {
+	if *baseURL == "" {
+		return r
+	}
 
-var prefix string
+	// figure out prefix from address
+	u, err := url.Parse(*baseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		log.Fatal("Scheme must be included in base url")
+	}
 
-func makeRouter(prefix string) *mux.Router {
-	// Skip clean is used to make link_resolver work
-	router := mux.NewRouter().SkipClean(true)
-	sr := router.PathPrefix(prefix).Subrouter().SkipClean(true)
+	prefix = u.Path
+	ur := chi.NewRouter()
+	ur.Mount(prefix, r)
 
-	return sr
+	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", *bind, prefix, *baseURL)
+
+	return ur
 }
 
-func listen(bind string, router *mux.Router) {
+func listen(bind string, router *chi.Mux) {
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         bind,
@@ -45,29 +60,15 @@ func listen(bind string, router *mux.Router) {
 func main() {
 	flag.Parse()
 
-	// figure out prefix from baseURL
-	if *baseURL != "" {
-		u, err := url.Parse(*baseURL)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if u.Scheme != "http" && u.Scheme != "https" {
-			log.Fatal("scheme must be included in base url")
-		}
-		prefix = u.Path
-	}
-
 	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", *bind, prefix, *baseURL)
 
-	router := makeRouter(prefix)
+	router := chi.NewRouter()
 
 	handleTwitchEmotes(router)
-
 	handleHealth(router)
 
 	defaultresolver.Initialize(router, *baseURL)
-
 	defaultresolver.InitializeThumbnail(router)
 
-	listen(*bind, router)
+	listen(*bind, mountRouter(router))
 }

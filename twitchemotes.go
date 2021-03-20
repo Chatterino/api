@@ -11,7 +11,7 @@ import (
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/utils"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 type TwitchEmotesError struct {
@@ -34,11 +34,11 @@ type EmoteSet struct {
 
 var (
 	errInvalidEmoteID = errors.New("invalid emote id")
+
+	customEmoteSets map[string][]byte = make(map[string][]byte)
+
+	twitchemotesCache = cache.New("twitchemotes", doTwitchemotesRequest, time.Duration(30)*time.Minute)
 )
-
-var customEmoteSets map[string][]byte = make(map[string][]byte)
-
-var twitchemotesCache = cache.New("twitchemotes", doTwitchemotesRequest, time.Duration(30)*time.Minute)
 
 func addEmoteSet(emoteSetID, channelName, channelID, setType string) {
 	b, err := json.Marshal(&EmoteSet{
@@ -67,8 +67,7 @@ func setsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func setHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	setID := vars["setID"]
+	setID := chi.URLParam(r, "setID")
 	w.Header().Set("Content-Type", "application/json")
 
 	// 1. Check our "custom" responses
@@ -157,8 +156,8 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Dur
 	return utils.MarshalNoDur(&emoteSets[0])
 }
 
-func handleTwitchEmotes(router *mux.Router) {
-	router.HandleFunc("/twitchemotes/set/{setID}/", setHandler).Methods("GET")
+func handleTwitchEmotes(router *chi.Mux) {
+	router.Get("/twitchemotes/set/{setID}/", setHandler)
 
-	router.HandleFunc("/twitchemotes/sets/", setsHandler).Methods("GET")
+	router.Get("/twitchemotes/sets/", setsHandler)
 }
