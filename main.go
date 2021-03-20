@@ -9,7 +9,6 @@ import (
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 var (
@@ -64,7 +63,6 @@ func main() {
 	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", *bind, prefix, *baseURL)
 
 	router := chi.NewRouter()
-	router.Use(middleware.DefaultLogger)
 
 	handleTwitchEmotes(router)
 	handleHealth(router)
@@ -72,6 +70,5 @@ func main() {
 	defaultresolver.Initialize(router, *baseURL)
 	defaultresolver.InitializeThumbnail(router)
 
-	log.Println(router.Routes())
 	listen(*bind, mountRouter(router))
 }
