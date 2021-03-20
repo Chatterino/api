@@ -1,6 +1,6 @@
 # Unreleased
 
-- Replaced `gorilla/mux` with `go-chi/chi`
+- Dev: Replaced `gorilla/mux` with `go-chi/chi`. This change requires the URL parameters to be percent-encoded, specifically the slashes. (#99)
 - Added support for Wikipedia article links. (#92)
 - Fixed an issue where OpenGraph descriptions were not HTML-sanitized. (#90)
 - Added support for imgur image links. (#81)
