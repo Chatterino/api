@@ -6,15 +6,6 @@ import (
 	"time"
 )
 
-// Date converts a date from a string in the RFC3339 format into one specified in the format string
-func Date(format string, str string) string {
-	date, err := time.Parse(time.RFC3339, str)
-	if err != nil {
-		return ""
-	}
-	return date.Format(format)
-}
-
 // Duration takes a `time.Duration` and converts it to the nearest-second string output
 // Example output: 01:59:59
 func Duration(duration time.Duration) string {
@@ -49,4 +40,16 @@ func DurationSeconds(duration time.Duration) string {
 // Example output: 02 Dec 2016
 func CreationDate(t time.Time) string {
 	return t.Format("02 Jan 2006")
+}
+
+// CreationDateRFC3339 parses the incoming string as an RFC3339-formatted date and then formats it into the `02 Jan 2006` format
+// If the given string is not a valid RFC3339-formatted date, we will return an empty string
+// Example output: 02 Dec 2016
+// See more: `CreationDate`
+func CreationDateRFC3339(str string) string {
+	t, err := time.Parse(time.RFC3339, str)
+	if err != nil {
+		return ""
+	}
+	return CreationDate(t)
 }

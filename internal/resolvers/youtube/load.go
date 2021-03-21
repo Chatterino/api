@@ -57,7 +57,7 @@ func load(videoID string, r *http.Request) (interface{}, time.Duration, error) {
 		Title:        video.Snippet.Title,
 		ChannelTitle: video.Snippet.ChannelTitle,
 		Duration:     parseDuration(video.ContentDetails.Duration),
-		PublishDate:  humanize.Date("02 Jan 2006", video.Snippet.PublishedAt),
+		PublishDate:  humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
 		Views:        humanize.Number(video.Statistics.ViewCount),
 		LikeCount:    humanize.Number(video.Statistics.LikeCount),
 		DislikeCount: humanize.Number(video.Statistics.DislikeCount),
