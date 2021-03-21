@@ -32,6 +32,7 @@ jobs:
 
       - name: Build
         run: go build -v
+        working-directory: cmd/api
 
       - name: Test
         run: go test -v ./...
