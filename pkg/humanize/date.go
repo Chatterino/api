@@ -54,6 +54,14 @@ func CreationDateRFC3339(str string) string {
 	return CreationDate(t)
 }
 
+// CreationDateUnix parses the incoming int64 as a unix timestamp and then returns the date in the `CreationDate` format.
+// Example output: 02 Dec 2016
+// See more: `CreationDate`
+func CreationDateUnix(unix int64) string {
+	t := time.Unix(unix, 0)
+	return CreationDate(t)
+}
+
 // CreationDateTime returns the `time.Time`'s date formatted in the `02 Jan 2006 • 15:04 UTC` format
 // Example output: 02 Jan 2006 • 15:04 UTC
 func CreationDateTime(t time.Time) string {
