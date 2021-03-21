@@ -24,11 +24,6 @@ var (
 
 const (
 	endpointURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
-
-	// TODO: Replace these with shared constants once implemented
-	maxTitleLength       = 60
-	maxDescriptionLength = 60
-	maxExtractLength     = 200
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
