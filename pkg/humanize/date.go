@@ -2,6 +2,7 @@ package humanize
 
 import (
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -29,4 +30,17 @@ func Duration(duration time.Duration) string {
 	seconds = duration / time.Second
 
 	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+// DurationSeconds takes a `time.Duration` and converts it to a string in the following format: %gs where %g is the number of seconds contained within this duration
+// Example output: 53s
+func DurationSeconds(duration time.Duration) string {
+	// Truncate away any non-second data
+	duration = duration.Truncate(1 * time.Second)
+
+	if duration > 90*time.Second {
+		log.Println("WARNING: humanize.DurationSeconds used for duration that's larger than 90 seconds")
+	}
+
+	return fmt.Sprintf("%gs", duration.Seconds())
 }
