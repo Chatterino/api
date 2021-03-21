@@ -24,7 +24,7 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 		AuthorName:   clip.Curator.DisplayName,
 		ChannelName:  clip.Broadcaster.DisplayName,
 		Duration:     humanize.DurationSeconds(time.Duration(clip.Duration) * time.Second),
-		CreationDate: clip.CreatedAt.Format("02 Jan 2006"),
+		CreationDate: humanize.CreationDate(clip.CreatedAt),
 		Views:        humanize.Number(uint64(clip.Views)),
 	}
 

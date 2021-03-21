@@ -44,3 +44,9 @@ func DurationSeconds(duration time.Duration) string {
 
 	return fmt.Sprintf("%gs", duration.Seconds())
 }
+
+// CreationDate returns the `time.Time`'s date formatted in the `02 Jan 2006` format
+// Example output: 02 Dec 2016
+func CreationDate(t time.Time) string {
+	return t.Format("02 Jan 2006")
+}
