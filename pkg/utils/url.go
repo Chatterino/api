@@ -49,3 +49,10 @@ func IsDomains(url *url.URL, domains map[string]struct{}) bool {
 	_, ok := domains[host]
 	return ok
 }
+
+// IsDomain checks whether `url`s domain matches the given domain exactly (non-case sensitive)
+// The `domain` string must be fully lowercased
+func IsDomain(url *url.URL, domain string) bool {
+	host := strings.ToLower(url.Host)
+	return host == domain
+}
