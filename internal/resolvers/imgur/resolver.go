@@ -13,8 +13,6 @@ import (
 )
 
 var (
-	timestampFormat = "Jan 2 2006 • 15:04 UTC"
-
 	// max size of an image before we use a small thumbnail of it
 	maxRawImageSize = 50 * 1024
 
