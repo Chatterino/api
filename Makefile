@@ -2,6 +2,6 @@ lint:
 	@staticcheck ./...
 
 build:
-	@go build
+	@cd cmd/api && go build
 
 check: lint
