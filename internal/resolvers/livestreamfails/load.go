@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -59,7 +60,7 @@ func load(clipID string, r *http.Request) (interface{}, time.Duration, error) {
 		RedditScore:  clipData.RedditScore,
 		Platform:     strings.Title(strings.ToLower(clipData.SourcePlatform)),
 		StreamerName: clipData.Streamer.Label,
-		CreationDate: clipData.CreatedAt.Format("02 Jan 2006"),
+		CreationDate: humanize.CreationDate(clipData.CreatedAt),
 	}
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
