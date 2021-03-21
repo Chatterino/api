@@ -1,8 +1,5 @@
 lint:
-	@golangci-lint run
-
-lint-current:
-	@golangci-lint run --new
+	@staticcheck ./...
 
 build:
 	@go build
