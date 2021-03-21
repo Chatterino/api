@@ -6,7 +6,6 @@ import (
 
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/Chatterino/api/pkg/utils"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -19,7 +18,7 @@ type tooltipData struct {
 
 func (d *tooltipData) Truncate() {
 	d.Title = humanize.Title(d.Title)
-	d.Description = utils.TruncateString(d.Description, MaxDescriptionLength)
+	d.Description = humanize.Description(d.Description)
 }
 
 func (d *tooltipData) Sanitize() {

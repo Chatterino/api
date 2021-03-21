@@ -31,9 +31,6 @@ const (
 <span>{{.Description}}</span><hr>
 {{end}}
 <b>URL:</b> {{.URL}}</div>`
-
-	// MaxDescriptionLength describes the maximum length of an og:description when returned from the default link resolver
-	MaxDescriptionLength = 200
 )
 
 var (
