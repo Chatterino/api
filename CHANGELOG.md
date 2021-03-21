@@ -1,5 +1,6 @@
 # Unreleased
 
+- Twitter resolver timestamp date format changed from `Jan 2 2006` to `02 Jan 2006`
 - Dev: Moved main package from root directory to `/cmd/api` (#104)
 - Dev: Replaced `gorilla/mux` with `go-chi/chi`. This change requires the URL parameters to be percent-encoded, specifically the slashes. (#99)
 - Added support for Livestreamfails clip links. (#98)

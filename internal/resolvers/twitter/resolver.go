@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	timestampFormat = "Jan 2 2006 • 15:04 UTC"
-
 	tweetTooltip = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
 <span style="white-space: pre-wrap; word-wrap: break-word;">

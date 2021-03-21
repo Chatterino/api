@@ -53,3 +53,9 @@ func CreationDateRFC3339(str string) string {
 	}
 	return CreationDate(t)
 }
+
+// CreationDateTime returns the `time.Time`'s date formatted in the `02 Jan 2006 • 15:04 UTC` format
+// Example output: 02 Jan 2006 • 15:04 UTC
+func CreationDateTime(t time.Time) string {
+	return t.Format("02 Jan 2006 • 15:04 UTC")
+}
