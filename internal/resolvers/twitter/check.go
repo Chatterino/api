@@ -2,13 +2,12 @@ package twitter
 
 import (
 	"net/url"
-	"strings"
+
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 func check(url *url.URL) bool {
-	isTwitter := (strings.HasSuffix(url.Host, ".twitter.com") || url.Host == "twitter.com")
-
-	if !isTwitter {
+	if !utils.IsSubdomainOf(url, "twitter.com") {
 		return false
 	}
 
