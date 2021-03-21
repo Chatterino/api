@@ -3,6 +3,7 @@ package humanize
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -21,6 +22,16 @@ func Duration(duration time.Duration) string {
 	seconds = duration / time.Second
 
 	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+// DurationPT takes a PT-formatted string `time.Duration` and converts it to the nearest-second string output using the `Duration` helper
+// Example output: 01:59:59
+// See also: Duration
+func DurationPT(pt string) string {
+	pt = strings.ToLower(pt)
+	pt = strings.Replace(pt, "pt", "", 1)
+	duration, _ := time.ParseDuration(pt)
+	return Duration(duration)
 }
 
 // DurationSeconds takes a `time.Duration` and converts it to a string in the following format: %gs where %g is the number of seconds contained within this duration
