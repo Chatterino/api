@@ -29,8 +29,9 @@ func buildTweetTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 	data.Likes = humanize.Number(tweet.Likes)
 	data.Retweets = humanize.Number(tweet.Retweets)
 
+	// TODO: what time format is this exactly? can we move to humanize a la CreationDteRFC3339?
 	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Timestamp)
-	data.Timestamp = timestamp.Format(timestampFormat)
+	data.Timestamp = humanize.CreationDateTime(timestamp)
 	if err != nil {
 		log.Println(err.Error())
 		data.Timestamp = ""

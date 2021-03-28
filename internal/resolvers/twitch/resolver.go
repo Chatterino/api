@@ -11,6 +11,7 @@ import (
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 	"github.com/dankeroni/gotwitch"
 )
 
@@ -44,7 +45,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
-			return strings.HasSuffix(url.Host, "clips.twitch.tv")
+			return utils.IsDomain(url, "clips.twitch.tv")
 		},
 		Run: func(url *url.URL) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")

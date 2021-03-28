@@ -11,6 +11,7 @@ import (
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 const (
@@ -43,7 +44,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 	// Find clips that look like https://livestreamfails.com/clip/IdHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
-			if !strings.HasSuffix(url.Host, "livestreamfails.com") {
+			if !utils.IsSubdomainOf(url, "livestreamfails.com") {
 				return false
 			}
 

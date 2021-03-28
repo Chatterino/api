@@ -2,7 +2,6 @@ package twitch
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -24,8 +23,8 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 		Title:        clip.Title,
 		AuthorName:   clip.Curator.DisplayName,
 		ChannelName:  clip.Broadcaster.DisplayName,
-		Duration:     fmt.Sprintf("%g%s", clip.Duration, "s"),
-		CreationDate: clip.CreatedAt.Format("02 Jan 2006"),
+		Duration:     humanize.DurationSeconds(time.Duration(clip.Duration) * time.Second),
+		CreationDate: humanize.CreationDate(clip.CreatedAt),
 		Views:        humanize.Number(uint64(clip.Views)),
 	}
 
