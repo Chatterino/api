@@ -35,7 +35,7 @@ var (
 
 	clipCache = cache.New("livestreamfailclip", load, 1*time.Hour)
 
-	pathRegex      = regexp.MustCompile(`/clip/([0-9]+)`)
+	pathRegex      = regexp.MustCompile(`/clip|post/[0-9]+`)
 	errInvalidPath = errors.New("invalid livestreamfails clips path")
 )
 
