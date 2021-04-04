@@ -17,8 +17,7 @@ import (
 const (
 	livestreamfailsAPIURL = "https://api.livestreamfails.com/clip/%s"
 
-	thumbnailCDNFormat = "https://d2ek7gt5lc50t6.cloudfront.net/image/%s" // Hardcoded(?) cloudfront end-point
-	thumbnailFormat    = "https://alpinecdn.com/v1/%s"
+	thumbnailFormat = "https://livestreamfails-image-prod.b-cdn.net/image/%s"
 
 	livestreamfailsTooltipString = `<div style="text-align: left;">
 {{ if .NSFW }}<li><b><span style="color: red">NSFW</span></b></li>{{ end }}
