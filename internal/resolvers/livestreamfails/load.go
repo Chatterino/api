@@ -2,7 +2,6 @@ package livestreamfails
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -82,19 +81,7 @@ func load(clipID string, r *http.Request) (interface{}, time.Duration, error) {
 		return &resolverResponse, cache.NoSpecialDur, nil
 	}
 
-	// Make a request for thumbnail
-	thumbnailRequest := LivestreamFailsThumbnailRequest{
-		fmt.Sprintf(thumbnailCDNFormat, clipData.ImageID), // ImageID goes into the hardcoded cloudfront url.
-		Resize{Width: 300, Height: 169},                   // Default values that livestreamfails API uses.
-		Output{Format: "png"},                             // Livestreamfails API uses "webp", but here we use "png".
-	}
-
-	thumbnailRequestJSON, _ := json.Marshal(thumbnailRequest)
-	// Livestreamfails' CDN requests that the url is a base64 encoded JSON string that has the output & resize data.
-	thumbnailRequestJSONToBase64 := base64.StdEncoding.EncodeToString([]byte(thumbnailRequestJSON))
-	thumbnailURL := fmt.Sprintf(thumbnailFormat, thumbnailRequestJSONToBase64)
-
-	resolverResponse.Thumbnail = thumbnailURL
+	resolverResponse.Thumbnail = fmt.Sprintf(thumbnailFormat, clipData.ImageID)
 
 	return &resolverResponse, cache.NoSpecialDur, nil
 }
