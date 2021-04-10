@@ -33,22 +33,24 @@ import "time"
 }
 */
 
+type FrankerFaceZUser struct {
+	DisplayName string `json:"display_name"`
+	ID          int    `json:"_id"`
+	Name        string `json:"name"`
+}
+
 type FrankerFaceZEmoteAPIResponse struct {
-	Height    int16     `json:"height"`
-	Modifier  bool      `json:"modifier"`
-	Status    int       `json:"status"`
-	Width     int16     `json:"width"`
-	Hidden    bool      `json:"hidden"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"last_updated"`
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Public    bool      `json:"public"`
-	Owner     struct {
-		DisplayName string `json:"display_name"`
-		ID          int    `json:"_id"`
-		Name        string `json:"name"`
-	} `json:"owner"`
+	Height    int16            `json:"height"`
+	Modifier  bool             `json:"modifier"`
+	Status    int              `json:"status"`
+	Width     int16            `json:"width"`
+	Hidden    bool             `json:"hidden"`
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt time.Time        `json:"last_updated"`
+	ID        int              `json:"id"`
+	Name      string           `json:"name"`
+	Public    bool             `json:"public"`
+	Owner     FrankerFaceZUser `json:"owner"`
 
 	URLs struct {
 		Size1 string `json:"1"`
