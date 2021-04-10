@@ -31,7 +31,7 @@ func testLoadAndUnescape(c *qt.C, urlString string) (cleanTooltip string) {
 }
 
 func TestLoad(t *testing.T) {
-	datetime := time.Date(2019, time.November, 10, 23, 0, 0, 0, time.UTC).Unix()
+	datetime := time.Date(2019, time.November, 10, 23, 0, 0, 0, time.UTC).UTC().Unix()
 	c := qt.New(t)
 	mockCtrl := gomock.NewController(c)
 	m := mocks.NewMockImgurClient(mockCtrl)
