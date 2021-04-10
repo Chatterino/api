@@ -31,7 +31,7 @@ func testLoadAndUnescape(c *qt.C, urlString string) (cleanTooltip string) {
 }
 
 func TestLoad(t *testing.T) {
-	datetime := time.Date(2019, time.November, 10, 23, 0, 0, 0, time.UTC).UTC().Unix()
+	datetime := time.Date(2019, time.November, 10, 23, 0, 0, 0, time.UTC).Unix()
 	c := qt.New(t)
 	mockCtrl := gomock.NewController(c)
 	m := mocks.NewMockImgurClient(mockCtrl)
@@ -54,7 +54,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -79,7 +79,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -103,7 +103,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -161,7 +161,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -193,7 +193,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -250,7 +250,7 @@ func TestLoad(t *testing.T) {
 				Limit: &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -282,7 +282,7 @@ func TestLoad(t *testing.T) {
 				Limit: &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -307,7 +307,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -332,7 +332,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -356,7 +356,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 

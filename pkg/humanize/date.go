@@ -83,5 +83,5 @@ func CreationDateTime(t time.Time) string {
 // Example output: 02 Jan 2006 • 15:04 UTC
 func CreationDateTimeUnix(unix int64) string {
 	t := time.Unix(unix, 0)
-	return CreationDateTime(t)
+	return CreationDateTime(t.UTC())
 }
