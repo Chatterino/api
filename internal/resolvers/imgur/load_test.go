@@ -3,6 +3,7 @@ package imgur
 import (
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/Chatterino/api/internal/mocks"
 	qt "github.com/frankban/quicktest"
@@ -30,6 +31,7 @@ func testLoadAndUnescape(c *qt.C, urlString string) (cleanTooltip string) {
 }
 
 func TestLoad(t *testing.T) {
+	datetime := time.Date(2019, time.November, 10, 23, 0, 0, 0, time.UTC).Unix()
 	c := qt.New(t)
 	mockCtrl := gomock.NewController(c)
 	m := mocks.NewMockImgurClient(mockCtrl)
@@ -44,6 +46,7 @@ func TestLoad(t *testing.T) {
 				Image: &imgur.ImageInfo{
 					Title:       "My Cool Title",
 					Description: "My Cool Description",
+					Datetime:    int(datetime),
 				},
 				Album:  nil,
 				GImage: nil,
@@ -51,7 +54,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -67,6 +70,7 @@ func TestLoad(t *testing.T) {
 				Image: &imgur.ImageInfo{
 					Title:       "My Cool Title",
 					Description: "My Cool Description",
+					Datetime:    int(datetime),
 					Nsfw:        true,
 				},
 				Album:  nil,
@@ -75,7 +79,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -91,6 +95,7 @@ func TestLoad(t *testing.T) {
 				Image: &imgur.ImageInfo{
 					Title:       "My <b>Cool</b> Title",
 					Description: "My <b>Cool</b> Description",
+					Datetime:    int(datetime),
 				},
 				Album:  nil,
 				GImage: nil,
@@ -98,7 +103,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -115,6 +120,7 @@ func TestLoad(t *testing.T) {
 				Album: &imgur.AlbumInfo{
 					Title:       "Album Title",
 					Description: "Album Description",
+					DateTime:    int(datetime),
 					ImagesCount: 0,
 					Images:      []imgur.ImageInfo{},
 				},
@@ -140,11 +146,13 @@ func TestLoad(t *testing.T) {
 				Album: &imgur.AlbumInfo{
 					Title:       "Album Title",
 					Description: "Album Description",
+					DateTime:    int(datetime),
 					ImagesCount: 1,
 					Images: []imgur.ImageInfo{
 						{
 							Title:       "My Cool Title",
 							Description: "My Cool Description",
+							Datetime:    int(datetime),
 						},
 					},
 				},
@@ -153,7 +161,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -170,11 +178,13 @@ func TestLoad(t *testing.T) {
 				Album: &imgur.AlbumInfo{
 					Title:       "Album <b>Title</b>",
 					Description: "Album <b>Description</b>",
+					DateTime:    int(datetime),
 					ImagesCount: 1,
 					Images: []imgur.ImageInfo{
 						{
 							Title:       "My Cool Title",
 							Description: "My Cool Description",
+							Datetime:    int(datetime),
 						},
 					},
 				},
@@ -183,7 +193,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -227,18 +237,20 @@ func TestLoad(t *testing.T) {
 				GAlbum: &imgur.GalleryAlbumInfo{
 					Title:       "Album Title",
 					Description: "Album Description",
+					DateTime:    int(datetime),
 					ImagesCount: 1,
 					Images: []imgur.ImageInfo{
 						{
 							Title:       "My Cool Title",
 							Description: "My Cool Description",
+							Datetime:    int(datetime),
 						},
 					},
 				},
 				Limit: &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -257,18 +269,20 @@ func TestLoad(t *testing.T) {
 				GAlbum: &imgur.GalleryAlbumInfo{
 					Title:       "Album <b>Title</b>",
 					Description: "Album <b>Description</b>",
+					DateTime:    int(datetime),
 					ImagesCount: 1,
 					Images: []imgur.ImageInfo{
 						{
 							Title:       "My Cool Title",
 							Description: "My Cool Description",
+							Datetime:    int(datetime),
 						},
 					},
 				},
 				Limit: &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -287,12 +301,13 @@ func TestLoad(t *testing.T) {
 				GImage: &imgur.GalleryImageInfo{
 					Title:       "My Cool Title",
 					Description: "My Cool Description",
+					Datetime:    int(datetime),
 				},
 				GAlbum: nil,
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -310,13 +325,14 @@ func TestLoad(t *testing.T) {
 				GImage: &imgur.GalleryImageInfo{
 					Title:       "My Cool Title",
 					Description: "My Cool Description",
+					Datetime:    int(datetime),
 					Nsfw:        true,
 				},
 				GAlbum: nil,
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
@@ -334,12 +350,13 @@ func TestLoad(t *testing.T) {
 				GImage: &imgur.GalleryImageInfo{
 					Title:       "My <b>Cool</b> Title",
 					Description: "My <b>Cool</b> Description",
+					Datetime:    int(datetime),
 				},
 				GAlbum: nil,
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 01 Jan 1970 • 01:00 UTC</li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 11 Nov 2019 • 00:00 UTC</li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
