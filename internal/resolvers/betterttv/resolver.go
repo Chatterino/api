@@ -13,10 +13,11 @@ import (
 const (
 	thumbnailFormat = "https://cdn.betterttv.net/emote/%s/3x"
 
-	tooltipTemplate = `<div style="text-align: left;">
-<b>{{.Code}}</b><br>
-<b>{{.Type}} BetterTTV Emote</b><br>
-<b>By:</b> {{.Uploader}}</div>`
+	tooltipTemplate = `<div style="text-align: left;">` +
+		`<b>{{.Code}}</b><br>` +
+		`<b>{{.Type}} BetterTTV Emote</b><br>` +
+		`<b>By:</b> {{.Uploader}}` +
+		`</div>`
 )
 
 var (
