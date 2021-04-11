@@ -1,12 +1,15 @@
+//go:generate mockgen -destination ../../mocks/mock_TwitchAPIClient.go -package=mocks . TwitchAPIClient
+
 package twitch
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -14,6 +17,10 @@ import (
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/dankeroni/gotwitch"
 )
+
+type TwitchAPIClient interface {
+	GetClip(clipSlug string) (clip gotwitch.V5GetClipResponse, r *http.Response, err error)
+}
 
 const (
 	twitchClipsTooltipString = `<div style="text-align: left;">` +
@@ -31,7 +38,7 @@ var (
 
 	clipCache = cache.New("twitchclip", load, 1*time.Hour)
 
-	v5API *gotwitch.TwitchAPI
+	v5API TwitchAPIClient
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
