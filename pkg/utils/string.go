@@ -11,3 +11,7 @@ func TruncateString(s string, maxLength int) string {
 
 	return strings.TrimSpace(string(runes[:maxLength-1])) + "…"
 }
+
+func StringPtr(s string) *string {
+	return &s
+}
