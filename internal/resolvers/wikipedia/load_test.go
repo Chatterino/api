@@ -14,8 +14,7 @@ import (
 )
 
 func testLoadAndUnescape(c *qt.C, locale, page string) (cleanTooltip string) {
-	const urlFormat = "https://%s.wikipedia.org/wiki/%s"
-	urlString := fmt.Sprintf(urlFormat, locale, page)
+	urlString := fmt.Sprintf("https://%s.wikipedia.org/wiki/%s", locale, page)
 	iret, _, err := load(urlString, nil)
 
 	c.Assert(err, qt.IsNil)
