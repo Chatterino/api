@@ -2,8 +2,8 @@ package wikipedia
 
 import (
 	"errors"
+	"html/template"
 	"regexp"
-	"text/template"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
