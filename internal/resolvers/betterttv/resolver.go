@@ -2,8 +2,8 @@ package betterttv
 
 import (
 	"errors"
+	"html/template"
 	"regexp"
-	"text/template"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -11,17 +11,18 @@ import (
 )
 
 const (
-	emoteAPIURL = "https://api.betterttv.net/3/emotes/%s"
-
 	thumbnailFormat = "https://cdn.betterttv.net/emote/%s/3x"
 
-	tooltipTemplate = `<div style="text-align: left;">
-<b>{{.Code}}</b><br>
-<b>{{.Type}} BetterTTV Emote</b><br>
-<b>By:</b> {{.Uploader}}</div>`
+	tooltipTemplate = `<div style="text-align: left;">` +
+		`<b>{{.Code}}</b><br>` +
+		`<b>{{.Type}} BetterTTV Emote</b><br>` +
+		`<b>By:</b> {{.Uploader}}` +
+		`</div>`
 )
 
 var (
+	emoteAPIURL = "https://api.betterttv.net/3/emotes/%s"
+
 	errInvalidBTTVEmotePath = errors.New("invalid BetterTTV emote path")
 
 	// BetterTTV hosts we're doing our smart things on
