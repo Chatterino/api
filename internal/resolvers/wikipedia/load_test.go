@@ -56,6 +56,15 @@ func init() {
 		Thumbnail:   nil,
 		Description: utils.StringPtr("<b>Test description</b>"),
 	}
+
+	wikiData["en_test_no_description"] = &wikipediaAPIResponse{
+		Titles: wikipediaAPITitles{
+			Display: "Test title",
+		},
+		Extract:     "Test extract",
+		Thumbnail:   nil,
+		Description: nil,
+	}
 }
 
 func TestLoad(t *testing.T) {
@@ -98,6 +107,17 @@ func TestLoad(t *testing.T) {
 		const page = "test_html"
 
 		const expectedTooltip = `<div style="text-align: left;"><b>&lt;b&gt;Test title&lt;/b&gt;&nbsp;•&nbsp;&lt;b&gt;Test description&lt;/b&gt;</b><br>&lt;b&gt;Test extract&lt;/b&gt;</div>`
+
+		cleanTooltip := testLoadAndUnescape(c, locale, page)
+
+		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
+	})
+
+	c.Run("Normal page (No description)", func(c *qt.C) {
+		const locale = "en"
+		const page = "test_no_description"
+
+		const expectedTooltip = `<div style="text-align: left;"><b>Test title</b><br>Test extract</div>`
 
 		cleanTooltip := testLoadAndUnescape(c, locale, page)
 
