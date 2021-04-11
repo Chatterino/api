@@ -1,4 +1,6 @@
 //go:generate mockgen -destination ../../mocks/mock_imgurClient.go -package=mocks . ImgurClient
+// The above comment will make it so that when `go generate` is called, the command after go:generate is called in this files PWD.
+// The mockgen command itself generates a mock for the ImgurClient interface in this file and stores it in the internal/mocks/ package
 
 package imgur
 
