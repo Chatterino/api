@@ -56,6 +56,28 @@ func TestLoad(t *testing.T) {
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
 
+	c.Run("Normal clip (Number formatting)", func(c *qt.C) {
+		const slug = "KKona"
+		var clipResponse gotwitch.V5GetClipResponse
+		clipResponse.Title = "Clipped it LUL"
+		clipResponse.Broadcaster.DisplayName = "pajlada"
+		clipResponse.Curator.DisplayName = "supinic"
+		clipResponse.Duration = 30
+		clipResponse.CreatedAt = time.Date(2019, time.November, 14, 04, 20, 6, 9, time.UTC)
+		clipResponse.Views = 6969
+
+		m.
+			EXPECT().
+			GetClip(gomock.Eq(slug)).
+			Return(clipResponse, nil, nil)
+
+		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> supinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 6,969</div>`
+
+		cleanTooltip := testLoadAndUnescape(c, slug)
+
+		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
+	})
+
 	c.Run("Normal clip (HTML)", func(c *qt.C) {
 		const slug = "KKona"
 		var clipResponse gotwitch.V5GetClipResponse
