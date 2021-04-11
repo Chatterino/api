@@ -79,7 +79,7 @@ func TestLoad(t *testing.T) {
 				Limit:  &imgur.RateLimit{},
 			}, 420, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li><li><b><span style="color: red">NSFW</span></b></li></div>`
+		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li><li><b><span style="color: red;">NSFW</span></b></li></div>`
 
 		cleanTooltip := testLoadAndUnescape(c, url)
 
