@@ -20,7 +20,7 @@ var (
 func init() {
 	wikiData["en_test"] = &wikipediaAPIResponse{
 		Titles: wikipediaAPITitles{
-			Display: "Test title",
+			Normalized: "Test title",
 		},
 		Extract:     "Test extract",
 		Thumbnail:   nil,
@@ -29,7 +29,7 @@ func init() {
 
 	wikiData["en_test_html"] = &wikipediaAPIResponse{
 		Titles: wikipediaAPITitles{
-			Display: "<b>Test title</b>",
+			Normalized: "<b>Test title</b>",
 		},
 		Extract:     "<b>Test extract</b>",
 		Thumbnail:   nil,
@@ -38,7 +38,7 @@ func init() {
 
 	wikiData["en_test_no_description"] = &wikipediaAPIResponse{
 		Titles: wikipediaAPITitles{
-			Display: "Test title",
+			Normalized: "Test title",
 		},
 		Extract:     "Test extract",
 		Thumbnail:   nil,

@@ -56,7 +56,7 @@ func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
 	// Transform API response into our tooltip model for Wikipedia links
 	tooltipData := &wikipediaTooltipData{}
 
-	sanitizedTitle := pageInfo.Titles.Display
+	sanitizedTitle := pageInfo.Titles.Normalized
 	tooltipData.Title = humanize.Title(sanitizedTitle)
 
 	sanitizedExtract := pageInfo.Extract

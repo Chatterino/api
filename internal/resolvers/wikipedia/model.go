@@ -1,7 +1,7 @@
 package wikipedia
 
 type wikipediaAPITitles struct {
-	Display string `json:"display"`
+	Normalized string `json:"normalized"`
 }
 
 type wikipediaAPIThumbnail struct {
