@@ -4,7 +4,6 @@ package defaultresolver
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -19,10 +18,8 @@ var (
 	}
 )
 
-func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
+func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, error) {
 	// decoder wants []byte, so read the whole file into a buffer
-	inputBuf, _ := ioutil.ReadAll(resp.Body)
-
 	decoder, err := lilliput.NewDecoder(inputBuf)
 	// this error reflects very basic checks,
 	// mostly just for the magic bytes of the file to match known image formats
@@ -42,12 +39,12 @@ func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
 	newHeight := header.Height()
 
 	// get ready to resize image,
-	// using 8192x8192 maximum resize buffer size
 	ops := lilliput.NewImageOps(8192)
 	defer ops.Close()
 
-	// create a buffer to store the output image, 50MB in this case
-	outputImg := make([]byte, 50*1024*1024)
+	// create a buffer to store the output image, 2MB in this case
+	// If the final image does not fit within this buffer, then we fall back to providing a static thumbnail
+	outputImg := make([]byte, 2*1024*1024)
 
 	// don't transcode (use existing type)
 	outputType := "." + strings.ToLower(decoder.Description())
