@@ -53,7 +53,7 @@ func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, erro
 	resizeMethod := lilliput.ImageOpsNoResize
 
 	// Only trigger if original image has higher values than maxThumbnailSize
-	if maxThumbnailSize < newWidth && maxThumbnailSize < newHeight {
+	if newWidth > maxThumbnailSize || newHeight > maxThumbnailSize {
 		resizeMethod = lilliput.ImageOpsResize // We want to resize
 
 		/* Preserve aspect ratio is from previous module, thanks nfnt/resize.
