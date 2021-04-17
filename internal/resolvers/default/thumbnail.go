@@ -2,12 +2,7 @@
 package defaultresolver
 
 import (
-	"bytes"
 	"fmt"
-	"image"
-	"image/gif"
-	"image/jpeg"
-	"image/png"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,11 +14,10 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/go-chi/chi/v5"
-	"github.com/nfnt/resize"
 )
 
 var (
-	supportedThumbnails = []string{"image/jpeg", "image/png", "image/gif"}
+	supportedThumbnails = []string{"image/jpeg", "image/png", "image/gif", "image/webp"}
 )
 
 const (
@@ -113,26 +107,4 @@ var (
 
 func InitializeThumbnail(router *chi.Mux) {
 	router.Get("/thumbnail/{url}", thumbnail)
-}
-
-func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
-	image, _, err := image.Decode(resp.Body)
-	if err != nil {
-		return []byte{}, fmt.Errorf("could not decode image from url: %s", resp.Request.URL)
-	}
-
-	resized := resize.Thumbnail(maxThumbnailSize, maxThumbnailSize, image, resize.Bilinear)
-	buffer := new(bytes.Buffer)
-	if resp.Header.Get("content-type") == "image/png" {
-		err = png.Encode(buffer, resized)
-	} else if resp.Header.Get("content-type") == "image/gif" {
-		err = gif.Encode(buffer, resized, nil)
-	} else if resp.Header.Get("content-type") == "image/jpeg" {
-		err = jpeg.Encode(buffer, resized, nil)
-	}
-	if err != nil {
-		return []byte{}, fmt.Errorf("could not encode image from url: %s", resp.Request.URL)
-	}
-
-	return buffer.Bytes(), nil
 }
