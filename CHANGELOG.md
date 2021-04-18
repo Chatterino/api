@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0
+
 - Non-Windows builds now use `discord/lilliput` to support animated GIFs and static WebP thumbnails. (#119)
 - Twitter resolver timestamp date format changed from `Jan 2 2006` to `02 Jan 2006` (#105)
 - Dev, Breaking: Moved main package from root directory to `/cmd/api`. This change also changes the path of the executable from `./api` to `./cmd/api/api` - make sure to reflect this change in your systemd unit. (#104, #107)
