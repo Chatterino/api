@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Dev: You can now set the Base URL flag with the `CHATTERINO_API_BASE_URL` environment variable. (#123)
+  Note that the priority will always be CLI Argument > Environment Variable, so passing `-b` to the application will negate any environment variables set.
+
 ## 1.0.0
 
 - Non-Windows builds now use `discord/lilliput` to support animated GIFs and static WebP thumbnails. (#119)
