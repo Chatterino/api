@@ -5,6 +5,8 @@
 - Dev: You can now set the Base URL flag with the `CHATTERINO_API_BASE_URL` environment variable. (#123)
   Note that the priority will always be CLI Argument > Environment Variable, so passing `-b` to the application will negate any environment variables set.
 - Dev: Add Dockerfile (#125)
+- Dev: You can now set the Base URL flag with the `CHATTERINO_API_BIND_ADDRESS` environment variable. (#124)
+  Note that the priority will always be CLI Argument > Environment Variable.
 
 ## 1.0.0
 
