@@ -36,6 +36,28 @@ func BaseURL() string {
 	return ""
 }
 
+func isFlagPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
+}
+
+func BindAddress() string {
+	if isFlagPassed("l") {
+		return *bind
+	}
+
+	if value, exists := utils.LookupEnv("BIND_ADDRESS"); exists {
+		return value
+	}
+
+	return ":1234"
+}
+
 func mountRouter(r *chi.Mux) *chi.Mux {
 	if BaseURL() == "" {
 		return r
@@ -54,7 +76,7 @@ func mountRouter(r *chi.Mux) *chi.Mux {
 	ur := chi.NewRouter()
 	ur.Mount(prefix, r)
 
-	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", *bind, prefix, BaseURL())
+	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", BindAddress(), prefix, BaseURL())
 
 	return ur
 }
@@ -73,7 +95,7 @@ func listen(bind string, router *chi.Mux) {
 func main() {
 	flag.Parse()
 
-	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", *bind, prefix, BaseURL())
+	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", BindAddress(), prefix, BaseURL())
 
 	router := chi.NewRouter()
 
@@ -83,5 +105,5 @@ func main() {
 	defaultresolver.Initialize(router, BaseURL())
 	defaultresolver.InitializeThumbnail(router)
 
-	listen(*bind, mountRouter(router))
+	listen(BindAddress(), mountRouter(router))
 }
