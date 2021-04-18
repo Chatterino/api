@@ -1,4 +1,6 @@
-# Unreleased
+# Changelog
+
+## Unreleased
 
 - Non-Windows builds now use `discord/lilliput` to support animated GIFs and static WebP thumbnails. (#119)
 - Twitter resolver timestamp date format changed from `Jan 2 2006` to `02 Jan 2006` (#105)
