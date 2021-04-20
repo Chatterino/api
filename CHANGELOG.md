@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Youtube thumbnails are now in medium quality instead of standard definition to get a rectangular shaped image. (#127)
+
 ## 1.0.1
 
 - Dev: You can now set the Base URL flag with the `CHATTERINO_API_BASE_URL` environment variable. (#123)
