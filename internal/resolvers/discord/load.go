@@ -67,7 +67,7 @@ func load(inviteCode string, r *http.Request) (interface{}, time.Duration, error
 	// Comverting Discord Snowflake to date string
 	// Reference https://discord.com/developers/docs/reference#snowflakes
 	snowflake, _ := strconv.ParseInt(jsonResponse.Guild.ID, 10, 64)
-	dateFromSnowflake := time.Unix(snowflake>>22/1000+1420066800, 0).Format("02 Jan 2006")
+	dateFromSnowflake := humanize.CreationDateUnix(snowflake>>22/1000 + 1420066800)
 
 	// Adding row with inviter's user tag if present
 	userTag := ""

@@ -2,13 +2,10 @@ package imgur
 
 import (
 	"net/url"
-	"strings"
+
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 func check(url *url.URL) bool {
-	// TODO: Make a shared helper function that does basically this.
-	// helpers.IsSubdomainOf(url.Host, "imgur.com")
-	isImgur := strings.HasSuffix(url.Host, ".imgur.com") || url.Host == "imgur.com"
-
-	return isImgur
+	return utils.IsSubdomainOf(url, "imgur.com")
 }

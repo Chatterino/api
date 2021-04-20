@@ -41,3 +41,18 @@ func IsSubdomainOf(url *url.URL, parent string) bool {
 
 	return same || trueSub
 }
+
+// IsDomains checks whether `url`s domain matches any of the given domains exactly (non-case sensitive)
+// The `domains` map should only contain fully lowercased domains
+func IsDomains(url *url.URL, domains map[string]struct{}) bool {
+	host := strings.ToLower(url.Hostname())
+	_, ok := domains[host]
+	return ok
+}
+
+// IsDomain checks whether `url`s domain matches the given domain exactly (non-case sensitive)
+// The `domain` string must be fully lowercased
+func IsDomain(url *url.URL, domain string) bool {
+	host := strings.ToLower(url.Hostname())
+	return host == domain
+}

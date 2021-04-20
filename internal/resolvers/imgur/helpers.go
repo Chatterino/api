@@ -5,24 +5,17 @@ import (
 	"net/url"
 	"path"
 	"strings"
-	"time"
 
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/koffeinsource/go-imgur"
 )
-
-// format the incoming "created at" timestamp from the imgur api to our standard created at format
-// see top of resolver.go for the format
-func formatTimestamp(datetime int64) string {
-	t := time.Unix(datetime, 0)
-	return t.Format(timestampFormat)
-}
 
 // Make a miniImage struct from a Gallery Image Info go-imgur struct
 func makeMiniImageFromGImage(imageInfo imgur.GalleryImageInfo) miniImage {
 	mini := miniImage{
 		Title:       imageInfo.Title,
 		Description: imageInfo.Description,
-		UploadDate:  formatTimestamp(int64(imageInfo.Datetime)),
+		UploadDate:  humanize.CreationDateTimeUnix(int64(imageInfo.Datetime)),
 		Nsfw:        imageInfo.Nsfw,
 		Animated:    imageInfo.Animated,
 		Album:       true,
@@ -43,7 +36,7 @@ func makeMiniImage(imageInfo imgur.ImageInfo) miniImage {
 	mini := miniImage{
 		Title:       imageInfo.Title,
 		Description: imageInfo.Description,
-		UploadDate:  formatTimestamp(int64(imageInfo.Datetime)),
+		UploadDate:  humanize.CreationDateTimeUnix(int64(imageInfo.Datetime)),
 		Nsfw:        imageInfo.Nsfw,
 		Animated:    imageInfo.Animated,
 		Album:       true,

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -71,21 +72,13 @@ func load(rawTrackID string, r *http.Request) (interface{}, time.Duration, error
 		prettyAuthors = "unknown"
 	}
 
-	// formatDuration() cannot be use here as that parses an ISO duration
-	duration := time.Duration(trackData.Duration) * time.Second
-	hours := duration / time.Hour
-	duration -= hours * time.Hour
-	minutes := duration / time.Minute
-	duration -= minutes * time.Minute
-	seconds := duration / time.Second
-
 	// Build tooltip data from the API response
 	data := TooltipData{
 		ID:         trackData.ID,
 		Name:       trackData.Name,
 		AuthorName: prettyAuthors,
 		Tags:       strings.Join(trackData.Tags, ", "),
-		Duration:   fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds),
+		Duration:   humanize.Duration(time.Duration(trackData.Duration) * time.Second),
 	}
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above

@@ -4,7 +4,7 @@
 
 1. Clone the repo: `git pull https://github.com/Chatterino/api.git`
 2. Move into the directory, fetch the dependencies and build the binary: `cd api && make build`
-3. Start the API: `./api`
+3. Start the API: `./cmd/api/api`
 
 ## Install systemd unit
 

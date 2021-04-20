@@ -1,27 +1,35 @@
+//go:generate mockgen -destination ../../mocks/mock_TwitchAPIClient.go -package=mocks . TwitchAPIClient
+
 package twitch
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/url"
 	"os"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 	"github.com/nicklaw5/helix"
-	// "github.com/dankeroni/gotwitch"
 )
 
+type TwitchAPIClient interface {
+	GetClips(params *helix.ClipsParams) (clip *helix.ClipsResponse, err error)
+}
+
 const (
-	twitchClipsTooltipString = `<div style="text-align: left;">
-<b>{{.Title}}</b><hr>
-<b>Clipped by:</b> {{.AuthorName}}<br>
-<b>Channel:</b> {{.ChannelName}}<br>
-<b>Created:</b> {{.CreationDate}}<br>
-<b>Views:</b> {{.Views}}</div>`
+	twitchClipsTooltipString = `<div style="text-align: left;">` +
+		`<b>{{.Title}}</b><hr>` +
+		`<b>Clipped by:</b> {{.AuthorName}}<br>` +
+		`<b>Channel:</b> {{.ChannelName}}<br>` +
+		//`<b>Duration:</b> {{.Duration}}<br>` +
+		`<b>Created:</b> {{.CreationDate}}<br>` +
+		`<b>Views:</b> {{.Views}}` +
+		`</div>`
 )
 
 var (
@@ -29,7 +37,7 @@ var (
 
 	clipCache = cache.New("twitchclip", load, 1*time.Hour)
 
-	helixAPI *helix.Client
+	helixAPI TwitchAPIClient
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
@@ -51,40 +59,19 @@ func New() (resolvers []resolver.CustomURLManager) {
 		ClientSecret: clientSecret,
 	})
 
-	helixAPI = helixAPIlol // weird workaround for now, maybe pajlada can fix this
-
 	if err != nil {
 		log.Fatalf("[Helix] Error initializing API client: %s", err.Error())
 	}
 
-	// Request app access token
-	response, err := helixAPI.RequestAppAccessToken([]string{})
+	// Initialize methods responsible for refreshing oauth
+	requestAppAccessToken(helixAPIlol)
 
-	if err != nil {
-		log.Fatalf("[Helix] Error requesting app access token: %s , \n %s", err.Error(), response.Error)
-	}
-
-	log.Printf("[Helix] Requested access token, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
-	helixAPI.SetAppAccessToken(response.Data.AccessToken)
-
-	// Refresh app access token every 24 hours
-	ticker := time.NewTicker(24 * time.Hour)
-
-	for range ticker.C {
-		response, err := helixAPI.RequestAppAccessToken([]string{})
-		if err != nil {
-			log.Printf("[Helix] Failed to refresh app access token, status: %d", response.StatusCode)
-			continue
-		}
-		log.Printf("[Helix] Requested access token from ticker, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
-
-		helixAPI.SetAppAccessToken(response.Data.AccessToken)
-	}
+	helixAPI = helixAPIlol // weird workaround for now, maybe pajlada can fix this
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
-			return strings.HasSuffix(url.Host, "clips.twitch.tv")
+			return utils.IsDomain(url, "clips.twitch.tv")
 		},
 		Run: func(url *url.URL) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")

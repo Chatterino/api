@@ -11,13 +11,13 @@ import (
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 const (
 	livestreamfailsAPIURL = "https://api.livestreamfails.com/clip/%s"
 
-	thumbnailCDNFormat = "https://d2ek7gt5lc50t6.cloudfront.net/image/%s" // Hardcoded(?) cloudfront end-point
-	thumbnailFormat    = "https://alpinecdn.com/v1/%s"
+	thumbnailFormat = "https://livestreamfails-image-prod.b-cdn.net/image/%s"
 
 	livestreamfailsTooltipString = `<div style="text-align: left;">
 {{ if .NSFW }}<li><b><span style="color: red">NSFW</span></b></li>{{ end }}
@@ -35,7 +35,7 @@ var (
 
 	clipCache = cache.New("livestreamfailclip", load, 1*time.Hour)
 
-	pathRegex      = regexp.MustCompile(`/clip/([0-9]+)`)
+	pathRegex      = regexp.MustCompile(`/clip|post/[0-9]+`)
 	errInvalidPath = errors.New("invalid livestreamfails clips path")
 )
 
@@ -43,7 +43,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 	// Find clips that look like https://livestreamfails.com/clip/IdHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
-			if !strings.HasSuffix(url.Host, "livestreamfails.com") {
+			if !utils.IsSubdomainOf(url, "livestreamfails.com") {
 				return false
 			}
 

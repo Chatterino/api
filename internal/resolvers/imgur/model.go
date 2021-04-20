@@ -21,11 +21,10 @@ type miniImage struct {
 	Link string
 }
 
-const imageTooltip = `<div style="text-align: left;">
-{{ if .Title }}<li><b>Title:</b> {{ .Title }}</li>{{ end }}
-{{ if .Description }}<li><b>Description:</b> {{.Description}}</li>{{ end }}
-<li><b>Uploaded:</b> {{.UploadDate}}</li>
-{{ if .Nsfw }}<li><b><span style="color: red">NSFW</span></b></li>{{ end }}
-{{ if .Animated }}<li><b><span style="color: red">ANIMATED</span></b></li>{{ end }}
-</div>
-`
+const imageTooltip = `<div style="text-align: left;">` +
+	`{{ if .Title }}<li><b>Title:</b> {{ .Title }}</li>{{ end }}` +
+	`{{ if .Description }}<li><b>Description:</b> {{.Description}}</li>{{ end }}` +
+	`<li><b>Uploaded:</b> {{.UploadDate}}</li>` +
+	`{{ if .Nsfw }}<li><b><span style="color: red;">NSFW</span></b></li>{{ end }}` +
+	`{{ if .Animated }}<li><b><span style="color: red;">ANIMATED</span></b></li>{{ end }}` +
+	`</div>`

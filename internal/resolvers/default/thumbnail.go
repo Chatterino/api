@@ -8,6 +8,7 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -23,13 +24,36 @@ import (
 )
 
 var (
-	supportedThumbnails = []string{"image/jpeg", "image/png", "image/gif"}
+	supportedThumbnails = []string{"image/jpeg", "image/png", "image/gif", "image/webp"}
 )
 
 const (
 	// max width or height the thumbnail will be resized to
 	maxThumbnailSize = 300
 )
+
+// buildStaticThumbnailByteArray is used when we fail to build an animated thumbnail using lilliput
+func buildStaticThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, error) {
+	image, _, err := image.Decode(bytes.NewReader(inputBuf))
+	if err != nil {
+		return []byte{}, fmt.Errorf("could not decode image from url: %s", resp.Request.URL)
+	}
+
+	resized := resize.Thumbnail(maxThumbnailSize, maxThumbnailSize, image, resize.Bilinear)
+	buffer := new(bytes.Buffer)
+	if resp.Header.Get("content-type") == "image/png" {
+		err = png.Encode(buffer, resized)
+	} else if resp.Header.Get("content-type") == "image/gif" {
+		err = gif.Encode(buffer, resized, nil)
+	} else if resp.Header.Get("content-type") == "image/jpeg" {
+		err = jpeg.Encode(buffer, resized, nil)
+	}
+	if err != nil {
+		return []byte{}, fmt.Errorf("could not encode image from url: %s", resp.Request.URL)
+	}
+
+	return buffer.Bytes(), nil
+}
 
 func doThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Duration, error) {
 	url, err := url.Parse(urlString)
@@ -70,10 +94,20 @@ func doThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
-	image, err := buildThumbnailByteArray(resp)
+	inputBuf, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Error reading body from request:", err)
 		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
+	}
+
+	image, err := buildThumbnailByteArray(inputBuf, resp)
+	if err != nil {
+		log.Println("Error trying to build animated thumbnail:", err.Error(), "falling back to static thumbnail building")
+		image, err = buildStaticThumbnailByteArray(inputBuf, resp)
+		if err != nil {
+			log.Println("Error trying to build static thumbnail:", err.Error())
+			return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
+		}
 	}
 
 	return image, 10 * time.Minute, nil
@@ -113,26 +147,4 @@ var (
 
 func InitializeThumbnail(router *chi.Mux) {
 	router.Get("/thumbnail/{url}", thumbnail)
-}
-
-func buildThumbnailByteArray(resp *http.Response) ([]byte, error) {
-	image, _, err := image.Decode(resp.Body)
-	if err != nil {
-		return []byte{}, fmt.Errorf("could not decode image from url: %s", resp.Request.URL)
-	}
-
-	resized := resize.Thumbnail(maxThumbnailSize, maxThumbnailSize, image, resize.Bilinear)
-	buffer := new(bytes.Buffer)
-	if resp.Header.Get("content-type") == "image/png" {
-		err = png.Encode(buffer, resized)
-	} else if resp.Header.Get("content-type") == "image/gif" {
-		err = gif.Encode(buffer, resized, nil)
-	} else if resp.Header.Get("content-type") == "image/jpeg" {
-		err = jpeg.Encode(buffer, resized, nil)
-	}
-	if err != nil {
-		return []byte{}, fmt.Errorf("could not encode image from url: %s", resp.Request.URL)
-	}
-
-	return buffer.Bytes(), nil
 }

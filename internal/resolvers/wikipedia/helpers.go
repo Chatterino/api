@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"html"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/Chatterino/api/pkg/utils"
 )
 
 func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
@@ -57,15 +56,15 @@ func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
 	// Transform API response into our tooltip model for Wikipedia links
 	tooltipData := &wikipediaTooltipData{}
 
-	sanitizedTitle := html.EscapeString(pageInfo.Titles.Display)
-	tooltipData.Title = utils.TruncateString(sanitizedTitle, maxTitleLength)
+	sanitizedTitle := pageInfo.Titles.Normalized
+	tooltipData.Title = humanize.Title(sanitizedTitle)
 
-	sanitizedExtract := html.EscapeString(pageInfo.Extract)
-	tooltipData.Extract = utils.TruncateString(sanitizedExtract, maxExtractLength)
+	sanitizedExtract := pageInfo.Extract
+	tooltipData.Extract = humanize.Description(sanitizedExtract)
 
 	if pageInfo.Description != nil {
-		sanitizedDescription := html.EscapeString(*pageInfo.Description)
-		tooltipData.Description = utils.TruncateString(sanitizedDescription, maxDescriptionLength)
+		sanitizedDescription := *pageInfo.Description
+		tooltipData.Description = humanize.ShortDescription(sanitizedDescription)
 	}
 
 	if pageInfo.Thumbnail != nil {

@@ -7,11 +7,11 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 
 	"google.golang.org/api/option"
 	youtubeAPI "google.golang.org/api/youtube/v3"
@@ -53,7 +53,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
-			return strings.HasSuffix(url.Host, ".youtube.com") || url.Host == "youtube.com"
+			return utils.IsSubdomainOf(url, "youtube.com")
 		},
 		Run: func(url *url.URL) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL(url)

@@ -2,13 +2,12 @@ package supinic
 
 import (
 	"net/url"
-	"strings"
+
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 func check(url *url.URL) bool {
-	host := strings.ToLower(url.Host)
-
-	if _, ok := trackListDomains[host]; !ok {
+	if !utils.IsDomains(url, trackListDomains) {
 		return false
 	}
 
