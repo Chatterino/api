@@ -60,7 +60,7 @@ func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipDa
 	data.Username = user.Username
 	data.Description = user.Description
 	data.Followers = humanize.Number(user.Followers)
-	data.Thumbnail = strings.Replace(user.ProfileImageUrl, "_normal", "", 1)
+	data.Thumbnail = user.ProfileImageUrl
 
 	return data
 }
@@ -111,6 +111,9 @@ func getUserByName(userName, bearer string) (*TwitterUserApiResponse, error) {
 	if err != nil {
 		return nil, errors.New("unable to process response")
 	}
+
+	// Do modifications to response
+	user.ProfileImageUrl = strings.Replace(user.ProfileImageUrl, "_normal", "", 1)
 
 	return user, nil
 }
