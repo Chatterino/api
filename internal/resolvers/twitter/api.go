@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/humanize"
@@ -59,7 +60,7 @@ func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipDa
 	data.Username = user.Username
 	data.Description = user.Description
 	data.Followers = humanize.Number(user.Followers)
-	data.Thumbnail = user.ProfileImageUrl
+	data.Thumbnail = strings.Replace(user.ProfileImageUrl, "_normal", "", 1)
 
 	return data
 }
