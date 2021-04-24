@@ -58,8 +58,8 @@ func load(videoID string, r *http.Request) (interface{}, time.Duration, error) {
 	}
 
 	thumbnail := video.Snippet.Thumbnails.Default.Url
-	if video.Snippet.Thumbnails.Standard != nil {
-		thumbnail = video.Snippet.Thumbnails.Standard.Url
+	if video.Snippet.Thumbnails.Medium != nil {
+		thumbnail = video.Snippet.Thumbnails.Medium.Url
 	}
 
 	return &resolver.Response{
