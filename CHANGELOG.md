@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.2
+
 - Twitter profile pictures are now returned in their original quality. (#131)
 - Youtube thumbnails are now in medium quality instead of standard definition to get a rectangular shaped image. (#127)
 
