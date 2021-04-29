@@ -3,10 +3,12 @@ package resolver
 import (
 	"net/url"
 	"time"
+
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 func New() {
-	maxContentSize, exists = utils.LookupEnv("MAX_CONTENT_SIZE")
+	maxContentSize, exists := utils.LookupEnv("MAX_CONTENT_SIZE")
 	if !exists {
 		maxContentSize = 5
 	}
