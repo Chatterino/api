@@ -5,9 +5,11 @@ import (
 	"time"
 )
 
-maxContentSize, exists = utils.LookupEnv("MAX_CONTENT_SIZE")
-if !exists {
-	maxContentSize = 5
+func New() {
+	maxContentSize, exists = utils.LookupEnv("MAX_CONTENT_SIZE")
+	if !exists {
+		maxContentSize = 5
+	}
 }
 
 const (
