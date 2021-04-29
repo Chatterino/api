@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added the ability to customize the max content size.
+
 ## 1.0.2
 
 - Twitter profile pictures are now returned in their original quality. (#131)
