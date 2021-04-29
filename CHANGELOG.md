@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added the ability to customize the max content size.
+- Added the ability to customize the max content size. (#137)
 
 ## 1.0.2
 
