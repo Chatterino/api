@@ -80,7 +80,7 @@ func doThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 		if err != nil {
 			return nil, cache.NoSpecialDur, err
 		}
-		if contentLengthBytes > resolver.MaxContentLength {
+		if contentLengthBytes > GetMaxContentLength() {
 			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}

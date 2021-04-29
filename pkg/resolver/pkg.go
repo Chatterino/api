@@ -7,18 +7,14 @@ import (
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-func GetMaxContentSize() {
-	maxContentSize, exists := utils.LookupEnv("MAX_CONTENT_SIZE")
+func GetMaxContentLength() {
+	maxContentLength, exists := utils.LookupEnv("MAX_CONTENT_SIZE")
 	if !exists {
-		maxContentSize = 5
+		maxContentLength := 5 // IN MB
 	}
 
-	return maxContentSize
+	return maxContentLength
 }
-
-const (
-	MaxContentLength = 1024 * 1024 * GetMaxContentSize // IN MB
-)
 
 type Response struct {
 	Status  int    `json:"status"`
