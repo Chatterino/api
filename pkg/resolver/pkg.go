@@ -15,7 +15,7 @@ func New() {
 }
 
 const (
-	MaxContentLength = 1024 * 1024 * customMaxSize // IN MB
+	MaxContentLength = 1024 * 1024 * maxContentSize // IN MB
 )
 
 type Response struct {
