@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-maxContentSize, exists := utils.LookupEnv("MAX_CONTENT_SIZE")
+maxContentSize, exists = utils.LookupEnv("MAX_CONTENT_SIZE")
 if !exists {
 	maxContentSize = 5
 }
