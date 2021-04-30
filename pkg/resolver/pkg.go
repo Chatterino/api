@@ -2,18 +2,21 @@ package resolver
 
 import (
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-func GetMaxContentLength() {
-	maxContentLength, exists := utils.LookupEnv("MAX_CONTENT_SIZE")
-	if !exists {
-		maxContentLength := 5 // IN MB
+func getMaxContentLength() int {
+	maxContentLengthStr, exists := utils.LookupEnv("MAX_CONTENT_LENGTH")
+	maxContentLength := 5
+	if exists {
+		if p, err := strconv.ParseFloat(maxContentLengthStr, 32); err != nil {
+			maxContentLength := float64(5)
+		}
 	}
-
-	return maxContentLength
+	return maxContentLength * 1024 * 1024
 }
 
 type Response struct {

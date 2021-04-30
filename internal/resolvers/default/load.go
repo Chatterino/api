@@ -72,7 +72,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 		if err != nil {
 			return nil, cache.NoSpecialDur, err
 		}
-		if contentLengthBytes > GetMaxContentLength() {
+		if contentLengthBytes > getMaxContentLength() {
 			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}
@@ -82,7 +82,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
-	limiter := &resolver.WriteLimiter{Limit: GetMaxContentLength()}
+	limiter := &resolver.WriteLimiter{Limit: getMaxContentLength()}
 
 	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
 	if err != nil {
