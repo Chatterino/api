@@ -7,8 +7,9 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
-func requestAppAccessToken(helixAPI *helix.Client) {
-	// Request app access token
+// initAppAccessToken requests and sets app access token to the provided helix.Client
+// and initializes a ticker running every 24 Hours which re-requests and sets app access token
+func initAppAccessToken(helixAPI *helix.Client) {
 	response, err := helixAPI.RequestAppAccessToken([]string{})
 
 	if err != nil {
@@ -18,16 +19,16 @@ func requestAppAccessToken(helixAPI *helix.Client) {
 	log.Printf("[Helix] Requested access token, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
 	helixAPI.SetAppAccessToken(response.Data.AccessToken)
 
-	// Refresh app access token every 24 hours
+	// initialize the ticker
 	ticker := time.NewTicker(24 * time.Hour)
 
 	for range ticker.C {
 		response, err := helixAPI.RequestAppAccessToken([]string{})
 		if err != nil {
-			log.Printf("[Helix] Failed to refresh app access token, status: %d", response.StatusCode)
+			log.Printf("[Helix] Failed to re-request app access token from ticker, status: %d", response.StatusCode)
 			continue
 		}
-		log.Printf("[Helix] Requested access token from ticker, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
+		log.Printf("[Helix] Re-requested access token from ticker, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
 
 		helixAPI.SetAppAccessToken(response.Data.AccessToken)
 	}

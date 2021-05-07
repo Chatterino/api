@@ -24,13 +24,11 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 
 	var clipHelix = response.Data.Clips[0]
 
-	//var createdData, _ = time.Parse("2006-01-02T15:04:05Z", clipHelix.CreatedAt)
-
 	data := twitchClipsTooltipData{
-		Title:       clipHelix.Title,
-		AuthorName:  clipHelix.CreatorName,
-		ChannelName: clipHelix.BroadcasterName,
-		//Duration: // humanize.DurationSeconds(time.Duration(clip.Duration) * time.Second)
+		Title:        clipHelix.Title,
+		AuthorName:   clipHelix.CreatorName,
+		ChannelName:  clipHelix.BroadcasterName,
+		Duration:     humanize.DurationSeconds(time.Duration(clipHelix.Duration) * time.Second),
 		CreationDate: humanize.CreationDateRFC3339(clipHelix.CreatedAt),
 		Views:        humanize.Number(uint64(clipHelix.ViewCount)),
 	}

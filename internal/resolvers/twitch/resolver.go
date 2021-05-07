@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"log"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -26,7 +25,7 @@ const (
 		`<b>{{.Title}}</b><hr>` +
 		`<b>Clipped by:</b> {{.AuthorName}}<br>` +
 		`<b>Channel:</b> {{.ChannelName}}<br>` +
-		//`<b>Duration:</b> {{.Duration}}<br>` +
+		`<b>Duration:</b> {{.Duration}}<br>` +
 		`<b>Created:</b> {{.CreationDate}}<br>` +
 		`<b>Views:</b> {{.Views}}` +
 		`</div>`
@@ -41,8 +40,8 @@ var (
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
-	clientID, existsClientID := os.LookupEnv("CHATTERINO_API_TWITCH_CLIENT_ID")
-	clientSecret, existsClientSecret := os.LookupEnv("CHATTERINO_API_TWITCH_CLIENT_SECRET")
+	clientID, existsClientID := utils.LookupEnv("TWITCH_CLIENT_ID")
+	clientSecret, existsClientSecret := utils.LookupEnv("TWITCH_CLIENT_SECRET")
 
 	if !existsClientID {
 		log.Println("No CHATTERINO_API_TWITCH_CLIENT_ID specified, won't do special responses for Twitch clips")
@@ -54,7 +53,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 		return
 	}
 
-	helixAPIlol, err := helix.NewClient(&helix.Options{
+	helixAPIxd, err := helix.NewClient(&helix.Options{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 	})
@@ -64,9 +63,9 @@ func New() (resolvers []resolver.CustomURLManager) {
 	}
 
 	// Initialize methods responsible for refreshing oauth
-	requestAppAccessToken(helixAPIlol)
+	go initAppAccessToken(helixAPIxd)
 
-	helixAPI = helixAPIlol // weird workaround for now, maybe pajlada can fix this
+	helixAPI = helixAPIxd // KKona workaround for now, maybe pajlada can fix this
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
