@@ -35,13 +35,15 @@ func TestLoad(t *testing.T) {
 
 	c.Run("Normal clip", func(c *qt.C) {
 		const slug = "KKona"
-		var clip helix.Clip
-		clip.Title = "Clipped it LUL"
-		clip.BroadcasterName = "pajlada"
-		clip.CreatorName = "supinic"
-		clip.Duration = 30
-		clip.CreatedAt = "2019-11-14T04:20:06.09Z"
-		clip.ViewCount = 69
+
+		clip := helix.Clip{
+			Title:           "Clipped it LUL",
+			BroadcasterName: "pajlada",
+			CreatorName:     "supinic",
+			Duration:        30,
+			CreatedAt:       "2019-11-14T04:20:06.09Z",
+			ViewCount:       69,
+		}
 
 		response := &helix.ClipsResponse{}
 		response.Data.Clips = []helix.Clip{clip}
@@ -60,13 +62,15 @@ func TestLoad(t *testing.T) {
 
 	c.Run("Normal clip (Number formatting)", func(c *qt.C) {
 		const slug = "KKaper"
-		var clip helix.Clip
-		clip.Title = "Clipped it LUL"
-		clip.BroadcasterName = "pajlada"
-		clip.CreatorName = "supinic"
-		clip.Duration = 30.1
-		clip.CreatedAt = "2019-11-14T04:20:06.09Z"
-		clip.ViewCount = 6969
+
+		clip := helix.Clip{
+			Title:           "Clipped it LUL",
+			BroadcasterName: "pajlada",
+			CreatorName:     "suspinic",
+			Duration:        30.1,
+			CreatedAt:       "2019-11-14T04:20:06.09Z",
+			ViewCount:       6969,
+		}
 
 		response := &helix.ClipsResponse{}
 		response.Data.Clips = []helix.Clip{clip}
@@ -76,7 +80,7 @@ func TestLoad(t *testing.T) {
 			GetClips(gomock.Eq(&helix.ClipsParams{IDs: []string{slug}})).
 			Return(response, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> supinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 6,969</div>`
+		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> suspinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 6,969</div>`
 
 		cleanTooltip := testLoadAndUnescape(c, slug)
 
@@ -85,13 +89,15 @@ func TestLoad(t *testing.T) {
 
 	c.Run("Normal clip (HTML)", func(c *qt.C) {
 		const slug = "KKool"
-		var clip helix.Clip
-		clip.Title = "Clipped it <b>LUL</b>"
-		clip.BroadcasterName = "<b>pajlada</b>"
-		clip.CreatorName = "<b>supinic</b>"
-		clip.Duration = 30
-		clip.CreatedAt = "2019-11-14T04:20:06.09Z"
-		clip.ViewCount = 69
+
+		clip := helix.Clip{
+			Title:           "Clipped it <b>LUL</b>",
+			BroadcasterName: "<b>pajlada</b>",
+			CreatorName:     "<b>supinic</b>",
+			Duration:        30,
+			CreatedAt:       "2019-11-14T04:20:06.09Z",
+			ViewCount:       69,
+		}
 
 		response := &helix.ClipsResponse{}
 		response.Data.Clips = []helix.Clip{clip}
