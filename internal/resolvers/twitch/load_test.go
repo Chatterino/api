@@ -39,7 +39,7 @@ func TestLoad(t *testing.T) {
 		clip.Title = "Clipped it LUL"
 		clip.BroadcasterName = "pajlada"
 		clip.CreatorName = "supinic"
-		clip.Duration = 30.1
+		clip.Duration = 30
 		clip.CreatedAt = "2019-11-14T04:20:06.09Z"
 		clip.ViewCount = 69
 
@@ -59,12 +59,12 @@ func TestLoad(t *testing.T) {
 	})
 
 	c.Run("Normal clip (Number formatting)", func(c *qt.C) {
-		const slug = "KKona2"
+		const slug = "KKaper"
 		var clip helix.Clip
 		clip.Title = "Clipped it LUL"
 		clip.BroadcasterName = "pajlada"
 		clip.CreatorName = "supinic"
-		clip.Duration = 30
+		clip.Duration = 30.1
 		clip.CreatedAt = "2019-11-14T04:20:06.09Z"
 		clip.ViewCount = 6969
 
@@ -84,7 +84,7 @@ func TestLoad(t *testing.T) {
 	})
 
 	c.Run("Normal clip (HTML)", func(c *qt.C) {
-		const slug = "KKona3"
+		const slug = "KKool"
 		var clip helix.Clip
 		clip.Title = "Clipped it <b>LUL</b>"
 		clip.BroadcasterName = "<b>pajlada</b>"
