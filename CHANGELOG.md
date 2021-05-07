@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.0.2
+
+- Twitter profile pictures are now returned in their original quality. (#131)
+- Youtube thumbnails are now in medium quality instead of standard definition to get a rectangular shaped image. (#127)
+
 ## 1.0.1
 
 - Dev: You can now set the Base URL flag with the `CHATTERINO_API_BASE_URL` environment variable. (#123)

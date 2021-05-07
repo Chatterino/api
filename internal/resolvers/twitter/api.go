@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/humanize"
@@ -110,6 +111,12 @@ func getUserByName(userName, bearer string) (*TwitterUserApiResponse, error) {
 	if err != nil {
 		return nil, errors.New("unable to process response")
 	}
+
+	/* By default, Twitter returns a low resolution image.
+	 * This modification removes "_normal" to get the original sized image, based on Twitter's API documentation:
+	 * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/user-profile-images-and-banners
+	 */
+	user.ProfileImageUrl = strings.Replace(user.ProfileImageUrl, "_normal", "", 1)
 
 	return user, nil
 }
