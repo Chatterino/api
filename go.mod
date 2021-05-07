@@ -4,7 +4,6 @@ go 1.15
 
 require (
 	github.com/PuerkitoBio/goquery v1.6.1
-	github.com/dankeroni/gotwitch v0.0.0-20190429150511-5924c422419a
 	github.com/discord/lilliput v0.0.0-20210410064651-6e127f25858d
 	github.com/frankban/quicktest v1.12.1
 	github.com/go-chi/chi/v5 v5.0.3
