@@ -9,7 +9,7 @@ import (
 
 // initAppAccessToken requests and sets app access token to the provided helix.Client
 // and initializes a ticker running every 24 Hours which re-requests and sets app access token
-func initAppAccessToken(helixAPI *helix.Client) {
+func initAppAccessToken(helixAPI *helix.Client, tokenFetched chan struct{}) {
 	response, err := helixAPI.RequestAppAccessToken([]string{})
 
 	if err != nil {
@@ -18,6 +18,7 @@ func initAppAccessToken(helixAPI *helix.Client) {
 
 	log.Printf("[Helix] Requested access token, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
 	helixAPI.SetAppAccessToken(response.Data.AccessToken)
+	close(tokenFetched)
 
 	// initialize the ticker
 	ticker := time.NewTicker(24 * time.Hour)

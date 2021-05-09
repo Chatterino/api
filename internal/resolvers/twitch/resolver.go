@@ -64,8 +64,11 @@ func New() (resolvers []resolver.CustomURLManager) {
 		log.Fatalf("[Helix] Error initializing API client: %s", err.Error())
 	}
 
+	waitForFirstAppAccessToken := make(chan struct{})
+
 	// Initialize methods responsible for refreshing oauth
-	go initAppAccessToken(helixAPI.(*helix.Client))
+	go initAppAccessToken(helixAPI.(*helix.Client), waitForFirstAppAccessToken)
+	<-waitForFirstAppAccessToken
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
