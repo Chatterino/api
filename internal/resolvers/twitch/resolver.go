@@ -53,7 +53,9 @@ func New() (resolvers []resolver.CustomURLManager) {
 		return
 	}
 
-	helixAPIxd, err := helix.NewClient(&helix.Options{
+	var err error
+
+	helixAPI, err = helix.NewClient(&helix.Options{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 	})
@@ -63,9 +65,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 	}
 
 	// Initialize methods responsible for refreshing oauth
-	go initAppAccessToken(helixAPIxd)
-
-	helixAPI = helixAPIxd // KKona workaround for now, maybe pajlada can fix this
+	go initAppAccessToken(helixAPI.(*helix.Client))
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
