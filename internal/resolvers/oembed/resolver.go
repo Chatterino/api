@@ -30,8 +30,6 @@ var (
 	oEmbedCache = cache.New("oEmbed", load, 1*time.Hour)
 
 	oEmbed = oembed.NewOembed()
-
-	excludedHosts = [...]string{"reddit.com", "spotify.com", "kickstarter.com"}
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
@@ -53,12 +51,6 @@ func New() (resolvers []resolver.CustomURLManager) {
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
-			for _, host := range excludedHosts {
-				if utils.IsSubdomainOf(url, host) {
-					return false
-				}
-			}
-
 			return oEmbed.FindItem(url.String()) != nil
 		},
 		Run: func(url *url.URL) ([]byte, error) {
