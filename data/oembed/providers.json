@@ -1,44 +1,11 @@
 [
   {
-    "provider_name": "CircuitLab",
-    "provider_url": "https://www.circuitlab.com/",
-    "endpoints": [
-      {
-        "schemes": ["https://www.circuitlab.com/circuit/*"],
-        "url": "https://www.circuitlab.com/circuit/oembed/",
-        "discovery": true
-      }
-    ]
-  },
-  {
-    "provider_name": "Clyp",
-    "provider_url": "http://clyp.it/",
-    "endpoints": [
-      {
-        "schemes": ["http://clyp.it/*", "http://clyp.it/playlist/*"],
-        "url": "http://api.clyp.it/oembed/",
-        "discovery": true
-      }
-    ]
-  },
-  {
     "provider_name": "CodePen",
     "provider_url": "https://codepen.io",
     "endpoints": [
       {
         "schemes": ["http://codepen.io/*", "https://codepen.io/*"],
         "url": "https://codepen.io/api/oembed"
-      }
-    ]
-  },
-  {
-    "provider_name": "CollegeHumor",
-    "provider_url": "http://www.collegehumor.com/",
-    "endpoints": [
-      {
-        "schemes": ["http://www.collegehumor.com/video/*"],
-        "url": "http://www.collegehumor.com/oembed.{format}",
-        "discovery": true
       }
     ]
   },
@@ -137,16 +104,6 @@
     ]
   },
   {
-    "provider_name": "FunnyOrDie",
-    "provider_url": "http://www.funnyordie.com/",
-    "endpoints": [
-      {
-        "schemes": ["http://www.funnyordie.com/videos/*"],
-        "url": "http://www.funnyordie.com/oembed.{format}"
-      }
-    ]
-  },
-  {
     "provider_name": "Getty Images",
     "provider_url": "http://www.gettyimages.com/",
     "endpoints": [
@@ -154,22 +111,6 @@
         "schemes": ["http://gty.im/*"],
         "url": "http://embed.gettyimages.com/oembed",
         "formats": ["json"]
-      }
-    ]
-  },
-  {
-    "provider_name": "Gfycat",
-    "provider_url": "https://gfycat.com/",
-    "endpoints": [
-      {
-        "schemes": [
-          "http://gfycat.com/*",
-          "http://www.gfycat.com/*",
-          "https://gfycat.com/*",
-          "https://www.gfycat.com/*"
-        ],
-        "url": "https://api.gfycat.com/v1/oembed",
-        "discovery": true
       }
     ]
   },
@@ -197,37 +138,6 @@
         "schemes": ["https://gyazo.com/*"],
         "url": "https://api.gyazo.com/api/oembed",
         "formats": ["json"]
-      }
-    ]
-  },
-  {
-    "provider_name": "Hulu",
-    "provider_url": "http://www.hulu.com/",
-    "endpoints": [
-      {
-        "schemes": ["http://www.hulu.com/watch/*"],
-        "url": "http://www.hulu.com/api/oembed.{format}"
-      }
-    ]
-  },
-  {
-    "provider_name": "iFixit",
-    "provider_url": "http://www.iFixit.com",
-    "endpoints": [
-      {
-        "schemes": ["http://www.ifixit.com/Guide/View/*"],
-        "url": "http://www.ifixit.com/Embed"
-      }
-    ]
-  },
-  {
-    "provider_name": "IFTTT",
-    "provider_url": "http://www.ifttt.com/",
-    "endpoints": [
-      {
-        "schemes": ["http://ifttt.com/recipes/*"],
-        "url": "http://www.ifttt.com/oembed/",
-        "discovery": true
       }
     ]
   },
