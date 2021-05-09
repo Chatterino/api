@@ -30,15 +30,15 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 		return noTwitchClipWithThisIDFound, cache.NoSpecialDur, nil
 	}
 
-	var clipHelix = response.Data.Clips[0]
+	var clip = response.Data.Clips[0]
 
 	data := twitchClipsTooltipData{
-		Title:        clipHelix.Title,
-		AuthorName:   clipHelix.CreatorName,
-		ChannelName:  clipHelix.BroadcasterName,
-		Duration:     humanize.DurationSeconds(time.Duration(clipHelix.Duration) * time.Second),
-		CreationDate: humanize.CreationDateRFC3339(clipHelix.CreatedAt),
-		Views:        humanize.Number(uint64(clipHelix.ViewCount)),
+		Title:        clip.Title,
+		AuthorName:   clip.CreatorName,
+		ChannelName:  clip.BroadcasterName,
+		Duration:     humanize.DurationSeconds(time.Duration(clip.Duration) * time.Second),
+		CreationDate: humanize.CreationDateRFC3339(clip.CreatedAt),
+		Views:        humanize.Number(uint64(clip.ViewCount)),
 	}
 
 	var tooltip bytes.Buffer
@@ -52,6 +52,6 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 	return &resolver.Response{
 		Status:    200,
 		Tooltip:   url.PathEscape(tooltip.String()),
-		Thumbnail: clipHelix.ThumbnailURL,
+		Thumbnail: clip.ThumbnailURL,
 	}, cache.NoSpecialDur, nil
 }
