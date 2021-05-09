@@ -3,6 +3,7 @@ package oembed
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -15,9 +16,22 @@ import (
 )
 
 func load(fullURL string, r *http.Request) (interface{}, time.Duration, error) {
+	extraOpts := url.Values{}
+
 	item := oEmbed.FindItem(fullURL)
 
-	data, err := item.FetchOembed(oembed.Options{URL: fullURL})
+	if item.ProviderName == "Facebook" || item.ProviderName == "Instagram" {
+		// Add facebook token if it exists
+		if facebookAppAccessToken != "" {
+			extraOpts.Set("access_token", facebookAppAccessToken)
+			extraOpts.Set("omitscript", "true")
+		}
+	}
+
+	data, err := item.FetchOembed(oembed.Options{
+		URL:       fullURL,
+		ExtraOpts: extraOpts,
+	})
 
 	if err != nil {
 		return &resolver.Response{
@@ -27,7 +41,7 @@ func load(fullURL string, r *http.Request) (interface{}, time.Duration, error) {
 	}
 
 	if data.Status >= 300 {
-		fmt.Printf("[oEmbed] Skipping url %s because status code is %d\n", fullURL, data.Status)
+		log.Printf("[oEmbed] Skipping url %s because status code is %d\n", fullURL, data.Status)
 		return &resolver.Response{
 			Status:  data.Status,
 			Message: fmt.Sprintf("oEmbed status code: %d", data.Status),

@@ -47,6 +47,14 @@ func New() (resolvers []resolver.CustomURLManager) {
 		return
 	}
 
+	if facebookAppID, facebookAppSecret, exists := loadFacebookCredentials(); exists {
+		if err := initFacebookAppAccessToken(facebookAppID, facebookAppSecret); err != nil {
+			log.Println("[oEmbed] error loading facebook app access token", err)
+		} else {
+			log.Println("[oEmbed] Extra rich info loading enabled for Instagram and Facebook")
+		}
+	}
+
 	oEmbed.ParseProviders(bytes.NewReader(data))
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
