@@ -5,11 +5,10 @@
 package mocks
 
 import (
-	http "net/http"
 	reflect "reflect"
 
-	gotwitch "github.com/dankeroni/gotwitch"
 	gomock "github.com/golang/mock/gomock"
+	helix "github.com/nicklaw5/helix"
 )
 
 // MockTwitchAPIClient is a mock of TwitchAPIClient interface.
@@ -35,18 +34,17 @@ func (m *MockTwitchAPIClient) EXPECT() *MockTwitchAPIClientMockRecorder {
 	return m.recorder
 }
 
-// GetClip mocks base method.
-func (m *MockTwitchAPIClient) GetClip(arg0 string) (gotwitch.V5GetClipResponse, *http.Response, error) {
+// GetClips mocks base method.
+func (m *MockTwitchAPIClient) GetClips(arg0 *helix.ClipsParams) (*helix.ClipsResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetClip", arg0)
-	ret0, _ := ret[0].(gotwitch.V5GetClipResponse)
-	ret1, _ := ret[1].(*http.Response)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret := m.ctrl.Call(m, "GetClips", arg0)
+	ret0, _ := ret[0].(*helix.ClipsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// GetClip indicates an expected call of GetClip.
-func (mr *MockTwitchAPIClientMockRecorder) GetClip(arg0 interface{}) *gomock.Call {
+// GetClips indicates an expected call of GetClips.
+func (mr *MockTwitchAPIClientMockRecorder) GetClips(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClip", reflect.TypeOf((*MockTwitchAPIClient)(nil).GetClip), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClips", reflect.TypeOf((*MockTwitchAPIClient)(nil).GetClips), arg0)
 }

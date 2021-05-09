@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Breaking: Environment variable `CHATTERINO_API_CACHE_TWITCH_CLIENT_ID` was renamed to `CHATTERINO_API_TWITCH_CLIENT_ID`. (#144)
+- Dev, Breaking: Replaced `dankeroni/gotwitch` with `nicklaw5/helix`. This change requires you to add new environment variable: `CHATTERINO_API_TWITCH_CLIENT_SECRET` - it's a client secret generated for your Twitch application.
+
 ## 1.0.2
 
 - Twitter profile pictures are now returned in their original quality. (#131)

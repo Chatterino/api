@@ -6,20 +6,18 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
-	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
-	"github.com/dankeroni/gotwitch"
+	"github.com/nicklaw5/helix"
 )
 
 type TwitchAPIClient interface {
-	GetClip(clipSlug string) (clip gotwitch.V5GetClipResponse, r *http.Response, err error)
+	GetClips(params *helix.ClipsParams) (clip *helix.ClipsResponse, err error)
 }
 
 const (
@@ -38,17 +36,39 @@ var (
 
 	clipCache = cache.New("twitchclip", load, 1*time.Hour)
 
-	v5API TwitchAPIClient
+	helixAPI TwitchAPIClient
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
-	clientID, exists := os.LookupEnv("CHATTERINO_API_CACHE_TWITCH_CLIENT_ID")
-	if !exists {
-		log.Println("No CHATTERINO_API_CACHE_TWITCH_CLIENT_ID specified, won't do special responses for twitch clips")
+	clientID, existsClientID := utils.LookupEnv("TWITCH_CLIENT_ID")
+	clientSecret, existsClientSecret := utils.LookupEnv("TWITCH_CLIENT_SECRET")
+
+	if !existsClientID {
+		log.Println("No CHATTERINO_API_TWITCH_CLIENT_ID specified, won't do special responses for Twitch clips")
 		return
 	}
 
-	v5API = gotwitch.NewV5(clientID)
+	if !existsClientSecret {
+		log.Println("No CHATTERINO_API_TWITCH_CLIENT_SECRET specified, won't do special responses for Twitch clips")
+		return
+	}
+
+	var err error
+
+	helixAPI, err = helix.NewClient(&helix.Options{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+	})
+
+	if err != nil {
+		log.Fatalf("[Helix] Error initializing API client: %s", err.Error())
+	}
+
+	waitForFirstAppAccessToken := make(chan struct{})
+
+	// Initialize methods responsible for refreshing oauth
+	go initAppAccessToken(helixAPI.(*helix.Client), waitForFirstAppAccessToken)
+	<-waitForFirstAppAccessToken
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{

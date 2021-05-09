@@ -3,13 +3,12 @@ package twitch
 import (
 	"net/url"
 	"testing"
-	"time"
 
 	"github.com/Chatterino/api/internal/mocks"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/dankeroni/gotwitch"
 	qt "github.com/frankban/quicktest"
 	"github.com/golang/mock/gomock"
+	"github.com/nicklaw5/helix"
 )
 
 func testLoadAndUnescape(c *qt.C, clipSlug string) (cleanTooltip string) {
@@ -32,22 +31,27 @@ func TestLoad(t *testing.T) {
 	c := qt.New(t)
 	mockCtrl := gomock.NewController(c)
 	m := mocks.NewMockTwitchAPIClient(mockCtrl)
-	v5API = m
+	helixAPI = m
 
 	c.Run("Normal clip", func(c *qt.C) {
 		const slug = "KKona"
-		var clipResponse gotwitch.V5GetClipResponse
-		clipResponse.Title = "Clipped it LUL"
-		clipResponse.Broadcaster.DisplayName = "pajlada"
-		clipResponse.Curator.DisplayName = "supinic"
-		clipResponse.Duration = 30
-		clipResponse.CreatedAt = time.Date(2019, time.November, 14, 04, 20, 6, 9, time.UTC)
-		clipResponse.Views = 69
+
+		clip := helix.Clip{
+			Title:           "Clipped it LUL",
+			BroadcasterName: "pajlada",
+			CreatorName:     "supinic",
+			Duration:        30,
+			CreatedAt:       "2019-11-14T04:20:06.09Z",
+			ViewCount:       69,
+		}
+
+		response := &helix.ClipsResponse{}
+		response.Data.Clips = []helix.Clip{clip}
 
 		m.
 			EXPECT().
-			GetClip(gomock.Eq(slug)).
-			Return(clipResponse, nil, nil)
+			GetClips(gomock.Eq(&helix.ClipsParams{IDs: []string{slug}})).
+			Return(response, nil)
 
 		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> supinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 69</div>`
 
@@ -57,21 +61,26 @@ func TestLoad(t *testing.T) {
 	})
 
 	c.Run("Normal clip (Number formatting)", func(c *qt.C) {
-		const slug = "KKona"
-		var clipResponse gotwitch.V5GetClipResponse
-		clipResponse.Title = "Clipped it LUL"
-		clipResponse.Broadcaster.DisplayName = "pajlada"
-		clipResponse.Curator.DisplayName = "supinic"
-		clipResponse.Duration = 30
-		clipResponse.CreatedAt = time.Date(2019, time.November, 14, 04, 20, 6, 9, time.UTC)
-		clipResponse.Views = 6969
+		const slug = "KKaper"
+
+		clip := helix.Clip{
+			Title:           "Clipped it LUL",
+			BroadcasterName: "pajlada",
+			CreatorName:     "suspinic",
+			Duration:        30.1,
+			CreatedAt:       "2019-11-14T04:20:06.09Z",
+			ViewCount:       6969,
+		}
+
+		response := &helix.ClipsResponse{}
+		response.Data.Clips = []helix.Clip{clip}
 
 		m.
 			EXPECT().
-			GetClip(gomock.Eq(slug)).
-			Return(clipResponse, nil, nil)
+			GetClips(gomock.Eq(&helix.ClipsParams{IDs: []string{slug}})).
+			Return(response, nil)
 
-		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> supinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 6,969</div>`
+		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> suspinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 6,969</div>`
 
 		cleanTooltip := testLoadAndUnescape(c, slug)
 
@@ -79,19 +88,24 @@ func TestLoad(t *testing.T) {
 	})
 
 	c.Run("Normal clip (HTML)", func(c *qt.C) {
-		const slug = "KKona"
-		var clipResponse gotwitch.V5GetClipResponse
-		clipResponse.Title = "Clipped it <b>LUL</b>"
-		clipResponse.Broadcaster.DisplayName = "<b>pajlada</b>"
-		clipResponse.Curator.DisplayName = "<b>supinic</b>"
-		clipResponse.Duration = 30
-		clipResponse.CreatedAt = time.Date(2019, time.November, 14, 04, 20, 6, 9, time.UTC)
-		clipResponse.Views = 69
+		const slug = "KKool"
+
+		clip := helix.Clip{
+			Title:           "Clipped it <b>LUL</b>",
+			BroadcasterName: "<b>pajlada</b>",
+			CreatorName:     "<b>supinic</b>",
+			Duration:        30,
+			CreatedAt:       "2019-11-14T04:20:06.09Z",
+			ViewCount:       69,
+		}
+
+		response := &helix.ClipsResponse{}
+		response.Data.Clips = []helix.Clip{clip}
 
 		m.
 			EXPECT().
-			GetClip(gomock.Eq(slug)).
-			Return(clipResponse, nil, nil)
+			GetClips(gomock.Eq(&helix.ClipsParams{IDs: []string{slug}})).
+			Return(response, nil)
 
 		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it &lt;b&gt;LUL&lt;/b&gt;</b><hr><b>Clipped by:</b> &lt;b&gt;supinic&lt;/b&gt;<br><b>Channel:</b> &lt;b&gt;pajlada&lt;/b&gt;<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 69</div>`
 

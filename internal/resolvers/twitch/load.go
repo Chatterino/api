@@ -10,22 +10,35 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/nicklaw5/helix"
 )
 
 func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) {
 	log.Println("[TwitchClip] GET", clipSlug)
-	clip, _, err := v5API.GetClip(clipSlug)
+
+	response, err := helixAPI.GetClips(&helix.ClipsParams{IDs: []string{clipSlug}})
 	if err != nil {
+		log.Println("[TwitchClip] Error getting clip", clipSlug, ":", err.Error())
+
+		return &resolver.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "An internal error occured while fetching the Twitch clip",
+		}, cache.NoSpecialDur, nil
+	}
+
+	if len(response.Data.Clips) != 1 {
 		return noTwitchClipWithThisIDFound, cache.NoSpecialDur, nil
 	}
 
+	var clip = response.Data.Clips[0]
+
 	data := twitchClipsTooltipData{
 		Title:        clip.Title,
-		AuthorName:   clip.Curator.DisplayName,
-		ChannelName:  clip.Broadcaster.DisplayName,
+		AuthorName:   clip.CreatorName,
+		ChannelName:  clip.BroadcasterName,
 		Duration:     humanize.DurationSeconds(time.Duration(clip.Duration) * time.Second),
-		CreationDate: humanize.CreationDate(clip.CreatedAt),
-		Views:        humanize.Number(uint64(clip.Views)),
+		CreationDate: humanize.CreationDateRFC3339(clip.CreatedAt),
+		Views:        humanize.Number(uint64(clip.ViewCount)),
 	}
 
 	var tooltip bytes.Buffer
@@ -39,6 +52,6 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 	return &resolver.Response{
 		Status:    200,
 		Tooltip:   url.PathEscape(tooltip.String()),
-		Thumbnail: clip.Thumbnails.Medium,
+		Thumbnail: clip.ThumbnailURL,
 	}, cache.NoSpecialDur, nil
 }
