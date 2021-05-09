@@ -17,8 +17,16 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 	log.Println("[TwitchClip] GET", clipSlug)
 
 	response, err := helixAPI.GetClips(&helix.ClipsParams{IDs: []string{clipSlug}})
+	if err != nil {
+		log.Println("[TwitchClip] Error getting clip", clipSlug, ":", err.Error())
 
-	if err != nil || len(response.Data.Clips) != 1 {
+		return &resolver.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "An internal error occured while fetching the Twitch clip",
+		}, cache.NoSpecialDur, nil
+	}
+
+	if len(response.Data.Clips) != 1 {
 		return noTwitchClipWithThisIDFound, cache.NoSpecialDur, nil
 	}
 
