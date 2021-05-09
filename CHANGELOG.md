@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Support for oEmbed resolving for websites customizable with the `resolvers.json` file. See `data/oembed/resolvers.json`. (#139)
 - Breaking: Environment variable `CHATTERINO_API_CACHE_TWITCH_CLIENT_ID` was renamed to `CHATTERINO_API_TWITCH_CLIENT_ID`. (#144)
 - Dev, Breaking: Replaced `dankeroni/gotwitch` with `nicklaw5/helix`. This change requires you to add new environment variable: `CHATTERINO_API_TWITCH_CLIENT_SECRET` - it's a client secret generated for your Twitch application.
 
