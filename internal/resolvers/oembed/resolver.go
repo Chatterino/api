@@ -35,7 +35,14 @@ var (
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
-	data, err := ioutil.ReadFile("./providers.json")
+	providersPath := "./providers.json"
+
+	if providersPathEnv, exists := utils.LookupEnv("OEMBED_PROVIDERS_PATH"); exists {
+		log.Println("[oEmbed] Overriding path of providers.json to", providersPathEnv)
+		providersPath = providersPathEnv
+	}
+
+	data, err := ioutil.ReadFile(providersPath)
 
 	if err != nil {
 		log.Println("No providers.json file found, won't do oEmbed parsing")
