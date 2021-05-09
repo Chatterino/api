@@ -18,7 +18,7 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 
 	response, err := helixAPI.GetClips(&helix.ClipsParams{IDs: []string{clipSlug}})
 
-	if err != nil {
+	if err != nil || len(response.Data.Clips) != 1 {
 		return noTwitchClipWithThisIDFound, cache.NoSpecialDur, nil
 	}
 
