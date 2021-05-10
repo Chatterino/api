@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/discord/lilliput v0.0.0-20210410064651-6e127f25858d
-	github.com/frankban/quicktest v1.12.1
+	github.com/frankban/quicktest v1.13.0
 	github.com/go-chi/chi/v5 v5.0.3
 	github.com/golang/mock v1.5.0
 	github.com/koffeinsource/go-imgur v0.3.0
