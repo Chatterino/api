@@ -15,12 +15,12 @@ var (
 )
 
 func loadFacebookCredentials() (appID string, appSecret string, exists bool) {
-	if appID, exists = utils.LookupEnv("CHATTERINO_API_OEMBED_FACEBOOK_APP_ID"); !exists {
+	if appID, exists = utils.LookupEnv("OEMBED_FACEBOOK_APP_ID"); !exists {
 		log.Println("No CHATTERINO_API_OEMBED_FACEBOOK_APP_ID specified, won't do special responses for Facebook or Instagram oEmbed")
 		return
 	}
 
-	if appSecret, exists = utils.LookupEnv("CHATTERINO_API_OEMBED_FACEBOOK_APP_SECRET"); !exists {
+	if appSecret, exists = utils.LookupEnv("OEMBED_FACEBOOK_APP_SECRET"); !exists {
 		log.Println("No CHATTERINO_API_OEMBED_FACEBOOK_APP_SECRET specified, won't do special responses for Facebook or Instagram oEmbed")
 		return
 	}
