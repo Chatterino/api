@@ -64,7 +64,7 @@ func load(fullURL string, r *http.Request) (interface{}, time.Duration, error) {
 	}
 
 	resolverResponse := resolver.Response{
-		Status:  200,
+		Status:  http.StatusOK,
 		Tooltip: url.PathEscape(tooltip.String()),
 	}
 
