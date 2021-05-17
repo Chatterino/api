@@ -36,7 +36,7 @@ func load(requestedURL string, r *http.Request) (interface{}, time.Duration, err
 	if err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
-			Message: "oEmbed error: " + resolver.CleanResponse(err.Error()),
+			Message: "Something went wrong loading this oEmbed.\noEmbed error: " + resolver.CleanResponse(err.Error()),
 		}, cache.NoSpecialDur, nil
 	}
 
@@ -44,7 +44,7 @@ func load(requestedURL string, r *http.Request) (interface{}, time.Duration, err
 		log.Printf("[oEmbed] Skipping url %s because status code is %d\n", requestedURL, data.Status)
 		return &resolver.Response{
 			Status:  data.Status,
-			Message: fmt.Sprintf("oEmbed status code: %d", data.Status),
+			Message: fmt.Sprintf("This oEmbed couldn't be loaded in.\noEmbed status code: %d", data.Status),
 		}, cache.NoSpecialDur, nil
 	}
 
