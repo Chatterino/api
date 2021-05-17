@@ -4,5 +4,9 @@ import "github.com/dyatlov/go-oembed/oembed"
 
 type oEmbedData struct {
 	*oembed.Info
-	FullURL string
+	RequestedURL string
+}
+
+type facebookTokenResponse struct {
+	AccessToken string `json:"access_token"`
 }

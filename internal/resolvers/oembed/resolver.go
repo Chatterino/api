@@ -43,7 +43,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 	data, err := ioutil.ReadFile(providersPath)
 
 	if err != nil {
-		log.Println("No providers.json file found, won't do oEmbed parsing")
+		log.Println("[oEmbed] No providers.json file found, won't do oEmbed parsing")
 		return
 	}
 

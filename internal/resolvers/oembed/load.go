@@ -15,10 +15,10 @@ import (
 	"github.com/dyatlov/go-oembed/oembed"
 )
 
-func load(fullURL string, r *http.Request) (interface{}, time.Duration, error) {
+func load(requestedURL string, r *http.Request) (interface{}, time.Duration, error) {
 	extraOpts := url.Values{}
 
-	item := oEmbed.FindItem(fullURL)
+	item := oEmbed.FindItem(requestedURL)
 
 	if item.ProviderName == "Facebook" || item.ProviderName == "Instagram" {
 		// Add facebook token if it exists
@@ -29,7 +29,7 @@ func load(fullURL string, r *http.Request) (interface{}, time.Duration, error) {
 	}
 
 	data, err := item.FetchOembed(oembed.Options{
-		URL:       fullURL,
+		URL:       requestedURL,
 		ExtraOpts: extraOpts,
 	})
 
@@ -41,18 +41,18 @@ func load(fullURL string, r *http.Request) (interface{}, time.Duration, error) {
 	}
 
 	if data.Status < http.StatusOK || data.Status > http.StatusMultipleChoices {
-		log.Printf("[oEmbed] Skipping url %s because status code is %d\n", fullURL, data.Status)
+		log.Printf("[oEmbed] Skipping url %s because status code is %d\n", requestedURL, data.Status)
 		return &resolver.Response{
 			Status:  data.Status,
 			Message: fmt.Sprintf("oEmbed status code: %d", data.Status),
 		}, cache.NoSpecialDur, nil
 	}
 
-	infoTooltipData := oEmbedData{data, fullURL}
+	infoTooltipData := oEmbedData{data, requestedURL}
 
 	infoTooltipData.Title = humanize.Title(infoTooltipData.Title)
 	infoTooltipData.Description = humanize.Description(infoTooltipData.Description)
-	infoTooltipData.FullURL = fullURL
+	infoTooltipData.RequestedURL = requestedURL
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer

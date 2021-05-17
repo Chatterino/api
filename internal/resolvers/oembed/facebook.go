@@ -15,11 +15,11 @@ var (
 )
 
 func loadFacebookCredentials() (appID string, appSecret string, exists bool) {
-	if appID, exists = utils.LookupEnv("OEMBED_FACEBOOK_APP_ID"); !exists {
+	if appID, exists = utils.LookupEnv("CHATTERINO_API_OEMBED_FACEBOOK_APP_ID"); !exists {
 		return
 	}
 
-	if appSecret, exists = utils.LookupEnv("OEMBED_FACEBOOK_APP_SECRET"); !exists {
+	if appSecret, exists = utils.LookupEnv("CHATTERINO_API_OEMBED_FACEBOOK_APP_SECRET"); !exists {
 		return
 	}
 
@@ -51,11 +51,7 @@ func initFacebookAppAccessToken(appID, appSecret string) error {
 
 	defer resp.Body.Close()
 
-	type dataxd struct {
-		AccessToken string `json:"access_token"`
-	}
-
-	d := &dataxd{}
+	d := &facebookTokenResponse{}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
