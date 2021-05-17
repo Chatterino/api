@@ -20,7 +20,7 @@ const (
 <b>{{.ProviderName}}{{ if .Title }} - {{.Title}}{{ end }}</b><hr>
 {{ if .Description }}{{.Description}}{{ end }}
 {{ if .AuthorName }}<br><b>Author:</b> {{.AuthorName}}{{ end }}
-<br><b>URL:</b> {{.FullURL}}
+<br><b>URL:</b> {{.RequestedURL}}
 </div>`
 )
 
