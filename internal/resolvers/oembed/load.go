@@ -59,7 +59,7 @@ func load(fullURL string, r *http.Request) (interface{}, time.Duration, error) {
 	if err := oEmbedTemplate.Execute(&tooltip, infoTooltipData); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
-			Message: "oEmbed template error " + resolver.CleanResponse(err.Error()),
+			Message: "oEmbed template error: " + resolver.CleanResponse(err.Error()),
 		}, cache.NoSpecialDur, nil
 	}
 
