@@ -12,6 +12,6 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/nicklaw5/helix v1.16.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	google.golang.org/api v0.46.0
+	google.golang.org/api v0.47.0
 	honnef.co/go/tools v0.1.4
 )
