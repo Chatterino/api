@@ -41,3 +41,13 @@
 2. Select "Anonymous usage without user authorization"
 3. Fill in the rest of the information
 4. Copy the Client ID value (which is what we need)
+
+## Facebook & Instagram
+
+1. Head here: https://developers.facebook.com/
+2. Tap on "My Apps" in the top right corner.
+3. Click `Create App` and select `Consumer`.
+4. Fill the provided information, and you will get a security check. If you don't see the security check, disable your ad-blocker and try the security check again.
+5. In "Add Products to Your App", under "oEmbed" click on `Set up`.
+6. Fill in "Privacy Policy URL" and "User Data Collection" with relevant information.
+7. In the left menu, click on "Settings" and select "Basic". Copy both "App ID" and "App Secret".

@@ -1,0 +1,413 @@
+[
+  {
+    "provider_name": "CodePen",
+    "provider_url": "https://codepen.io",
+    "endpoints": [
+      {
+        "schemes": ["http://codepen.io/*", "https://codepen.io/*"],
+        "url": "https://codepen.io/api/oembed"
+      }
+    ]
+  },
+  {
+    "provider_name": "Dailymotion",
+    "provider_url": "https://www.dailymotion.com",
+    "endpoints": [
+      {
+        "schemes": ["https://www.dailymotion.com/video/*"],
+        "url": "https://www.dailymotion.com/services/oembed",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "Deviantart.com",
+    "provider_url": "http://www.deviantart.com",
+    "endpoints": [
+      {
+        "schemes": [
+          "http://*.deviantart.com/art/*",
+          "http://*.deviantart.com/*#/d*",
+          "http://fav.me/*",
+          "http://sta.sh/*",
+          "https://*.deviantart.com/art/*",
+          "https://*.deviantart.com/*/art/*",
+          "https://sta.sh/*\",",
+          "https://*.deviantart.com/*#/d*\""
+        ],
+        "url": "http://backend.deviantart.com/oembed"
+      }
+    ]
+  },
+  {
+    "provider_name": "Facebook",
+    "provider_url": "https://www.facebook.com/",
+    "endpoints": [
+      {
+        "schemes": [
+          "https://www.facebook.com/*/posts/*",
+          "https://www.facebook.com/*/activity/*",
+          "https://www.facebook.com/*/photos/*",
+          "https://www.facebook.com/photo.php?fbid=*",
+          "https://www.facebook.com/photos/*",
+          "https://www.facebook.com/permalink.php?story_fbid=*",
+          "https://www.facebook.com/media/set?set=*",
+          "https://www.facebook.com/questions/*",
+          "https://www.facebook.com/notes/*/*/*"
+        ],
+        "url": "https://graph.facebook.com/v9.0/oembed_post",
+        "discovery": false
+      },
+      {
+        "schemes": [
+          "https://www.facebook.com/*/videos/*",
+          "https://www.facebook.com/video.php?id=*",
+          "https://www.facebook.com/video.php?v=*"
+        ],
+        "url": "https://graph.facebook.com/v9.0/oembed_video",
+        "discovery": false
+      },
+      {
+        "schemes": ["https://www.facebook.com/*"],
+        "url": "https://graph.facebook.com/v9.0/oembed_page",
+        "discovery": false
+      }
+    ]
+  },
+  {
+    "provider_name": "Flickr",
+    "provider_url": "https://www.flickr.com/",
+    "endpoints": [
+      {
+        "schemes": [
+          "http://*.flickr.com/photos/*",
+          "http://flic.kr/p/*",
+          "https://*.flickr.com/photos/*",
+          "https://flic.kr/p/*"
+        ],
+        "url": "https://www.flickr.com/services/oembed/",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "FOX SPORTS Australia",
+    "provider_url": "http://www.foxsports.com.au",
+    "endpoints": [
+      {
+        "schemes": [
+          "http://fiso.foxsports.com.au/isomorphic-widget/*",
+          "https://fiso.foxsports.com.au/isomorphic-widget/*"
+        ],
+        "url": "https://fiso.foxsports.com.au/oembed"
+      }
+    ]
+  },
+  {
+    "provider_name": "Getty Images",
+    "provider_url": "http://www.gettyimages.com/",
+    "endpoints": [
+      {
+        "schemes": ["http://gty.im/*"],
+        "url": "http://embed.gettyimages.com/oembed",
+        "formats": ["json"]
+      }
+    ]
+  },
+  {
+    "provider_name": "GIPHY",
+    "provider_url": "https://giphy.com",
+    "endpoints": [
+      {
+        "schemes": [
+          "https://giphy.com/gifs/*",
+          "https://giphy.com/clips/*",
+          "http://gph.is/*",
+          "https://media.giphy.com/media/*/giphy.gif"
+        ],
+        "url": "https://giphy.com/services/oembed",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "Gyazo",
+    "provider_url": "https://gyazo.com",
+    "endpoints": [
+      {
+        "schemes": ["https://gyazo.com/*"],
+        "url": "https://api.gyazo.com/api/oembed",
+        "formats": ["json"]
+      }
+    ]
+  },
+  {
+    "provider_name": "Instagram",
+    "provider_url": "https://instagram.com",
+    "endpoints": [
+      {
+        "schemes": [
+          "http://instagram.com/*/p/*,",
+          "http://www.instagram.com/*/p/*,",
+          "https://instagram.com/*/p/*,",
+          "https://www.instagram.com/*/p/*,",
+          "http://instagram.com/p/*",
+          "http://instagr.am/p/*",
+          "http://www.instagram.com/p/*",
+          "http://www.instagr.am/p/*",
+          "https://instagram.com/p/*",
+          "https://instagr.am/p/*",
+          "https://www.instagram.com/p/*",
+          "https://www.instagr.am/p/*",
+          "http://instagram.com/tv/*",
+          "http://instagr.am/tv/*",
+          "http://www.instagram.com/tv/*",
+          "http://www.instagr.am/tv/*",
+          "https://instagram.com/tv/*",
+          "https://instagr.am/tv/*",
+          "https://www.instagram.com/tv/*",
+          "https://www.instagr.am/tv/*"
+        ],
+        "url": "https://graph.facebook.com/v9.0/instagram_oembed",
+        "formats": ["json"]
+      }
+    ]
+  },
+  {
+    "provider_name": "Livestream",
+    "provider_url": "https://livestream.com/",
+    "endpoints": [
+      {
+        "schemes": [
+          "https://livestream.com/accounts/*/events/*",
+          "https://livestream.com/accounts/*/events/*/videos/*",
+          "https://livestream.com/*/events/*",
+          "https://livestream.com/*/events/*/videos/*",
+          "https://livestream.com/*/*",
+          "https://livestream.com/*/*/videos/*"
+        ],
+        "url": "https://livestream.com/oembed",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "LottieFiles",
+    "provider_url": "https://lottiefiles.com/",
+    "endpoints": [
+      {
+        "schemes": ["https://lottiefiles.com/*", "https://*.lottiefiles.com/*"],
+        "url": "https://embed.lottiefiles.com/oembed",
+        "discovery": true,
+        "formats": ["json"]
+      }
+    ]
+  },
+  {
+    "provider_name": "Microsoft Stream",
+    "provider_url": "https://stream.microsoft.com",
+    "endpoints": [
+      {
+        "schemes": [
+          "https://*.microsoftstream.com/video/*",
+          "https://*.microsoftstream.com/channel/*"
+        ],
+        "url": "https://web.microsoftstream.com/oembed",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "Nasjonalbiblioteket",
+    "provider_url": "https://www.nb.no/",
+    "endpoints": [
+      {
+        "schemes": ["https://www.nb.no/items/*"],
+        "url": "https://api.nb.no/catalog/v1/oembed",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "On Aol",
+    "provider_url": "http://on.aol.com/",
+    "endpoints": [
+      {
+        "schemes": ["http://on.aol.com/video/*"],
+        "url": "http://on.aol.com/api"
+      }
+    ]
+  },
+  {
+    "provider_name": "RoosterTeeth",
+    "provider_url": "https://roosterteeth.com",
+    "endpoints": [
+      {
+        "schemes": ["https://roosterteeth.com/*"],
+        "url": "https://roosterteeth.com/oembed",
+        "formats": ["json"],
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "Runkit",
+    "provider_url": "https://runkit.com",
+    "endpoints": [
+      {
+        "schemes": [
+          "http://embed.runkit.com/*,",
+          "https://embed.runkit.com/*,"
+        ],
+        "url": "https://embed.runkit.com/oembed",
+        "formats": ["json"]
+      }
+    ]
+  },
+  {
+    "provider_name": "SoundCloud",
+    "provider_url": "http://soundcloud.com/",
+    "endpoints": [
+      {
+        "schemes": [
+          "http://soundcloud.com/*",
+          "https://soundcloud.com/*",
+          "https://soundcloud.app.goog.gl/*"
+        ],
+        "url": "https://soundcloud.com/oembed"
+      }
+    ]
+  },
+  {
+    "provider_name": "Stanford Digital Repository",
+    "provider_url": "https://purl.stanford.edu/",
+    "endpoints": [
+      {
+        "schemes": ["https://purl.stanford.edu/*"],
+        "url": "https://purl.stanford.edu/embed.{format}",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "Streamable",
+    "provider_url": "https://streamable.com/",
+    "endpoints": [
+      {
+        "schemes": ["http://streamable.com/*", "https://streamable.com/*"],
+        "url": "https://api.streamable.com/oembed.json",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "TED",
+    "provider_url": "https://www.ted.com",
+    "endpoints": [
+      {
+        "schemes": [
+          "http://ted.com/talks/*",
+          "https://ted.com/talks/*",
+          "https://www.ted.com/talks/*"
+        ],
+        "url": "https://www.ted.com/services/v1/oembed.{format}",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "The New York Times",
+    "provider_url": "https://www.nytimes.com",
+    "endpoints": [
+      {
+        "schemes": [
+          "https://www.nytimes.com/svc/oembed",
+          "https://nytimes.com/*",
+          "https://*.nytimes.com/*"
+        ],
+        "url": "https://www.nytimes.com/svc/oembed/json/",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "TikTok",
+    "provider_url": "http://www.tiktok.com/",
+    "endpoints": [
+      {
+        "schemes": ["https://www.tiktok.com/*/video/*"],
+        "url": "https://www.tiktok.com/oembed"
+      }
+    ]
+  },
+  {
+    "provider_name": "Tumblr",
+    "provider_url": "https://www.tumblr.com",
+    "endpoints": [
+      {
+        "schemes": ["https://*.tumblr.com/post/*"],
+        "url": "https://www.tumblr.com/oembed/1.0"
+      }
+    ]
+  },
+  {
+    "provider_name": "University of Cambridge Map",
+    "provider_url": "https://map.cam.ac.uk",
+    "endpoints": [
+      {
+        "schemes": ["https://map.cam.ac.uk/*"],
+        "url": "https://map.cam.ac.uk/oembed/"
+      }
+    ]
+  },
+  {
+    "provider_name": "Vimeo",
+    "provider_url": "https://vimeo.com/",
+    "endpoints": [
+      {
+        "schemes": [
+          "https://vimeo.com/*",
+          "https://vimeo.com/album/*/video/*",
+          "https://vimeo.com/channels/*/*",
+          "https://vimeo.com/groups/*/videos/*",
+          "https://vimeo.com/ondemand/*/*",
+          "https://player.vimeo.com/video/*"
+        ],
+        "url": "https://vimeo.com/api/oembed.{format}",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "Wolfram Cloud",
+    "provider_url": "https://www.wolframcloud.com",
+    "endpoints": [
+      {
+        "schemes": ["https://*.wolframcloud.com/*"],
+        "url": "https://www.wolframcloud.com/oembed",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "WordPress.com",
+    "provider_url": "http://wordpress.com/",
+    "endpoints": [
+      {
+        "url": "http://public-api.wordpress.com/oembed/",
+        "discovery": true
+      }
+    ]
+  },
+  {
+    "provider_name": "YFrog",
+    "provider_url": "http://yfrog.com/",
+    "endpoints": [
+      {
+        "schemes": ["http://*.yfrog.com/*", "http://yfrog.us/*"],
+        "url": "http://www.yfrog.com/api/oembed",
+        "formats": ["json"]
+      }
+    ]
+  }
+]
