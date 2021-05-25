@@ -10,4 +10,4 @@ Original source: <https://oembed.com/providers.json> (2021-05-09)
 - Twitter because we have a rich resolver already
 - YouTube because we have a rich resolver already
 
-And a few more that can be diffed between <https://oembed.com/providers.json> and our [providers.json](data/provider.json) file
+And a few more that can be diffed between <https://oembed.com/providers.json> and our [providers.json](providers.json) file
