@@ -40,7 +40,7 @@ func load(requestedURL string, r *http.Request) (interface{}, time.Duration, err
 		}, cache.NoSpecialDur, nil
 	}
 
-	if data.Status < http.StatusOK || data.Status > http.StatusMultipleChoices {
+	if data.Status > http.StatusOK {
 		log.Printf("[oEmbed] Skipping url %s because status code is %d\n", requestedURL, data.Status)
 		return &resolver.Response{
 			Status:  data.Status,
