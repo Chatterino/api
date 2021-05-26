@@ -14,5 +14,5 @@ require (
 	github.com/nicklaw5/helix v1.16.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	google.golang.org/api v0.47.0
-	honnef.co/go/tools v0.1.4
+	honnef.co/go/tools v0.2.0
 )
