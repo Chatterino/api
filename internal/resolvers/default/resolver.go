@@ -12,6 +12,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/imgur"
 	"github.com/Chatterino/api/internal/resolvers/livestreamfails"
 	"github.com/Chatterino/api/internal/resolvers/oembed"
+	"github.com/Chatterino/api/internal/resolvers/seventv"
 	"github.com/Chatterino/api/internal/resolvers/supinic"
 	"github.com/Chatterino/api/internal/resolvers/twitch"
 	"github.com/Chatterino/api/internal/resolvers/twitter"
@@ -84,6 +85,7 @@ func New(baseURL string) *R {
 	r.customResolvers = append(r.customResolvers, wikipedia.New()...)
 	r.customResolvers = append(r.customResolvers, livestreamfails.New()...)
 	r.customResolvers = append(r.customResolvers, oembed.New()...)
+	r.customResolvers = append(r.customResolvers, seventv.New()...)
 
 	return r
 }
