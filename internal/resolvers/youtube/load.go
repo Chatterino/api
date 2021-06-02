@@ -79,10 +79,6 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 	builtRequest := youtubeClient.Channels.List(youtubeChannelParts)
 
 	channelId := deconstructChannelIdFromCacheKey(channelCacheKey)
-
-	log.Println("Channel type[1]:", channelId.channelType)
-	log.Println("Channel id[2]:", channelId.id)
-
 	switch channelId.channelType {
 		case UserChannel:
 			builtRequest = builtRequest.ForUsername(channelId.id)
