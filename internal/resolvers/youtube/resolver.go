@@ -27,6 +27,15 @@ const (
 <br><span style="color: #2ecc71;">{{.LikeCount}} likes</span>&nbsp;•&nbsp;<span style="color: #e74c3c;">{{.DislikeCount}} dislikes</span>
 </div>
 `
+
+	youtubeChannelTooltip = `<div style="text-align: left;">
+<b>{{.Title}}</b>
+<br><b>Description:</b> {{.Description}}
+<br><b>Published Date:</b> {{.PublishDate}}
+<br><b>Subscribers:</b> {{.Subscribers}}
+<br><b>Views:</b> {{.Views}}
+</div>
+`
 )
 
 var (
