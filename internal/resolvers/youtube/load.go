@@ -50,7 +50,7 @@ func load(videoID string, r *http.Request) (interface{}, time.Duration, error) {
 	}
 
 	var tooltip bytes.Buffer
-	if err := youtubeTooltipTemplate.Execute(&tooltip, data); err != nil {
+	if err := youtubeVideoTooltipTemplate.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "youtube template error " + resolver.CleanResponse(err.Error()),

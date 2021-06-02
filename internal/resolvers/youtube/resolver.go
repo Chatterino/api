@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	youtubeTooltip = `<div style="text-align: left;">
+	youtubeVideoTooltip = `<div style="text-align: left;">
 <b>{{.Title}}</b>
 <br><b>Channel:</b> {{.ChannelTitle}}
 <br><b>Duration:</b> {{.Duration}}
@@ -34,7 +34,7 @@ var (
 
 	youtubeClient *youtubeAPI.Service
 
-	youtubeTooltipTemplate = template.Must(template.New("youtubeTooltip").Parse(youtubeTooltip))
+	youtubeVideoTooltipTemplate = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
