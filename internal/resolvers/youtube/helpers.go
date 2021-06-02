@@ -3,8 +3,21 @@ package youtube
 import (
 	"net/url"
 	"path"
+	"regexp"
 	"strings"
 )
+
+type ChannelType string
+const (
+	InvalidChannel ChannelType = ""
+	UserChannel = "user"
+	IdentifierChannel = "channel"
+)
+
+type ChannelId struct {
+	id string
+	channelType ChannelType
+}
 
 func getYoutubeVideoIDFromURL(url *url.URL) string {
 	if strings.Contains(url.Path, "embed") {
@@ -18,19 +31,42 @@ func getYoutubeVideoIDFromURL2(url *url.URL) string {
 	return path.Base(url.Path)
 }
 
-func getYoutubeChannelIdFromURL(url *url.URL) string {
-	segments := strings.Split(url.Path, "/")
-
-	// Get the segment of the path after the channel or user segment
-	for i, segment := range segments {
-		if i == len(segment) - 1 {
-			break
-		}
-
-		if segment == "channel" || segment == "user" {
-			return segments[i + 1]
-		}
+func getChannelTypeFromString(channelType string) ChannelType  {
+	switch channelType {
+		case "c":
+		case "user":
+			return UserChannel
+		case "channel":
+			return IdentifierChannel
 	}
 
-	return ""
+	return InvalidChannel
+}
+
+func constructCacheKeyFromChannelId(id ChannelId) string {
+	return string(id.channelType) + ":" + id.id
+}
+
+func deconstructChannelIdFromCacheKey(cacheKey string) ChannelId  {
+	splitKey := strings.Split(cacheKey, ":")
+
+	if len(splitKey) < 2 {
+		return ChannelId{id: "", channelType: InvalidChannel}
+	}
+
+	return ChannelId{id: splitKey[1], channelType: getChannelTypeFromString(splitKey[0])}
+}
+
+func getYoutubeChannelIdFromURL(url *url.URL) ChannelId {
+	pattern, err := regexp.Compile(`(user|c(?:hannel)?)/([\w-]+)`)
+	if err != nil {
+		return ChannelId{id: "", channelType: InvalidChannel}
+	}
+
+	match := pattern.FindStringSubmatch(url.Path)
+	if match == nil || len(match) < 3 {
+		return ChannelId{id: "", channelType: InvalidChannel}
+	}
+
+	return ChannelId{id: match[2], channelType: getChannelTypeFromString(match[1])}
 }

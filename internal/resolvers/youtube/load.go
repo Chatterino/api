@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -70,19 +69,30 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 	}, cache.NoSpecialDur, nil
 }
 
-func loadChannels(channelID string, r *http.Request) (interface{}, time.Duration, error) {
+func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Duration, error) {
 	youtubeChannelParts := []string{
 		"statistics",
 		"snippet",
 	}
 
-	log.Println("[YouTube] GET channel", channelID)
+	log.Println("[YouTube] GET channel", channelCacheKey)
 	builtRequest := youtubeClient.Channels.List(youtubeChannelParts)
 
-	if strings.HasPrefix(channelID, "UC") {
-		builtRequest = builtRequest.Id(channelID)
-	} else {
-		builtRequest = builtRequest.ForUsername(channelID)
+	channelId := deconstructChannelIdFromCacheKey(channelCacheKey)
+
+	log.Println("Channel type[1]:", channelId.channelType)
+	log.Println("Channel id[2]:", channelId.id)
+
+	switch channelId.channelType {
+		case UserChannel:
+			builtRequest = builtRequest.ForUsername(channelId.id)
+		case IdentifierChannel:
+			builtRequest = builtRequest.Id(channelId.id)
+		case InvalidChannel:
+			return &resolver.Response{
+				Status:  500,
+				Message: "cached channel ID is invalid",
+			}, 1 * time.Hour, nil
 	}
 
 	youtubeResponse, err := builtRequest.Do()

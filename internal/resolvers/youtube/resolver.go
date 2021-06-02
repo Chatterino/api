@@ -72,11 +72,13 @@ func New() (resolvers []resolver.CustomURLManager) {
 		Run: func(url *url.URL) ([]byte, error) {
 			channelID := getYoutubeChannelIdFromURL(url)
 
-			if channelID == "" {
+			if channelID.channelType == InvalidChannel {
 				return resolver.NoLinkInfoFound, nil
 			}
 
-			apiResponse := channelCache.Get(channelID, nil)
+			// TODO: cache key as channel/id for loading
+			channelCacheKey := constructCacheKeyFromChannelId(channelID)
+			apiResponse := channelCache.Get(channelCacheKey, nil)
 			return json.Marshal(apiResponse)
 		},
 	})
