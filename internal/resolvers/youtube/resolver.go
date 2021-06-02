@@ -64,7 +64,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 	}
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
-		// TODO(jammeh): handle
+		// TODO(jammeh): handle channels where channel/user segment doesn't exist (e.g. https://www.youtube.com/tranceluv)
 		Check: func(url *url.URL) bool {
 			matches, regexErr := regexp.MatchString(`(user|channel)/.+`, url.Path)
 			return utils.IsSubdomainOf(url, "youtube.com") && regexErr == nil && matches
