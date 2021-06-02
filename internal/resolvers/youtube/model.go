@@ -12,7 +12,6 @@ type youtubeVideoTooltipData struct {
 
 type youtubeChannelTooltipData struct {
 	Title        string
-	Description  string
 	PublishDate  string
 	Subscribers  string
 	Views        string

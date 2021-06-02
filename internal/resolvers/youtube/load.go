@@ -109,7 +109,6 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 	data := youtubeChannelTooltipData{
 		Title:        channel.Snippet.Title,
 		PublishDate:  humanize.CreationDateRFC3339(channel.Snippet.PublishedAt),
-		Description:  channel.Snippet.Description,
 		Subscribers:  humanize.Number(channel.Statistics.SubscriberCount),
 		// TODO: fix billions showing as millions (e.g. 2B shows as 2000M)
 		Views:        humanize.Number(channel.Statistics.ViewCount),

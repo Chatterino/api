@@ -31,7 +31,6 @@ const (
 
 	youtubeChannelTooltip = `<div style="text-align: left;">
 <b>{{.Title}}</b>
-<br><b>Description:</b> {{.Description}}
 <br><b>Published Date:</b> {{.PublishDate}}
 <br><b>Subscribers:</b> {{.Subscribers}}
 <br><b>Views:</b> {{.Views}}
