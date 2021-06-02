@@ -21,7 +21,7 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 		"contentDetails",
 	}
 
-	log.Println("[YouTube] GET", videoID)
+	log.Println("[YouTube] GET video/", videoID)
 	youtubeResponse, err := youtubeClient.Videos.List(youtubeVideoParts).Id(videoID).Do()
 	if err != nil {
 		return &resolver.Response{
@@ -76,7 +76,7 @@ func loadChannels(channelID string, r *http.Request) (interface{}, time.Duration
 		"snippet",
 	}
 
-	log.Println("[YouTube] GET", channelID)
+	log.Println("[YouTube] GET channel/", channelID)
 	builtRequest := youtubeClient.Channels.List(youtubeChannelParts)
 
 	if strings.HasPrefix(channelID, "UC") {
