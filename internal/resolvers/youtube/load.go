@@ -100,10 +100,6 @@ func loadChannels(channelID string, r *http.Request) (interface{}, time.Duration
 
 	channel := youtubeResponse.Items[0]
 
-	if channel.ContentDetails == nil {
-		return &resolver.Response{Status: 500, Message: "channel unavailable"}, cache.NoSpecialDur, nil
-	}
-
 	data := youtubeChannelTooltipData{
 		Title:        channel.Snippet.Title,
 		PublishDate:  humanize.CreationDateRFC3339(channel.Snippet.PublishedAt),
