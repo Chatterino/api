@@ -39,7 +39,7 @@ func load(videoID string, r *http.Request) (interface{}, time.Duration, error) {
 		return &resolver.Response{Status: 500, Message: "video unavailable"}, cache.NoSpecialDur, nil
 	}
 
-	data := youtubeTooltipData{
+	data := youtubeVideoTooltipData{
 		Title:        video.Snippet.Title,
 		ChannelTitle: video.Snippet.ChannelTitle,
 		Duration:     humanize.DurationPT(video.ContentDetails.Duration),
