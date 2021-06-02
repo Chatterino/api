@@ -39,11 +39,13 @@ const (
 )
 
 var (
-	videoCache = cache.New("youtube_videos", load, 24*time.Hour)
+	videoCache = cache.New("youtube_videos", loadVideos, 24*time.Hour)
+	channelCache = cache.New("youtube_channels", loadChannels, 24*time.Hour)
 
 	youtubeClient *youtubeAPI.Service
 
 	youtubeVideoTooltipTemplate = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
+	youtubeChannelTooltipTemplate = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
