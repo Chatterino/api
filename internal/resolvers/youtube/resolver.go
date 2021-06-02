@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -61,6 +62,24 @@ func New() (resolvers []resolver.CustomURLManager) {
 		log.Println("Error initialization youtube api client:", err)
 		return
 	}
+
+	resolvers = append(resolvers, resolver.CustomURLManager{
+		// TODO(jammeh): handle
+		Check: func(url *url.URL) bool {
+			matches, regexErr := regexp.MatchString(`(user|channel)/.+`, url.Path)
+			return utils.IsSubdomainOf(url, "youtube.com") && regexErr == nil && matches
+		},
+		Run: func(url *url.URL) ([]byte, error) {
+			channelID := getYoutubeChannelIdFromURL(url)
+
+			if channelID == "" {
+				return resolver.NoLinkInfoFound, nil
+			}
+
+			apiResponse := channelCache.Get(channelID, nil)
+			return json.Marshal(apiResponse)
+		},
+	})
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
