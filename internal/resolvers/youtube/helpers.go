@@ -34,6 +34,7 @@ func getYoutubeVideoIDFromURL2(url *url.URL) string {
 func getChannelTypeFromString(channelType string) ChannelType  {
 	switch channelType {
 		case "c":
+			return UserChannel
 		case "user":
 			return UserChannel
 		case "channel":
