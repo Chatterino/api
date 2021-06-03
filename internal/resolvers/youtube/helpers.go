@@ -15,6 +15,8 @@ const (
 	UserChannel = "user"
 	// IdentifierChannel channel uses the YouTube channel ID format (UC*)
 	IdentifierChannel = "channel"
+	// CustomChannel channel uses a custom URL and requires a Search call for the ID
+	CustomChannel = "custom"
 )
 
 type ChannelId struct {
