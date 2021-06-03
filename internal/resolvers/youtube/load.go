@@ -84,6 +84,8 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 			builtRequest = builtRequest.ForUsername(channelId.id)
 		case IdentifierChannel:
 			builtRequest = builtRequest.Id(channelId.id)
+		case CustomChannel:
+			builtRequest = builtRequest.Id(channelId.id)
 		case InvalidChannel:
 			return &resolver.Response{
 				Status:  500,
