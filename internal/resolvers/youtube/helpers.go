@@ -16,7 +16,7 @@ const (
 	// IdentifierChannel channel uses the YouTube channel ID format (UC*)
 	IdentifierChannel = "channel"
 	// CustomChannel channel uses a custom URL and requires a Search call for the ID
-	CustomChannel = "custom"
+	CustomChannel = "c"
 )
 
 type ChannelId struct {
@@ -38,8 +38,6 @@ func getYoutubeVideoIDFromURL2(url *url.URL) string {
 
 func getChannelTypeFromString(channelType string) ChannelType  {
 	switch channelType {
-		case "custom":
-			return CustomChannel
 		case "c":
 			return CustomChannel
 		case "user":
