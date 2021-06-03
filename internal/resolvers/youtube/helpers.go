@@ -9,8 +9,11 @@ import (
 
 type ChannelType string
 const (
+	// InvalidChannel channel isn't of a known type or doesn't exist
 	InvalidChannel ChannelType = ""
+	// UserChannel channel ID is a username
 	UserChannel = "user"
+	// IdentifierChannel channel uses the YouTube channel ID format (UC*)
 	IdentifierChannel = "channel"
 )
 
