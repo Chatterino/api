@@ -60,6 +60,7 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 		Code:     jsonResponse.Data.Emote.Name,
 		Type:     "Channel",
 		Uploader: jsonResponse.Data.Emote.Owner.DisplayName,
+		Unlisted: jsonResponse.Data.Emote.Visibility&EmoteVisibilityHidden != 0,
 	}
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
@@ -72,10 +73,17 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 	}
 
 	// Success
-	return &resolver.Response{
+	successTooltip := &resolver.Response{
 		Status:    http.StatusOK,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: fmt.Sprintf(thumbnailFormat, emoteHash),
 		Link:      fmt.Sprintf("https://7tv.app/emotes/%s", emoteHash),
-	}, cache.NoSpecialDur, nil
+	}
+
+	// Hide thumbnail for unlisted or hidden emotes pajaS
+	if data.Unlisted {
+		successTooltip.Thumbnail = ""
+	}
+
+	return successTooltip, cache.NoSpecialDur, nil
 }

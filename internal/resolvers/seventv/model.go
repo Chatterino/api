@@ -8,7 +8,7 @@ type EmoteAPIUser struct {
 type EmoteAPIEmote struct {
 	ID         string       `json:"id"`
 	Name       string       `json:"name"`
-	Visibility int          `json:"visibility"`
+	Visibility int32        `json:"visibility"`
 	Owner      EmoteAPIUser `json:"owner"`
 }
 
@@ -22,4 +22,18 @@ type TooltipData struct {
 	Code     string
 	Type     string
 	Uploader string
+
+	Unlisted bool
 }
+
+const (
+	EmoteVisibilityPrivate int32 = 1 << iota
+	EmoteVisibilityGlobal
+	EmoteVisibilityHidden
+	EmoteVisibilityOverrideBTTV
+	EmoteVisibilityOverrideFFZ
+	EmoteVisibilityOverrideTwitchGlobal
+	EmoteVisibilityOverrideTwitchSubscriber
+
+	EmoteVisibilityAll int32 = (1 << iota) - 1
+)
