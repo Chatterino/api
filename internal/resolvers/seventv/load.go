@@ -18,7 +18,6 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 	log.Println("[SevenTV] GET", emoteHash)
 
 	// Execute SevenTV API request
-	fmt.Println(gqlQueryEmotes)
 	resp, err := resolver.RequestPOST(seventvAPIURL, fmt.Sprintf(gqlQueryEmotes, emoteHash))
 	if err != nil {
 		return &resolver.Response{
@@ -28,12 +27,8 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 	}
 	defer resp.Body.Close()
 
-	fmt.Println(resp.Status)
-	fmt.Println(resp.Status)
-
 	// Read response into a string
 	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
 	if err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
@@ -54,9 +49,9 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 		}, cache.NoSpecialDur, nil
 	}
 
-	// API returns data.emote as null if the emote wasn't found
-	fmt.Println(jsonResponse.Data)
-	if jsonResponse.Data.Emote.Name == "" {
+	// API returns Data.Emote as null if the emote wasn't found
+	fmt.Println(jsonResponse.Data.Emote)
+	if jsonResponse.Data.Emote == nil {
 		return emoteNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
