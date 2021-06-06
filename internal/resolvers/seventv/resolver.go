@@ -12,7 +12,6 @@ import (
 
 const (
 	thumbnailFormat = "https://cdn.7tv.app/emote/%s/4x"
-	gqlQueryEmotes  = `{"query": "{emote(id: \"%s\") { visibility id name owner { id display_name } }}"}`
 
 	tooltipTemplate = `<div style="text-align: left;">
 <b>{{.Code}}</b><br>
