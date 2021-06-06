@@ -19,8 +19,34 @@ import (
 func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error) {
 	log.Println("[SevenTV] GET", emoteHash)
 
+	queryMap := map[string]interface{}{
+		"query": `
+query fetchEmote($id: String!) {
+	emote(id: $id) {
+		visibility
+		id
+		name
+		owner {
+			id
+			display_name
+		}
+	}
+}`,
+		"variables": map[string]string{
+			"id": emoteHash,
+		},
+	}
+
+	queryBytes, err := json.Marshal(queryMap)
+	if err != nil {
+		return &resolver.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "SevenTV API request error" + resolver.CleanResponse(err.Error()),
+		}, cache.NoSpecialDur, nil
+	}
+
 	// Execute SevenTV API request
-	resp, err := resolver.RequestPOST(seventvAPIURL, fmt.Sprintf(gqlQueryEmotes, emoteHash))
+	resp, err := resolver.RequestPOST(seventvAPIURL, string(queryBytes))
 	if err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
