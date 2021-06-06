@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -55,12 +56,29 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 		return emoteNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
+	// Determine type of the emote based on visibility flags
+	visibility := jsonResponse.Data.Emote.Visibility
+	var emoteType []string
+
+	if visibility&EmoteVisibilityGlobal != 0 {
+		emoteType = append(emoteType, "Global")
+	}
+
+	if visibility&EmoteVisibilityPrivate != 0 {
+		emoteType = append(emoteType, "Private")
+	}
+
+	// Default to Shared emote
+	if len(emoteType) == 0 {
+		emoteType = append(emoteType, "Shared")
+	}
+
 	// Build tooltip data from the API response
 	data := TooltipData{
 		Code:     jsonResponse.Data.Emote.Name,
-		Type:     "Channel",
+		Type:     strings.Join(emoteType, " "),
 		Uploader: jsonResponse.Data.Emote.Owner.DisplayName,
-		Unlisted: jsonResponse.Data.Emote.Visibility&EmoteVisibilityHidden != 0,
+		Unlisted: visibility&EmoteVisibilityHidden != 0,
 	}
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
