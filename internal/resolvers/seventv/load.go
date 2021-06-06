@@ -13,6 +13,7 @@ import (
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error) {
@@ -60,11 +61,11 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 	visibility := jsonResponse.Data.Emote.Visibility
 	var emoteType []string
 
-	if visibility&EmoteVisibilityGlobal != 0 {
+	if utils.HasBits(visibility, EmoteVisibilityGlobal) {
 		emoteType = append(emoteType, "Global")
 	}
 
-	if visibility&EmoteVisibilityPrivate != 0 {
+	if utils.HasBits(visibility, EmoteVisibilityPrivate) {
 		emoteType = append(emoteType, "Private")
 	}
 
@@ -78,7 +79,7 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 		Code:     jsonResponse.Data.Emote.Name,
 		Type:     strings.Join(emoteType, " "),
 		Uploader: jsonResponse.Data.Emote.Owner.DisplayName,
-		Unlisted: visibility&EmoteVisibilityHidden != 0,
+		Unlisted: utils.HasBits(visibility, EmoteVisibilityHidden),
 	}
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
