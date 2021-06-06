@@ -2,9 +2,14 @@ package seventv
 
 import (
 	"net/url"
-	"strings"
+
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 func check(url *url.URL) bool {
-	return seventvEmoteURLRegex.MatchString(strings.ToLower(url.Host) + url.Path)
+	if match, _ := resolver.MatchesHosts(url, domains); !match {
+		return false
+	}
+
+	return emotePathRegex.MatchString(url.Path)
 }

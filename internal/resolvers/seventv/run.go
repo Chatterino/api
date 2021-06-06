@@ -3,11 +3,10 @@ package seventv
 import (
 	"encoding/json"
 	"net/url"
-	"strings"
 )
 
 func run(url *url.URL) ([]byte, error) {
-	matches := seventvEmoteURLRegex.FindStringSubmatch(strings.ToLower(url.Host) + url.Path)
+	matches := emotePathRegex.FindStringSubmatch(url.Path)
 	if len(matches) != 2 {
 		return nil, errInvalidSevenTVEmotePath
 	}
