@@ -78,7 +78,6 @@ query fetchEmote($id: String!) {
 	}
 
 	// API returns Data.Emote as null if the emote wasn't found
-	fmt.Println(jsonResponse.Data.Emote)
 	if jsonResponse.Data.Emote == nil {
 		return emoteNotFoundResponse, cache.NoSpecialDur, nil
 	}
