@@ -53,7 +53,6 @@ func RequestPOST(url, body string) (response *http.Response, err error) {
 	req.Header.Set("Content-Type", "application/json")
 
 	return httpClient.Do(req)
-
 }
 
 func HTTPClient() *http.Client {
