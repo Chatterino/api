@@ -12,10 +12,12 @@ type EmoteAPIEmote struct {
 	Owner      EmoteAPIUser `json:"owner"`
 }
 
+type EmoteAPIResponseData struct {
+	Emote *EmoteAPIEmote `json:"emote,omitempty"`
+}
+
 type EmoteAPIResponse struct {
-	Data struct {
-		Emote *EmoteAPIEmote `json:"emote,omitempty"`
-	} `json:"data"`
+	Data EmoteAPIResponseData `json:"data"`
 }
 
 type TooltipData struct {
