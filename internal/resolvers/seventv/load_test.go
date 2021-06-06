@@ -102,6 +102,12 @@ func TestFoo(t *testing.T) {
 <li><b><span style="color: red;">UNLISTED</span></b></li>
 </div>`,
 		},
+		// TODO: Global emote
+		// TODO: Private emote
+		// TODO: Combined emote types
+		// TODO: Default emote type (shared)
+		// TODO: Thumbnails
+		// TODO: emote not found (404)
 	}
 
 	for _, test := range tests {
@@ -115,6 +121,7 @@ func TestFoo(t *testing.T) {
 		c.Assert(response, qt.Not(qt.IsNil))
 
 		c.Assert(response.Status, qt.Equals, 200)
+
 		// TODO: check thumbnail
 		// c.Assert(response.Thumbnail, qt.Equals, fmt.Sprintf(thumbnailFormat, test.emoteHash))
 
