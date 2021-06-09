@@ -1,6 +1,6 @@
 // +build windows
 
-package defaultresolver
+package thumbnail
 
 import (
 	"errors"

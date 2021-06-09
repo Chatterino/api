@@ -13,6 +13,7 @@ import (
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/PuerkitoBio/goquery"
 )
@@ -115,7 +116,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 		Thumbnail: data.ImageSrc,
 	}
 
-	if isSupportedThumbnail(resp.Header.Get("content-type")) {
+	if thumbnail.IsSupportedThumbnail(resp.Header.Get("content-type")) {
 		response.Thumbnail = utils.FormatThumbnailURL(dr.baseURL, r, resp.Request.URL.String())
 	}
 
