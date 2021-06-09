@@ -103,7 +103,6 @@ func main() {
 	handleHealth(router)
 
 	defaultresolver.Initialize(router, BaseURL())
-	defaultresolver.InitializeThumbnail(router)
 
 	listen(BindAddress(), mountRouter(router))
 }
