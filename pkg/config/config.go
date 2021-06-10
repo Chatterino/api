@@ -20,7 +20,7 @@ var (
 	v      = viper.New()
 )
 
-func Init() {
+func init() {
 	// Default config
 	ref := reflect.ValueOf(defaultConf)
 
@@ -30,8 +30,8 @@ func Init() {
 	}
 
 	// Flags
-	pflag.StringP("base_url", "b", "", "Sample Text")
-	pflag.StringP("bind_address", "l", "", "Sample Text")
+	pflag.StringP("base_url", "b", "", "Bind address")
+	pflag.StringP("bind_address", "l", "", "Base URL (useful if being proxied through something like nginx). Value needs to be full URL up to the application (e.g. https://braize.pajlada.com/chatterino)")
 	pflag.Bool("enable_lilliput", true, "enable_lilliput")
 	pflag.String("discord_token", "", "discord")
 	pflag.String("twitch_client_id", "", "twitch_client_id")
