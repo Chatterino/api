@@ -5,11 +5,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	. "github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -41,15 +41,11 @@ var (
 	errInvalidDiscordInvite = errors.New("invalid Discord invite Path")
 
 	discordInviteTemplate = template.Must(template.New("discordInviteTooltip").Parse(discordInviteTooltip))
-
-	discordToken string
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
-	var exists bool
-
 	// Bot authentication is required for higher ratelimit (250 requests/5s)
-	if discordToken, exists = os.LookupEnv("CHATTERINO_API_DISCORD_TOKEN"); !exists {
+	if Config.DiscordToken == "" {
 		log.Println("No CHATTERINO_API_DISCORD_TOKEN specified, won't do special responses for Discord invites")
 		return
 	}

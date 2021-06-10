@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	. "github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
@@ -22,7 +23,7 @@ func load(inviteCode string, r *http.Request) (interface{}, time.Duration, error
 	log.Println("[DiscordInvite] GET", inviteCode)
 	apiURL := fmt.Sprintf(discordInviteAPIURL, inviteCode)
 	extraHeaders := map[string]string{
-		"Authorization": fmt.Sprintf("Bot %s", discordToken),
+		"Authorization": fmt.Sprintf("Bot %s", Config.DiscordToken),
 	}
 
 	// Execute Discord API request
