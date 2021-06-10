@@ -6,10 +6,10 @@ import (
 	"html/template"
 	"log"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	. "github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 
@@ -38,15 +38,14 @@ var (
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
-	apiKey, exists := os.LookupEnv("YOUTUBE_API_KEY")
-	if !exists {
+	if Config.YoutubeApiKey == "" {
 		log.Println("No YOUTUBE_API_KEY specified, won't do special responses for youtube")
 		return
 	}
 
 	ctx := context.Background()
 	var err error
-	if youtubeClient, err = youtubeAPI.NewService(ctx, option.WithAPIKey(apiKey)); err != nil {
+	if youtubeClient, err = youtubeAPI.NewService(ctx, option.WithAPIKey(Config.YoutubeApiKey)); err != nil {
 		log.Println("Error initialization youtube api client:", err)
 		return
 	}
