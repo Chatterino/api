@@ -8,6 +8,7 @@ import (
 	"time"
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/go-chi/chi/v5"
 )
@@ -18,8 +19,12 @@ var (
 	}
 	startTime = time.Now()
 
-	bind    = flag.String("l", ":1234", "bind address")
-	baseURL = flag.String("b", "", "base url (useful if being proxied through something like nginx). Value needs to be full url up to the application (e.g. https://braize.pajlada.com/chatterino)")
+	//bind    = flag.String("l", ":1234", "bind address")
+	//baseURL = flag.String("b", "", "base url (useful if being proxied through something like nginx). Value needs to be full url up to the application (e.g. https://braize.pajlada.com/chatterino)")
+	xbind    = ":1234"
+	xbaseURL = ""
+	bind     = &xbind
+	baseURL  = &xbaseURL
 
 	prefix string
 )
@@ -93,8 +98,9 @@ func listen(bind string, router *chi.Mux) {
 }
 
 func main() {
-	flag.Parse()
+	//flag.Parse()
 
+	config.Init()
 	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", BindAddress(), prefix, BaseURL())
 
 	router := chi.NewRouter()
