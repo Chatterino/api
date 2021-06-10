@@ -41,7 +41,7 @@ func init() {
 	pflag.String("imgur_client_id", "", "imgur_client_id")
 	pflag.String("oembed_facebook_app_id", "", "oembed_facebook_app_id")
 	pflag.String("oembed_facebook_app_secret", "", "oembed_facebook_app_secret")
-	pflag.String("oembed_providers_path", "", "oembed_providers_path")
+	pflag.String("oembed_providers_path", "./providers.json", "oembed_providers_path")
 	pflag.Parse()
 	v.BindPFlags(pflag.CommandLine)
 
@@ -72,5 +72,5 @@ func init() {
 	Config = defaultConf
 	v.UnmarshalExact(&Config)
 
-	//fmt.Printf("%# v\n", pretty.Formatter(cfg))
+	//fmt.Printf("%# v\n", Config)
 }
