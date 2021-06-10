@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	. "github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/nicklaw5/helix"
@@ -40,15 +41,12 @@ var (
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
-	clientID, existsClientID := utils.LookupEnv("TWITCH_CLIENT_ID")
-	clientSecret, existsClientSecret := utils.LookupEnv("TWITCH_CLIENT_SECRET")
-
-	if !existsClientID {
+	if Config.TwitchClientID == "" {
 		log.Println("No CHATTERINO_API_TWITCH_CLIENT_ID specified, won't do special responses for Twitch clips")
 		return
 	}
 
-	if !existsClientSecret {
+	if Config.TwitchClientSecret == "" {
 		log.Println("No CHATTERINO_API_TWITCH_CLIENT_SECRET specified, won't do special responses for Twitch clips")
 		return
 	}
@@ -56,8 +54,8 @@ func New() (resolvers []resolver.CustomURLManager) {
 	var err error
 
 	helixAPI, err = helix.NewClient(&helix.Options{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
+		ClientID:     Config.TwitchClientID,
+		ClientSecret: Config.TwitchClientSecret,
 	})
 
 	if err != nil {
