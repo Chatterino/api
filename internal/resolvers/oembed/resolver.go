@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
-	. "github.com/Chatterino/api/pkg/config"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/dyatlov/go-oembed/oembed"
 )
@@ -34,14 +34,14 @@ var (
 
 func New() (resolvers []resolver.CustomURLManager) {
 
-	data, err := ioutil.ReadFile(Config.OembedProvidersPath)
+	data, err := ioutil.ReadFile(config.Cfg.OembedProvidersPath)
 
 	if err != nil {
 		log.Println("[oEmbed] No providers.json file found, won't do oEmbed parsing")
 		return
 	}
 
-	if Config.OembedFacebookAppID != "" && Config.OembedFacebookAppSecret != "" {
+	if config.Cfg.OembedFacebookAppID != "" && config.Cfg.OembedFacebookAppSecret != "" {
 		if err := initFacebookAppAccessToken(); err != nil {
 			log.Println("[oEmbed] error loading facebook app access token", err)
 		} else {

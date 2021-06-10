@@ -7,7 +7,7 @@ import (
 	"time"
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
-	. "github.com/Chatterino/api/pkg/config"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -21,13 +21,13 @@ var (
 )
 
 func mountRouter(r *chi.Mux) *chi.Mux {
-	if Config.BaseURL == "" {
-		log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", Config.BindAddress, prefix, Config.BaseURL)
+	if config.Cfg.BaseURL == "" {
+		log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", config.Cfg.BindAddress, prefix, config.Cfg.BaseURL)
 		return r
 	}
 
 	// figure out prefix from address
-	u, err := url.Parse(Config.BaseURL)
+	u, err := url.Parse(config.Cfg.BaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func mountRouter(r *chi.Mux) *chi.Mux {
 	ur := chi.NewRouter()
 	ur.Mount(prefix, r)
 
-	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", Config.BindAddress, prefix, Config.BaseURL)
+	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", config.Cfg.BindAddress, prefix, config.Cfg.BaseURL)
 
 	return ur
 }
@@ -60,7 +60,7 @@ func main() {
 
 	handleTwitchEmotes(router)
 	handleHealth(router)
-	defaultresolver.Initialize(router, Config.BaseURL)
+	defaultresolver.Initialize(router, config.Cfg.BaseURL)
 
-	listen(Config.BindAddress, mountRouter(router))
+	listen(config.Cfg.BindAddress, mountRouter(router))
 }

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
-	. "github.com/Chatterino/api/pkg/config"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -45,7 +45,7 @@ var (
 
 func New() (resolvers []resolver.CustomURLManager) {
 	// Bot authentication is required for higher ratelimit (250 requests/5s)
-	if Config.DiscordToken == "" {
+	if config.Cfg.DiscordToken == "" {
 		log.Println("No CHATTERINO_API_DISCORD_TOKEN specified, won't do special responses for Discord invites")
 		return
 	}

@@ -16,8 +16,8 @@ const (
 )
 
 var (
-	Config APIConfig
-	v      = viper.New()
+	Cfg APIConfig
+	v   = viper.New()
 )
 
 func init() {
@@ -69,8 +69,8 @@ func init() {
 	v.AutomaticEnv()
 
 	// Print config
-	Config = defaultConf
-	v.UnmarshalExact(&Config)
+	Cfg = defaultConf
+	v.UnmarshalExact(&Cfg)
 
 	//fmt.Printf("%# v\n", Config)
 }
