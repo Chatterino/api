@@ -1,0 +1,13 @@
+base_url: ""
+bind_address: ":1234"
+enable_lilliput: true
+
+discord_token: ""
+twitch_client_id: ""
+twitch_client_secret: ""
+youtube_api_key: ""
+twitter_bearer_token: ""
+imgur_client_id: ""
+oembed_facebook_app_id: ""
+oembed_facebook_app_secret: ""
+oembed_providers_path: ""

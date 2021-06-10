@@ -12,4 +12,7 @@ api
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# Config file
+chatterino-api.yaml
+
 cached/
