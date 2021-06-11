@@ -32,7 +32,7 @@ func init() {
 	// Flags
 	pflag.StringP("base_url", "b", "", "Bind address")
 	pflag.StringP("bind_address", "l", "", "Base URL (useful if being proxied through something like nginx). Value needs to be full URL up to the application (e.g. https://braize.pajlada.com/chatterino)")
-	pflag.Uint64("max_content_length", 5242880, "Max content size (in bytes) - requests with body bigger than this value will be skipped")
+	pflag.Uint64("max_content_length", 5*1024*1024, "Max content size (in bytes) - requests with body bigger than this value will be skipped")
 	pflag.Bool("enable_lilliput", true, "enable_lilliput")
 	pflag.String("discord_token", "", "discord")
 	pflag.String("twitch_client_id", "", "twitch_client_id")
@@ -79,5 +79,5 @@ func init() {
 	Cfg = defaultConf
 	v.UnmarshalExact(&Cfg)
 
-	//fmt.Printf("%# v\n", Config)
+	fmt.Printf("%# v\n", Cfg)
 }

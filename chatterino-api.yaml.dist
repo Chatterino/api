@@ -1,5 +1,6 @@
 base_url: ""
 bind_address: ":1234"
+max_content_length: 5242880
 enable_lilliput: true
 
 discord_token: ""
