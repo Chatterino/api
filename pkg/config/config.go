@@ -46,7 +46,7 @@ func init() {
 	v.BindPFlags(pflag.CommandLine)
 
 	// figure out XDG_DATA_CONFIG to be compliant with the standard
-	xdgConfigHome, exists := os.LookupEnv("XDG_DATA_CONFIG")
+	xdgConfigHome, exists := os.LookupEnv("XDG_CONFIG_HOME")
 	if !exists || xdgConfigHome == "" {
 		xdgConfigHome = fmt.Sprintf("$HOME/.config/%s/", appName)
 	}
