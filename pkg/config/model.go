@@ -3,9 +3,10 @@ package config
 type APIConfig struct {
 	// Core
 
-	BaseURL        string `mapstructure:"base_url" json:"base_url"`
-	BindAddress    string `mapstructure:"bind_address" json:"bind_address"`
-	EnableLilliput bool   `mapstructure:"enable_lilliput" json:"enable_lilliput"`
+	BaseURL          string `mapstructure:"base_url" json:"base_url"`
+	BindAddress      string `mapstructure:"bind_address" json:"bind_address"`
+	MaxContentLength uint64 `mapstructure:"max_content_length" json:"max_content_length"`
+	EnableLilliput   bool   `mapstructure:"enable_lilliput" json:"enable_lilliput"`
 
 	// Secrets
 

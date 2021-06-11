@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/nfnt/resize"
@@ -78,7 +79,7 @@ func DoThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 		if err != nil {
 			return nil, cache.NoSpecialDur, err
 		}
-		if contentLengthBytes > resolver.MaxContentLength {
+		if uint64(contentLengthBytes) > config.Cfg.MaxContentLength {
 			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}

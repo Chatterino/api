@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/Chatterino/api/pkg/utils"
@@ -73,7 +74,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 		if err != nil {
 			return nil, cache.NoSpecialDur, err
 		}
-		if contentLengthBytes > resolver.MaxContentLength {
+		if uint64(contentLengthBytes) > config.Cfg.MaxContentLength {
 			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}
@@ -83,7 +84,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
-	limiter := &resolver.WriteLimiter{Limit: resolver.MaxContentLength}
+	limiter := &resolver.WriteLimiter{Limit: config.Cfg.MaxContentLength}
 
 	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
 	if err != nil {
