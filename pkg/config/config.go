@@ -3,8 +3,8 @@ package config
 import (
 	"fmt"
 	"log"
+	"os"
 	"reflect"
-	//"strings"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -45,11 +45,17 @@ func init() {
 	pflag.Parse()
 	v.BindPFlags(pflag.CommandLine)
 
+	// figure out XDG_DATA_CONFIG to be compliant with the standard
+	xdgConfigHome, exists := os.LookupEnv("XDG_DATA_CONFIG")
+	if !exists || xdgConfigHome == "" {
+		xdgConfigHome = fmt.Sprintf("$HOME/.config/%s/", appName)
+	}
+
 	// File
 	v.SetConfigName(appName)
 	v.SetConfigType("yaml")
 	v.AddConfigPath("/etc/")
-	v.AddConfigPath(fmt.Sprintf("$HOME/.config/%s/", appName))
+	v.AddConfigPath(xdgConfigHome)
 	v.AddConfigPath(".")
 
 	if err := v.ReadInConfig(); err != nil {
