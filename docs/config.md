@@ -18,4 +18,4 @@ All respected environment variables follow the format `CHATTERINO_API_X`, where 
 
 ## Command line flags
 
-All command line flags are the same as settings in config file. You can also run api with `--help` flag for list of those and more detailed information about each of those.
+All command line flags are the same as settings in config file. You can also run API with `--help` flag for list of those and more detailed information about each of those.
