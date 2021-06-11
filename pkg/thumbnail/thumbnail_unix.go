@@ -1,6 +1,6 @@
 // +build !windows
 
-package defaultresolver
+package thumbnail
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	EncodeOptions = map[string]map[int]int{
+	encodeOptions = map[string]map[int]int{
 		".jpeg": {lilliput.JpegQuality: 85},
 		".png":  {lilliput.PngCompression: 7},
 		".webp": {lilliput.WebpQuality: 85},
@@ -83,7 +83,7 @@ func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, erro
 		Width:         newWidth,
 		Height:        newHeight,
 		ResizeMethod:  resizeMethod,
-		EncodeOptions: EncodeOptions[outputType],
+		EncodeOptions: encodeOptions[outputType],
 	}
 
 	// resize and transcode image
