@@ -99,9 +99,17 @@ func DoThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
-	image, err := buildThumbnailByteArray(inputBuf, resp)
-	if err != nil {
-		log.Println("Error trying to build animated thumbnail:", err.Error(), "falling back to static thumbnail building")
+	var image []byte
+	// attempt building an animated image
+	if config.Cfg.EnableLilliput {
+		image, err = buildThumbnailByteArray(inputBuf, resp)
+	}
+
+	// fallback to static image if animated image building failed or is disabled
+	if !config.Cfg.EnableLilliput || err != nil {
+		if err != nil {
+			log.Println("Error trying to build animated thumbnail:", err.Error(), "falling back to static thumbnail building")
+		}
 		image, err = buildStaticThumbnailByteArray(inputBuf, resp)
 		if err != nil {
 			log.Println("Error trying to build static thumbnail:", err.Error())
