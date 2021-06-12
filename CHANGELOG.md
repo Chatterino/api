@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Pass http.Request all the way down the pipeline to custom resolvers. (#167)
+
 ## 1.1.0
 
 - Made Reddit Score field in Livestreamfails tooltip use humanized value. (#164)
