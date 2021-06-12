@@ -1,14 +1,14 @@
-base_url: ""
-bind_address: ":1234"
-max_content_length: 5242880
-enable_lilliput: true
+base-url: ""
+bind-address: ":1234"
+max-content-length: 5242880
+enable-lilliput: true
 
-discord_token: ""
-twitch_client_id: ""
-twitch_client_secret: ""
-youtube_api_key: ""
-twitter_bearer_token: ""
-imgur_client_id: ""
-oembed_facebook_app_id: ""
-oembed_facebook_app_secret: ""
-oembed_providers_path: "./providers.json"
+discord-token: ""
+twitch-client-id: ""
+twitch-client-secret: ""
+youtube-api-key: ""
+twitter-bearer-token: ""
+imgur-client-id: ""
+oembed-facebook-app-id: ""
+oembed-facebook-app-secret: ""
+oembed-providers-path: "./providers.json"
