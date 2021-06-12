@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -75,11 +76,11 @@ func New() (resolvers []resolver.CustomURLManager) {
 		Check: func(url *url.URL) bool {
 			return utils.IsDomain(url, "clips.twitch.tv")
 		},
-		Run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[0]
 
-			apiResponse := clipCache.Get(clipSlug, nil)
+			apiResponse := clipCache.Get(clipSlug, r)
 			return json.Marshal(apiResponse)
 		},
 	})
@@ -95,11 +96,11 @@ func New() (resolvers []resolver.CustomURLManager) {
 
 			return len(pathParts) >= 4 && pathParts[2] == "clip"
 		},
-		Run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipSlug := pathParts[2]
 
-			apiResponse := clipCache.Get(clipSlug, nil)
+			apiResponse := clipCache.Get(clipSlug, r)
 			return json.Marshal(apiResponse)
 		},
 	})

@@ -2,20 +2,21 @@ package twitter
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func run(url *url.URL) ([]byte, error) {
+func run(url *url.URL, r *http.Request) ([]byte, error) {
 	if tweetRegexp.MatchString(url.String()) {
 		tweetID := getTweetIDFromURL(url)
 		if tweetID == "" {
 			return resolver.NoLinkInfoFound, nil
 		}
 
-		apiResponse := tweetCache.Get(tweetID, nil)
+		apiResponse := tweetCache.Get(tweetID, r)
 		return json.Marshal(apiResponse)
 	}
 
@@ -27,7 +28,7 @@ func run(url *url.URL) ([]byte, error) {
 			return resolver.NoLinkInfoFound, nil
 		}
 
-		apiResponse := twitterUserCache.Get(userName, nil)
+		apiResponse := twitterUserCache.Get(userName, r)
 		return json.Marshal(apiResponse)
 	}
 

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -61,8 +62,8 @@ func New() (resolvers []resolver.CustomURLManager) {
 		Check: func(url *url.URL) bool {
 			return oEmbed.FindItem(url.String()) != nil
 		},
-		Run: func(url *url.URL) ([]byte, error) {
-			apiResponse := oEmbedCache.Get(url.String(), nil)
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
+			apiResponse := oEmbedCache.Get(url.String(), r)
 			return json.Marshal(apiResponse)
 		},
 	})

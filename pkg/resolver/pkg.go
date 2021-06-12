@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -23,7 +24,7 @@ type Response struct {
 
 type CustomURLManager struct {
 	Check func(url *url.URL) bool
-	Run   func(url *url.URL) ([]byte, error)
+	Run   func(url *url.URL, r *http.Request) ([]byte, error)
 }
 
 var NoSpecialDur time.Duration
