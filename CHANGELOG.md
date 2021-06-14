@@ -2,7 +2,14 @@
 
 ## Unreleased
 
-- Breaking: Added viper as a configuration manager. This allows to set configuration with config files, environment variables or command line flags. Youtube environment variable has been renamed to keep consistency. There are also new configurable properties. (#162)
+- Breaking: YouTube environment variable has been renamed (`CHATTERINO_API_YOUTUBE_API_KEY`).
+- Added viper as a configuration manager. This allows to set configuration with config files, environment variables or command line flags. There are also new configurable properties. See docs/config.md for detailed information. (#162)
+- Pass http.Request all the way down the pipeline to custom resolvers. (#167)
+
+## 1.1.0
+
+- Made Reddit Score field in Livestreamfails tooltip use humanized value. (#164)
+>>>>>>> origin/master
 - Added support for customizable oEmbed resolving for websites with the `providers.json` file. See [`data/oembed/providers.json`](data/oembed/providers.json). Three new environment variables can be set. See [`internal/resolvers/oembed/README.md`](internal/resolvers/oembed/README.md) (#139, #152)
 - Breaking: Environment variable `CHATTERINO_API_CACHE_TWITCH_CLIENT_ID` was renamed to `CHATTERINO_API_TWITCH_CLIENT_ID`. (#144)
 - Dev, Breaking: Replaced `dankeroni/gotwitch` with `nicklaw5/helix`. This change requires you to add new environment variable: `CHATTERINO_API_TWITCH_CLIENT_SECRET` - it's a client secret generated for your Twitch application.

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -54,14 +55,14 @@ func New() (resolvers []resolver.CustomURLManager) {
 		Check: func(url *url.URL) bool {
 			return utils.IsSubdomainOf(url, "youtube.com")
 		},
-		Run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL(url)
 
 			if videoID == "" {
 				return resolver.NoLinkInfoFound, nil
 			}
 
-			apiResponse := videoCache.Get(videoID, nil)
+			apiResponse := videoCache.Get(videoID, r)
 			return json.Marshal(apiResponse)
 		},
 	})
@@ -70,14 +71,14 @@ func New() (resolvers []resolver.CustomURLManager) {
 		Check: func(url *url.URL) bool {
 			return url.Host == "youtu.be"
 		},
-		Run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			videoID := getYoutubeVideoIDFromURL2(url)
 
 			if videoID == "" {
 				return resolver.NoLinkInfoFound, nil
 			}
 
-			apiResponse := videoCache.Get(videoID, nil)
+			apiResponse := videoCache.Get(videoID, r)
 			return json.Marshal(apiResponse)
 		},
 	})
