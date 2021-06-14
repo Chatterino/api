@@ -96,16 +96,16 @@ func New(cfg config.APIConfig) *R {
 
 	// Register Link Resolvers from internal/resolvers/
 	r.customResolvers = append(r.customResolvers, betterttv.New()...)
-	r.customResolvers = append(r.customResolvers, frankerfacez.New()...)
-	r.customResolvers = append(r.customResolvers, twitter.New()...)
 	r.customResolvers = append(r.customResolvers, discord.New()...)
-	r.customResolvers = append(r.customResolvers, youtube.New()...)
-	r.customResolvers = append(r.customResolvers, supinic.New()...)
-	r.customResolvers = append(r.customResolvers, twitch.New()...)
+	r.customResolvers = append(r.customResolvers, frankerfacez.New()...)
 	r.customResolvers = append(r.customResolvers, imgur.New()...)
-	r.customResolvers = append(r.customResolvers, wikipedia.New()...)
 	r.customResolvers = append(r.customResolvers, livestreamfails.New()...)
 	r.customResolvers = append(r.customResolvers, oembed.New()...)
+	r.customResolvers = append(r.customResolvers, supinic.New()...)
+	r.customResolvers = append(r.customResolvers, twitch.New()...)
+	r.customResolvers = append(r.customResolvers, twitter.New()...)
+	r.customResolvers = append(r.customResolvers, wikipedia.New()...)
+	r.customResolvers = append(r.customResolvers, youtube.New()...)
 
 	return r
 }
