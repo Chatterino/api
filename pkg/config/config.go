@@ -11,15 +11,16 @@ import (
 )
 
 const (
-	envPrefix = "CHATTERINO_API"
-	appName   = "chatterino-api"
+	envPrefix  = "CHATTERINO_API"
+	appName    = "chatterino-api"
+	configName = "config"
 )
 
 var (
 	Cfg APIConfig
 )
 
-// readFromPath reads the config values from the given path (i.e. path/${appName}.yaml) and returns its values as a map
+// readFromPath reads the config values from the given path (i.e. path/${configName}.yaml) and returns its values as a map
 // This allows us to use the viper.MergeConfigMap to read config values in the unix standard,
 // so you start furthest down with reading the system config file, merge those values into the main config map,
 // then read the home directory config files, and merge any set values from there,
@@ -27,7 +28,7 @@ var (
 // but one is set in the system config file then the system config file value will be used
 func readFromPath(path string) (values map[string]interface{}, err error) {
 	v := viper.New()
-	v.SetConfigName(appName)
+	v.SetConfigName(configName)
 	v.SetConfigType("yaml")
 	v.AddConfigPath(path)
 
@@ -49,10 +50,10 @@ func init() {
 	v := viper.New()
 
 	// Define command-line flags and default values
-	pflag.StringP("base-url", "b", "", "Address to which API will bind and start listening")
-	pflag.StringP("bind-address", "l", ":1234", "Base URL (useful if being proxied through something like nginx). Value needs to be full URL up to the application (e.g. https://braize.pajlada.com/chatterino)")
-	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size (in bytes) - requests with body bigger than this value will be skipped")
-	pflag.Bool("enable-lilliput", true, "When enabled, will attempt to use lilliput library for building animated thumbnails. Could increase memory usage by a lot.")
+	pflag.StringP("base-url", "b", "", "Base URL to which clients will make their requests. Useful if the API is proxied through reverse proxy like nginx. Value needs to contain full URL with protocol scheme, e.g. https://braize.pajlada.com/chatterino")
+	pflag.StringP("bind-address", "l", ":1234", "Address to which API will bind and start listening on")
+	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size in bytes - requests with body bigger than this value will be skipped")
+	pflag.Bool("enable-lilliput", true, "When enabled, will attempt to use lilliput library for building animated thumbnails. Can increase memory usage by a lot")
 	pflag.String("discord-token", "", "Discord token")
 	pflag.String("twitch-client-id", "", "Twitch client ID")
 	pflag.String("twitch-client-secret", "", "Twitch client secret")
@@ -68,19 +69,19 @@ func init() {
 	// figure out XDG_DATA_CONFIG to be compliant with the standard
 	xdgConfigHome, exists := os.LookupEnv("XDG_CONFIG_HOME")
 	if !exists || xdgConfigHome == "" {
-		xdgConfigHome = fmt.Sprintf("$HOME/.config/%s", appName)
+		xdgConfigHome = "$HOME/.config"
 	}
 
 	// config paths to read from, in order of least importance
 	configPaths := []string{
-		"/etc",
-		xdgConfigHome,
+		fmt.Sprintf("/etc/%s", appName),
+		fmt.Sprintf("%s/%s", xdgConfigHome, appName),
 		".",
 	}
 
 	for _, configPath := range configPaths {
 		if configMap, err := readFromPath(configPath); err != nil {
-			fmt.Printf("Error reading config file from %s/%s.yaml: %s\n", configPath, appName, err)
+			fmt.Printf("Error reading config file from %s/%s.yaml: %s\n", configPath, configName, err)
 			return
 		} else {
 			v.MergeConfigMap(configMap)
@@ -88,7 +89,6 @@ func init() {
 	}
 
 	// Environment
-	//V.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // will be useful once we have nested keys
 	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	v.SetEnvPrefix(envPrefix)
 	v.AutomaticEnv()
@@ -96,5 +96,5 @@ func init() {
 	// Print config
 	v.UnmarshalExact(&Cfg)
 
-	fmt.Printf("%# v\n", Cfg)
+	fmt.Printf("%# v\n", Cfg) // uncomment for debugging purposes
 }
