@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -69,13 +70,13 @@ func init() {
 	// figure out XDG_DATA_CONFIG to be compliant with the standard
 	xdgConfigHome, exists := os.LookupEnv("XDG_CONFIG_HOME")
 	if !exists || xdgConfigHome == "" {
-		xdgConfigHome = "$HOME/.config"
+		xdgConfigHome = filepath.Join("$HOME", ".config")
 	}
 
 	// config paths to read from, in order of least importance
 	configPaths := []string{
-		fmt.Sprintf("/etc/%s", appName),
-		fmt.Sprintf("%s/%s", xdgConfigHome, appName),
+		filepath.Join("/etc", appName),
+		filepath.Join(xdgConfigHome, appName),
 		".",
 	}
 
