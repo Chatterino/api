@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -70,7 +71,12 @@ func init() {
 	// figure out XDG_DATA_CONFIG to be compliant with the standard
 	xdgConfigHome, exists := os.LookupEnv("XDG_CONFIG_HOME")
 	if !exists || xdgConfigHome == "" {
-		xdgConfigHome = filepath.Join("$HOME", ".config")
+		// on Windows, we use appdata since that's the closest equivalent
+		if runtime.GOOS == "windows" {
+			xdgConfigHome = "$APPDATA"
+		} else {
+			xdgConfigHome = filepath.Join("$HOME", ".config")
+		}
 	}
 
 	// config paths to read from, in order of least importance
