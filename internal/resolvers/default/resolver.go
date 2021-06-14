@@ -18,6 +18,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/wikipedia"
 	"github.com/Chatterino/api/internal/resolvers/youtube"
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/Chatterino/api/pkg/utils"
@@ -40,7 +41,7 @@ var (
 )
 
 type R struct {
-	baseURL string
+	cfg config.APIConfig
 
 	customResolvers []resolver.CustomURLManager
 
@@ -85,9 +86,9 @@ func (dr *R) HandleThumbnailRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func New(baseURL string) *R {
+func New(cfg config.APIConfig) *R {
 	r := &R{
-		baseURL: baseURL,
+		cfg: cfg,
 	}
 
 	r.defaultResolverCache = cache.New("linkResolver", r.load, 10*time.Minute)
@@ -109,8 +110,8 @@ func New(baseURL string) *R {
 	return r
 }
 
-func Initialize(router *chi.Mux, baseURL string) {
-	defaultLinkResolver := New(baseURL)
+func Initialize(router *chi.Mux, cfg config.APIConfig) {
+	defaultLinkResolver := New(cfg)
 
 	router.Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
 	router.Get("/thumbnail/{url}", defaultLinkResolver.HandleThumbnailRequest)

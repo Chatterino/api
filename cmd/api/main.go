@@ -17,17 +17,19 @@ var (
 	}
 	startTime = time.Now()
 
+	cfg = config.New()
+
 	prefix string
 )
 
 func mountRouter(r *chi.Mux) *chi.Mux {
-	if config.Cfg.BaseURL == "" {
-		log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", config.Cfg.BindAddress, prefix, config.Cfg.BaseURL)
+	if cfg.BaseURL == "" {
+		log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", cfg.BindAddress, prefix, cfg.BaseURL)
 		return r
 	}
 
 	// figure out prefix from address
-	u, err := url.Parse(config.Cfg.BaseURL)
+	u, err := url.Parse(cfg.BaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,7 +41,7 @@ func mountRouter(r *chi.Mux) *chi.Mux {
 	ur := chi.NewRouter()
 	ur.Mount(prefix, r)
 
-	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", config.Cfg.BindAddress, prefix, config.Cfg.BaseURL)
+	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", cfg.BindAddress, prefix, cfg.BaseURL)
 
 	return ur
 }
@@ -60,7 +62,7 @@ func main() {
 
 	handleTwitchEmotes(router)
 	handleHealth(router)
-	defaultresolver.Initialize(router, config.Cfg.BaseURL)
+	defaultresolver.Initialize(router, cfg)
 
-	listen(config.Cfg.BindAddress, mountRouter(router))
+	listen(cfg.BindAddress, mountRouter(router))
 }
