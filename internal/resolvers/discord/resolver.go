@@ -41,14 +41,17 @@ var (
 	errInvalidDiscordInvite = errors.New("invalid Discord invite Path")
 
 	discordInviteTemplate = template.Must(template.New("discordInviteTooltip").Parse(discordInviteTooltip))
+
+	token string
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Bot authentication is required for higher ratelimit (250 requests/5s)
-	if config.Cfg.DiscordToken == "" {
+	if cfg.DiscordToken == "" {
 		log.Println("No CHATTERINO_API_DISCORD_TOKEN specified, won't do special responses for Discord invites")
 		return
 	}
+	token = cfg.DiscordToken
 
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
 	resolvers = append(resolvers, resolver.CustomURLManager{

@@ -33,17 +33,17 @@ var (
 	oEmbed = oembed.NewOembed()
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 
-	data, err := ioutil.ReadFile(config.Cfg.OembedProvidersPath)
+	data, err := ioutil.ReadFile(cfg.OembedProvidersPath)
 
 	if err != nil {
 		log.Println("[oEmbed] No providers.json file found, won't do oEmbed parsing")
 		return
 	}
 
-	if config.Cfg.OembedFacebookAppID != "" && config.Cfg.OembedFacebookAppSecret != "" {
-		if err := initFacebookAppAccessToken(); err != nil {
+	if cfg.OembedFacebookAppID != "" && cfg.OembedFacebookAppSecret != "" {
+		if err := initFacebookAppAccessToken(cfg.OembedFacebookAppID, cfg.OembedFacebookAppSecret); err != nil {
 			log.Println("[oEmbed] error loading facebook app access token", err)
 		} else {
 			log.Println("[oEmbed] Extra rich info loading enabled for Instagram and Facebook")

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -37,7 +38,7 @@ var (
 	trackPathRegex = regexp.MustCompile(`/track/detail/([0-9]+)`)
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Find links matching the Track list link (e.g. https://supinic.com/track/detail/1883)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

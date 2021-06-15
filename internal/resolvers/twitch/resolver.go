@@ -41,13 +41,13 @@ var (
 	helixAPI TwitchAPIClient
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	if config.Cfg.TwitchClientID == "" {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	if cfg.TwitchClientID == "" {
 		log.Println("No CHATTERINO_API_TWITCH_CLIENT_ID specified, won't do special responses for Twitch clips")
 		return
 	}
 
-	if config.Cfg.TwitchClientSecret == "" {
+	if cfg.TwitchClientSecret == "" {
 		log.Println("No CHATTERINO_API_TWITCH_CLIENT_SECRET specified, won't do special responses for Twitch clips")
 		return
 	}
@@ -55,8 +55,8 @@ func New() (resolvers []resolver.CustomURLManager) {
 	var err error
 
 	helixAPI, err = helix.NewClient(&helix.Options{
-		ClientID:     config.Cfg.TwitchClientID,
-		ClientSecret: config.Cfg.TwitchClientSecret,
+		ClientID:     cfg.TwitchClientID,
+		ClientSecret: cfg.TwitchClientSecret,
 	})
 
 	if err != nil {

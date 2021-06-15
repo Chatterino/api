@@ -38,15 +38,15 @@ var (
 	youtubeTooltipTemplate = template.Must(template.New("youtubeTooltip").Parse(youtubeTooltip))
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	if config.Cfg.YoutubeApiKey == "" {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	if cfg.YoutubeApiKey == "" {
 		log.Println("No YOUTUBE_API_KEY specified, won't do special responses for youtube")
 		return
 	}
 
 	ctx := context.Background()
 	var err error
-	if youtubeClient, err = youtubeAPI.NewService(ctx, option.WithAPIKey(config.Cfg.YoutubeApiKey)); err != nil {
+	if youtubeClient, err = youtubeAPI.NewService(ctx, option.WithAPIKey(cfg.YoutubeApiKey)); err != nil {
 		log.Println("Error initialization youtube api client:", err)
 		return
 	}

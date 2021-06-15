@@ -6,23 +6,21 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-
-	"github.com/Chatterino/api/pkg/config"
 )
 
 var (
 	facebookAppAccessToken string
 )
 
-func initFacebookAppAccessToken() error {
+func initFacebookAppAccessToken(appID string, appSecret string) error {
 	u, err := url.Parse("https://graph.facebook.com/oauth/access_token")
 	if err != nil {
 		return err
 	}
 
 	queryVariables := url.Values{}
-	queryVariables.Set("client_id", config.Cfg.OembedFacebookAppID)
-	queryVariables.Set("client_secret", config.Cfg.OembedFacebookAppSecret)
+	queryVariables.Set("client_id", appID)
+	queryVariables.Set("client_secret", appSecret)
 	queryVariables.Set("grant_type", "client_credentials")
 
 	u.RawQuery = queryVariables.Encode()

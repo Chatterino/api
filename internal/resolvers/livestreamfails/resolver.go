@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 )
@@ -40,7 +41,7 @@ var (
 	errInvalidPath = errors.New("invalid livestreamfails clips path")
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Find clips that look like https://livestreamfails.com/clip/IdHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {

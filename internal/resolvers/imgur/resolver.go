@@ -31,8 +31,8 @@ var (
 	apiClient ImgurClient
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	if config.Cfg.ImgurClientID == "" {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	if cfg.ImgurClientID == "" {
 		log.Println("No CHATTERINO_API_IMGUR_CLIENT_ID specified, won't do special responses for imgur")
 		return
 	}
@@ -40,7 +40,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 	apiClient = &imgur.Client{
 		HTTPClient:    resolver.HTTPClient(),
 		Log:           &NullLogger{},
-		ImgurClientID: config.Cfg.ImgurClientID,
+		ImgurClientID: cfg.ImgurClientID,
 		RapidAPIKEY:   "",
 	}
 
