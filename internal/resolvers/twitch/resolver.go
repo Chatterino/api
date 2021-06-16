@@ -3,12 +3,10 @@
 package twitch
 
 import (
-	"encoding/json"
+	"errors"
 	"html/template"
 	"log"
-	"net/http"
-	"net/url"
-	"strings"
+	"regexp"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -33,6 +31,11 @@ const (
 )
 
 var (
+	// https://regex101.com/r/vNC06Q/1
+	twitchClipURLRegex = regexp.MustCompile(`^(twitch\.tv\/\w{2,25}\/clip|clips\.twitch\.tv)\/([a-zA-Z0-9]+(-[-\w]{16})?)$`)
+
+	errInvalidTwitchClip = errors.New("invalid Twitch clip link")
+
 	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
 
 	clipCache = cache.New("twitchclip", load, 1*time.Hour)
@@ -73,36 +76,9 @@ func New() (resolvers []resolver.CustomURLManager) {
 
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
-		Check: func(url *url.URL) bool {
-			return utils.IsDomain(url, "clips.twitch.tv")
-		},
-		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
-			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
-			clipSlug := pathParts[0]
+		Check: check,
 
-			apiResponse := clipCache.Get(clipSlug, r)
-			return json.Marshal(apiResponse)
-		},
-	})
-
-	// Find clips that look like https://twitch.tv/StreamerName/clip/SlugHere
-	resolvers = append(resolvers, resolver.CustomURLManager{
-		Check: func(url *url.URL) bool {
-			if !strings.HasSuffix(url.Host, "twitch.tv") {
-				return false
-			}
-
-			pathParts := strings.Split(url.Path, "/")
-
-			return len(pathParts) >= 4 && pathParts[2] == "clip"
-		},
-		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
-			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
-			clipSlug := pathParts[2]
-
-			apiResponse := clipCache.Get(clipSlug, r)
-			return json.Marshal(apiResponse)
-		},
+		Run: run,
 	})
 
 	return
