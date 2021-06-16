@@ -1,7 +1,6 @@
 package twitch
 
 import (
-	"fmt"
 	"net/url"
 	"regexp"
 
