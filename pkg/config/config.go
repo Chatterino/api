@@ -50,7 +50,7 @@ func readFromPath(path string) (values map[string]interface{}, err error) {
 func mergeConfig(v *viper.Viper, configPaths []string) {
 	for _, configPath := range configPaths {
 		if configMap, err := readFromPath(configPath); err != nil {
-			fmt.Printf("Error reading config file from %s/%s.yaml: %s\n", configPath, configName, err)
+			fmt.Printf("Error reading config file from %s.yaml: %s\n", filepath.Join(configPath, configName), err)
 			return
 		} else {
 			v.MergeConfigMap(configMap)
