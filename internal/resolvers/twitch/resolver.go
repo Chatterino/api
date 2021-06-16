@@ -43,12 +43,12 @@ var (
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	if cfg.TwitchClientID == "" {
-		log.Println("No CHATTERINO_API_TWITCH_CLIENT_ID specified, won't do special responses for Twitch clips")
+		log.Println("[Config] twitch_client_id is missing, won't do special responses for Twitch clips")
 		return
 	}
 
 	if cfg.TwitchClientSecret == "" {
-		log.Println("No CHATTERINO_API_TWITCH_CLIENT_SECRET specified, won't do special responses for Twitch clips")
+		log.Println("[Config] twitch_client_secret is missing, won't do special responses for Twitch clips")
 		return
 	}
 

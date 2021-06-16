@@ -48,7 +48,7 @@ var (
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Bot authentication is required for higher ratelimit (250 requests/5s)
 	if cfg.DiscordToken == "" {
-		log.Println("No CHATTERINO_API_DISCORD_TOKEN specified, won't do special responses for Discord invites")
+		log.Println("[Config] discord-token is missing, won't do special responses for Discord invites")
 		return
 	}
 	token = cfg.DiscordToken

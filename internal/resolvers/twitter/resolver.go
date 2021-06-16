@@ -47,7 +47,7 @@ var (
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	if cfg.TwitterBearerToken == "" {
-		log.Println("No CHATTERINO_API_TWITTER_BEARER_TOKEN specified, won't do special responses for twitter")
+		log.Println("[Config] twitter-bearer-token is missing, won't do special responses for twitter")
 		return
 	}
 	bearerKey = cfg.TwitterBearerToken

@@ -33,7 +33,7 @@ var (
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	if cfg.ImgurClientID == "" {
-		log.Println("No CHATTERINO_API_IMGUR_CLIENT_ID specified, won't do special responses for imgur")
+		log.Println("[Config] imgur-client-id is missing, won't do special responses for imgur")
 		return
 	}
 

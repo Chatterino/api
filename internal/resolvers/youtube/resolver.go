@@ -40,7 +40,7 @@ var (
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	if cfg.YoutubeApiKey == "" {
-		log.Println("No YOUTUBE_API_KEY specified, won't do special responses for youtube")
+		log.Println("[Config] youtube-api-key is missing, won't do special responses for youtube")
 		return
 	}
 
