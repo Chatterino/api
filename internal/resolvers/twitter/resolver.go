@@ -1,12 +1,10 @@
 package twitter
 
 import (
-	"os"
-	"time"
-
 	"log"
 	"regexp"
 	"text/template"
+	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
