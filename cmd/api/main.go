@@ -9,6 +9,7 @@ import (
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -60,6 +61,7 @@ func listen(bind string, router *chi.Mux) {
 
 func main() {
 	resolver.InitializeStaticResponses(cfg)
+	thumbnail.InitializeConfig(cfg)
 
 	router := chi.NewRouter()
 

@@ -18,10 +18,6 @@ const (
 	configName = "config"
 )
 
-var (
-	Cfg APIConfig
-)
-
 // readFromPath reads the config values from the given path (i.e. path/${configName}.yaml) and returns its values as a map.
 // This allows us to use mergeConfig cleanly
 func readFromPath(path string) (values map[string]interface{}, err error) {
@@ -80,7 +76,7 @@ func init() {
 	pflag.Parse()
 }
 
-func New() APIConfig {
+func New() (cfg APIConfig) {
 	v := viper.New()
 
 	v.BindPFlags(pflag.CommandLine)
@@ -110,10 +106,8 @@ func New() APIConfig {
 	v.SetEnvPrefix(envPrefix)
 	v.AutomaticEnv()
 
-	var cfg APIConfig
 	v.UnmarshalExact(&cfg)
 
 	fmt.Printf("%# v\n", cfg) // uncomment for debugging purposes
-	Cfg = cfg
-	return cfg
+	return
 }

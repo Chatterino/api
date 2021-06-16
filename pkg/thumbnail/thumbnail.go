@@ -24,12 +24,18 @@ import (
 
 var (
 	supportedThumbnails = []string{"image/jpeg", "image/png", "image/gif", "image/webp"}
+
+	cfg config.APIConfig
 )
 
 const (
 	// max width or height the thumbnail will be resized to
 	maxThumbnailSize = 300
 )
+
+func InitializeConfig(passedCfg config.APIConfig) {
+	cfg = passedCfg
+}
 
 // buildStaticThumbnailByteArray is used when we fail to build an animated thumbnail using lilliput
 func buildStaticThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, error) {
@@ -79,7 +85,7 @@ func DoThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 		if err != nil {
 			return nil, cache.NoSpecialDur, err
 		}
-		if uint64(contentLengthBytes) > config.Cfg.MaxContentLength {
+		if uint64(contentLengthBytes) > cfg.MaxContentLength {
 			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}
@@ -101,12 +107,12 @@ func DoThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 
 	var image []byte
 	// attempt building an animated image
-	if config.Cfg.EnableLilliput {
+	if cfg.EnableLilliput {
 		image, err = buildThumbnailByteArray(inputBuf, resp)
 	}
 
 	// fallback to static image if animated image building failed or is disabled
-	if !config.Cfg.EnableLilliput || err != nil {
+	if !cfg.EnableLilliput || err != nil {
 		if err != nil {
 			log.Println("Error trying to build animated thumbnail:", err.Error(), "falling back to static thumbnail building")
 		}
