@@ -16,7 +16,7 @@ var (
 	ResponseTooLarge []byte
 )
 
-func init() {
+func InitializeStaticResponses(cfg config.APIConfig) {
 	var err error
 	r := &Response{
 		Status:  404,
@@ -41,7 +41,7 @@ func init() {
 
 	r = &Response{
 		Status:  http.StatusInternalServerError,
-		Message: fmt.Sprintf("Could not fetch link info: Response too large (>%dMB)", config.Cfg.MaxContentLength/1024/1024),
+		Message: fmt.Sprintf("Could not fetch link info: Response too large (>%dMB)", cfg.MaxContentLength/1024/1024),
 	}
 	ResponseTooLarge, err = json.Marshal(r)
 	if err != nil {
