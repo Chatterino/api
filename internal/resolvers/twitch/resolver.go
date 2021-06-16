@@ -70,7 +70,6 @@ func New() (resolvers []resolver.CustomURLManager) {
 	go initAppAccessToken(helixAPI.(*helix.Client), waitForFirstAppAccessToken)
 	<-waitForFirstAppAccessToken
 
-	// Find clips that look like https://clips.twitch.tv/SlugHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,
 
