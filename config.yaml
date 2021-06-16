@@ -35,4 +35,4 @@
 #oembed-facebook-app-secret: ""
 
 # Path to a json file containing supported oEmbed resolvers
-#oembed-providers-path: "./providers.json"
+#oembed-providers-path: "./data/oembed/providers.json"
