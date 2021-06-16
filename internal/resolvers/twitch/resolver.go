@@ -6,7 +6,6 @@ import (
 	"errors"
 	"html/template"
 	"log"
-	"regexp"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -31,9 +30,6 @@ const (
 )
 
 var (
-	// https://regex101.com/r/vNC06Q/1
-	twitchClipURLRegex = regexp.MustCompile(`^(twitch\.tv\/\w{2,25}\/clip|clips\.twitch\.tv)\/([a-zA-Z0-9]+(-[-\w]{16})?)$`)
-
 	errInvalidTwitchClip = errors.New("invalid Twitch clip link")
 
 	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
