@@ -22,21 +22,13 @@ func check(url *url.URL) bool {
 	// Find clips that look like https://clips.twitch.tv/SlugHere
 	if utils.IsDomain(url, "clips.twitch.tv") {
 		// matches[1] contains "StreamerName/clip/" - we don't want it in this check though
-		if matches[1] != "" {
-			return false
-		}
-
-		return true
+		return matches[1] == ""
 	}
 
 	// Find clips that look like https://twitch.tv/StreamerName/clip/SlugHere
 	if utils.IsDomain(url, "twitch.tv") {
-		// matches[1] contains "StreamerName/clip/" - we need this in this check though
-		if matches[1] == "" {
-			return false
-		}
-
-		return true
+		// matches[1] contains "StreamerName/clip/" - we need it in this check
+		return matches[1] != ""
 	}
 
 	return false
