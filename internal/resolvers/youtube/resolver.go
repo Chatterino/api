@@ -47,6 +47,8 @@ var (
 
 	youtubeVideoTooltipTemplate = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
 	youtubeChannelTooltipTemplate = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
+
+	youtubeChannelRegex = regexp.MustCompile(`/(user|c(hannel)?)/[\w._\-']+`)
 )
 
 func New() (resolvers []resolver.CustomURLManager) {
@@ -66,8 +68,8 @@ func New() (resolvers []resolver.CustomURLManager) {
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		// TODO(jammeh): handle channels where channel/user segment doesn't exist (e.g. https://www.youtube.com/tranceluv)
 		Check: func(url *url.URL) bool {
-			matches, regexErr := regexp.MatchString(`/(user|c(hannel)?)/[\w._\-']+`, url.Path)
-			return utils.IsSubdomainOf(url, "youtube.com") && regexErr == nil && matches
+			matches := youtubeChannelRegex.MatchString(url.Path)
+			return utils.IsSubdomainOf(url, "youtube.com")  && matches
 		},
 		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			channelID := getYoutubeChannelIdFromURL(url)
