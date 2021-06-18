@@ -16,3 +16,8 @@ type youtubeChannelTooltipData struct {
 	Subscribers  string
 	Views        string
 }
+
+type ChannelId struct {
+	id string
+	channelType ChannelType
+}

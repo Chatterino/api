@@ -19,11 +19,6 @@ const (
 	CustomChannel = "c"
 )
 
-type ChannelId struct {
-	id string
-	channelType ChannelType
-}
-
 func getYoutubeVideoIDFromURL(url *url.URL) string {
 	if strings.Contains(url.Path, "embed") {
 		return path.Base(url.Path)
