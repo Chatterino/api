@@ -6,7 +6,7 @@ type TooltipData struct {
 	NSFW         bool
 	Title        string
 	Category     string
-	RedditScore  int
+	RedditScore  string
 	Platform     string
 	StreamerName string
 	CreationDate string

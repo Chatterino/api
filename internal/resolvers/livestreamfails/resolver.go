@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"html/template"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
@@ -53,11 +54,11 @@ func New() (resolvers []resolver.CustomURLManager) {
 
 			return true
 		},
-		Run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipId := pathParts[1]
 
-			apiResponse := clipCache.Get(clipId, nil)
+			apiResponse := clipCache.Get(clipId, r)
 			return json.Marshal(apiResponse)
 		},
 	})
