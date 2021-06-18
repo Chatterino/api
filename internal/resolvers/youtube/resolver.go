@@ -69,7 +69,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 			matches, regexErr := regexp.MatchString(`/(user|c(hannel)?)/.+`, url.Path)
 			return utils.IsSubdomainOf(url, "youtube.com") && regexErr == nil && matches
 		},
-		Run: func(url *url.URL) ([]byte, error) {
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			channelID := getYoutubeChannelIdFromURL(url)
 
 			if channelID.channelType == InvalidChannel {
@@ -78,7 +78,7 @@ func New() (resolvers []resolver.CustomURLManager) {
 
 			// TODO: cache key as channel/id for loading
 			channelCacheKey := constructCacheKeyFromChannelId(channelID)
-			apiResponse := channelCache.Get(channelCacheKey, nil)
+			apiResponse := channelCache.Get(channelCacheKey, r)
 			return json.Marshal(apiResponse)
 		},
 	})
