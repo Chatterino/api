@@ -10,7 +10,7 @@ Chatterino API will attempt reading config file in the following paths:
  - `$XDG_CONFIG_HOME` (default: `~/.config/chatterino-api/` or `%APPDATA\chatterino-api\` on Windows)
  - current working directory
 
-The [default config file](https://github.com/Chatterino/api/blob/master/config.yaml) has default values. Copy it, uncoumment and change values as needed.
+The [default config file](https://github.com/Chatterino/api/blob/master/config.yaml) has default values. Copy it, uncomment and change values as needed.
 
 
 ## Environment variables
