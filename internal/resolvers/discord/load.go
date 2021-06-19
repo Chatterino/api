@@ -22,7 +22,7 @@ func load(inviteCode string, r *http.Request) (interface{}, time.Duration, error
 	log.Println("[DiscordInvite] GET", inviteCode)
 	apiURL := fmt.Sprintf(discordInviteAPIURL, inviteCode)
 	extraHeaders := map[string]string{
-		"Authorization": fmt.Sprintf("Bot %s", discordToken),
+		"Authorization": fmt.Sprintf("Bot %s", token),
 	}
 
 	// Execute Discord API request
