@@ -17,7 +17,7 @@
 # Discord token, provides rich information for Discord invite links
 #discord-token: ""
 
-# Twitch client ID and Twitch client secret, provide rich information for Twitch Clips
+# Twitch Developer Application client ID and Twitch Developer Application client secret, provide rich information for Twitch Clips
 #twitch-client-id: ""
 #twitch-client-secret: ""
 
