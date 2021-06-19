@@ -93,11 +93,12 @@ func New() (cfg APIConfig) {
 	}
 
 	// config paths to read from, in order of least importance
-	configPaths := []string{
-		filepath.Join("/etc", appName),
-		filepath.Join(xdgConfigHome, appName),
-		".",
+	var configPaths []string
+	if runtime.GOOS != "windows" {
+		configPaths = append(configPaths, filepath.Join("/etc", appName))
 	}
+	configPaths = append(configPaths, filepath.Join(xdgConfigHome, appName))
+	configPaths = append(configPaths, ".")
 
 	mergeConfig(v, configPaths)
 
@@ -108,6 +109,6 @@ func New() (cfg APIConfig) {
 
 	v.UnmarshalExact(&cfg)
 
-	fmt.Printf("%# v\n", cfg) // uncomment for debugging purposes
+	//fmt.Printf("%# v\n", cfg) // uncomment for debugging purposes
 	return
 }

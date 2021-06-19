@@ -5,10 +5,12 @@ Chatterino API's configuration is manageable via config files, environment varia
 
 ## Config files
 
-Chatterino API will attempt reading config file in the following paths:
- - `/etc/chatterino-api/`
- - `$XDG_CONFIG_HOME` (default: `~/.config/chatterino-api/` or `%APPDATA\chatterino-api\` on Windows)
- - current working directory
+Chatterino API will attempt reading config file from the following paths:
+ - `/etc/chatterino-api/config.yaml`
+ - `$XDG_CONFIG_HOME` (default: `~/.config/chatterino-api/config.yaml` or `%APPDATA%\chatterino-api\config.yaml` on Windows)
+ - current working directory (`./config.yaml`)
+
+The values from each file is merged. Each subsequent read overrides previously set values (i.e. current working directory config file has priority over `$XDG_CONFIG_HOME` config file.
 
 The [default config file](https://github.com/Chatterino/api/blob/master/config.yaml) has default values. Copy it, uncomment and change values as needed.
 
