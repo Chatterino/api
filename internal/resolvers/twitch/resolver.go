@@ -11,7 +11,6 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/Chatterino/api/pkg/utils"
 	"github.com/nicklaw5/helix"
 )
 
