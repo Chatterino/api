@@ -9,13 +9,15 @@ import (
 	"testing"
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/go-chi/chi/v5"
 )
 
 func TestResolveTwitchClip(t *testing.T) {
 	router := chi.NewRouter()
-	defaultresolver.Initialize(router, "")
+	cfg := config.New()
+	defaultresolver.Initialize(router, cfg)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	fmt.Println(ts.URL)
@@ -42,7 +44,8 @@ func TestResolveTwitchClip(t *testing.T) {
 
 func TestResolveTwitchClip2(t *testing.T) {
 	router := chi.NewRouter()
-	defaultresolver.Initialize(router, "")
+	cfg := config.New()
+	defaultresolver.Initialize(router, cfg)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	const url = `https%3A%2F%2Ftwitch.tv%2Fpajlada%2Fclip%2FGorgeousAntsyPizzaSaltBae`

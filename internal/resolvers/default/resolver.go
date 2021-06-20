@@ -18,6 +18,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/wikipedia"
 	"github.com/Chatterino/api/internal/resolvers/youtube"
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/Chatterino/api/pkg/utils"
@@ -40,7 +41,7 @@ var (
 )
 
 type R struct {
-	baseURL string
+	cfg config.APIConfig
 
 	customResolvers []resolver.CustomURLManager
 
@@ -85,32 +86,32 @@ func (dr *R) HandleThumbnailRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func New(baseURL string) *R {
+func New(cfg config.APIConfig) *R {
 	r := &R{
-		baseURL: baseURL,
+		cfg: cfg,
 	}
 
 	r.defaultResolverCache = cache.New("linkResolver", r.load, 10*time.Minute)
 	r.defaultResolverThumbnailCache = cache.New("thumbnail", thumbnail.DoThumbnailRequest, 10*time.Minute)
 
 	// Register Link Resolvers from internal/resolvers/
-	r.customResolvers = append(r.customResolvers, betterttv.New()...)
-	r.customResolvers = append(r.customResolvers, frankerfacez.New()...)
-	r.customResolvers = append(r.customResolvers, twitter.New()...)
-	r.customResolvers = append(r.customResolvers, discord.New()...)
-	r.customResolvers = append(r.customResolvers, youtube.New()...)
-	r.customResolvers = append(r.customResolvers, supinic.New()...)
-	r.customResolvers = append(r.customResolvers, twitch.New()...)
-	r.customResolvers = append(r.customResolvers, imgur.New()...)
-	r.customResolvers = append(r.customResolvers, wikipedia.New()...)
-	r.customResolvers = append(r.customResolvers, livestreamfails.New()...)
-	r.customResolvers = append(r.customResolvers, oembed.New()...)
+	r.customResolvers = append(r.customResolvers, betterttv.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, discord.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, frankerfacez.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, imgur.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, livestreamfails.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, oembed.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, supinic.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, twitch.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, twitter.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, wikipedia.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, youtube.New(cfg)...)
 
 	return r
 }
 
-func Initialize(router *chi.Mux, baseURL string) {
-	defaultLinkResolver := New(baseURL)
+func Initialize(router *chi.Mux, cfg config.APIConfig) {
+	defaultLinkResolver := New(cfg)
 
 	router.Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
 	router.Get("/thumbnail/{url}", defaultLinkResolver.HandleThumbnailRequest)

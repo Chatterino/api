@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -37,7 +38,7 @@ var (
 	errInvalidFrankerFaceZEmotePath = errors.New("invalid FrankerFaceZ emote path")
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,
 

@@ -6,12 +6,12 @@ package imgur
 
 import (
 	"html/template"
-	"os"
 	"time"
 
 	"log"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/koffeinsource/go-imgur"
 )
@@ -31,19 +31,16 @@ var (
 	apiClient ImgurClient
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	var clientID string
-	var exists bool
-
-	if clientID, exists = os.LookupEnv("CHATTERINO_API_IMGUR_CLIENT_ID"); !exists {
-		log.Println("No CHATTERINO_API_IMGUR_CLIENT_ID specified, won't do special responses for imgur")
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	if cfg.ImgurClientID == "" {
+		log.Println("[Config] imgur-client-id is missing, won't do special responses for imgur")
 		return
 	}
 
 	apiClient = &imgur.Client{
 		HTTPClient:    resolver.HTTPClient(),
 		Log:           &NullLogger{},
-		ImgurClientID: clientID,
+		ImgurClientID: cfg.ImgurClientID,
 		RapidAPIKEY:   "",
 	}
 

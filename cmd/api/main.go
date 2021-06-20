@@ -1,14 +1,15 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
 	"net/url"
 	"time"
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
-	"github.com/Chatterino/api/pkg/utils"
+	"github.com/Chatterino/api/pkg/config"
+	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -18,53 +19,19 @@ var (
 	}
 	startTime = time.Now()
 
-	bind    = flag.String("l", ":1234", "bind address")
-	baseURL = flag.String("b", "", "base url (useful if being proxied through something like nginx). Value needs to be full url up to the application (e.g. https://braize.pajlada.com/chatterino)")
+	cfg = config.New()
 
 	prefix string
 )
 
-func BaseURL() string {
-	if *baseURL != "" {
-		return *baseURL
-	}
-
-	if value, exists := utils.LookupEnv("BASE_URL"); exists {
-		return value
-	}
-
-	return ""
-}
-
-func isFlagPassed(name string) bool {
-	found := false
-	flag.Visit(func(f *flag.Flag) {
-		if f.Name == name {
-			found = true
-		}
-	})
-	return found
-}
-
-func BindAddress() string {
-	if isFlagPassed("l") {
-		return *bind
-	}
-
-	if value, exists := utils.LookupEnv("BIND_ADDRESS"); exists {
-		return value
-	}
-
-	return ":1234"
-}
-
 func mountRouter(r *chi.Mux) *chi.Mux {
-	if BaseURL() == "" {
+	if cfg.BaseURL == "" {
+		log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", cfg.BindAddress, prefix, cfg.BaseURL)
 		return r
 	}
 
 	// figure out prefix from address
-	u, err := url.Parse(BaseURL())
+	u, err := url.Parse(cfg.BaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,7 +43,7 @@ func mountRouter(r *chi.Mux) *chi.Mux {
 	ur := chi.NewRouter()
 	ur.Mount(prefix, r)
 
-	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", BindAddress(), prefix, BaseURL())
+	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", cfg.BindAddress, prefix, cfg.BaseURL)
 
 	return ur
 }
@@ -93,16 +60,14 @@ func listen(bind string, router *chi.Mux) {
 }
 
 func main() {
-	flag.Parse()
-
-	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", BindAddress(), prefix, BaseURL())
+	resolver.InitializeStaticResponses(cfg)
+	thumbnail.InitializeConfig(cfg)
 
 	router := chi.NewRouter()
 
 	handleTwitchEmotes(router)
 	handleHealth(router)
+	defaultresolver.Initialize(router, cfg)
 
-	defaultresolver.Initialize(router, BaseURL())
-
-	listen(BindAddress(), mountRouter(router))
+	listen(cfg.BindAddress, mountRouter(router))
 }

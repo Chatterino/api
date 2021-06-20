@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/nicklaw5/helix"
@@ -39,25 +40,22 @@ var (
 	helixAPI TwitchAPIClient
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	clientID, existsClientID := utils.LookupEnv("TWITCH_CLIENT_ID")
-	clientSecret, existsClientSecret := utils.LookupEnv("TWITCH_CLIENT_SECRET")
-
-	if !existsClientID {
-		log.Println("No CHATTERINO_API_TWITCH_CLIENT_ID specified, won't do special responses for Twitch clips")
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	if cfg.TwitchClientID == "" {
+		log.Println("[Config] twitch_client_id is missing, won't do special responses for Twitch clips")
 		return
 	}
 
-	if !existsClientSecret {
-		log.Println("No CHATTERINO_API_TWITCH_CLIENT_SECRET specified, won't do special responses for Twitch clips")
+	if cfg.TwitchClientSecret == "" {
+		log.Println("[Config] twitch_client_secret is missing, won't do special responses for Twitch clips")
 		return
 	}
 
 	var err error
 
 	helixAPI, err = helix.NewClient(&helix.Options{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
+		ClientID:     cfg.TwitchClientID,
+		ClientSecret: cfg.TwitchClientSecret,
 	})
 
 	if err != nil {
