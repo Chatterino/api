@@ -71,7 +71,7 @@ func main() {
 		log.Printf("[Twitch] %s\n", err.Error())
 	}
 
-	handleTwitchEmotes(router)
+	handleTwitchEmotes(router, helixClient)
 	handleHealth(router)
 	defaultresolver.Initialize(router, cfg, helixClient)
 
