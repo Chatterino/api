@@ -9,7 +9,7 @@ import (
 func run(url *url.URL, r *http.Request) ([]byte, error) {
 	matches := clipSlugRegex.FindStringSubmatch(url.Path)
 
-	if len(matches) != 4 {
+	if len(matches) != 3 {
 		return nil, errInvalidTwitchClip
 	}
 

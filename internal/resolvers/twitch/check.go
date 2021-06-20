@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	clipSlugRegex = regexp.MustCompile(`^\/(\w{2,25}\/clip\/)?([a-zA-Z0-9]+(-[-\w]{16})?)$`)
+	clipSlugRegex = regexp.MustCompile(`^\/(\w{2,25}\/clip\/)?([a-zA-Z0-9]+(?:-[-\w]{16})?)$`)
 )
 
 func check(url *url.URL) bool {
 	// Regardless of domain path needs to match anyway, so we do it here to avoid duplication
 	matches := clipSlugRegex.FindStringSubmatch(url.Path)
 
-	if len(matches) != 4 {
+	if len(matches) != 3 {
 		return false
 	}
 
