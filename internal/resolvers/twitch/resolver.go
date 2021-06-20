@@ -39,33 +39,13 @@ var (
 	helixAPI TwitchAPIClient
 )
 
-func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
-	if cfg.TwitchClientID == "" {
-		log.Println("[Config] twitch_client_id is missing, won't do special responses for Twitch clips")
+func New(cfg config.APIConfig, helixClient *helix.Client) (resolvers []resolver.CustomURLManager) {
+	if helixClient == nil {
+		log.Println("[Config] No Helix Client passed to New - won't do special responses for Twitch clips")
 		return
 	}
 
-	if cfg.TwitchClientSecret == "" {
-		log.Println("[Config] twitch_client_secret is missing, won't do special responses for Twitch clips")
-		return
-	}
-
-	var err error
-
-	helixAPI, err = helix.NewClient(&helix.Options{
-		ClientID:     cfg.TwitchClientID,
-		ClientSecret: cfg.TwitchClientSecret,
-	})
-
-	if err != nil {
-		log.Fatalf("[Helix] Error initializing API client: %s", err.Error())
-	}
-
-	waitForFirstAppAccessToken := make(chan struct{})
-
-	// Initialize methods responsible for refreshing oauth
-	go initAppAccessToken(helixAPI.(*helix.Client), waitForFirstAppAccessToken)
-	<-waitForFirstAppAccessToken
+	helixAPI = helixClient
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

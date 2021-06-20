@@ -7,6 +7,7 @@ import (
 	"time"
 
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
+	"github.com/Chatterino/api/internal/twitchapiclient"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
@@ -65,9 +66,14 @@ func main() {
 
 	router := chi.NewRouter()
 
+	helixClient, err := twitchapiclient.New(cfg)
+	if err != nil {
+		log.Printf("[Twitch] %s\n", err.Error())
+	}
+
 	handleTwitchEmotes(router)
 	handleHealth(router)
-	defaultresolver.Initialize(router, cfg)
+	defaultresolver.Initialize(router, cfg, helixClient)
 
 	listen(cfg.BindAddress, mountRouter(router))
 }
