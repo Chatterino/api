@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -24,7 +25,7 @@ var (
 	endpointURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,
 

@@ -6,12 +6,13 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/Chatterino/api/pkg/utils"
 	"github.com/dyatlov/go-oembed/oembed"
 )
 
@@ -32,23 +33,17 @@ var (
 	oEmbed = oembed.NewOembed()
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	providersPath := "./providers.json"
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 
-	if providersPathEnv, exists := utils.LookupEnv("OEMBED_PROVIDERS_PATH"); exists {
-		log.Println("[oEmbed] Overriding path of providers.json to", providersPathEnv)
-		providersPath = providersPathEnv
-	}
-
-	data, err := ioutil.ReadFile(providersPath)
+	data, err := ioutil.ReadFile(cfg.OembedProvidersPath)
 
 	if err != nil {
 		log.Println("[oEmbed] No providers.json file found, won't do oEmbed parsing")
 		return
 	}
 
-	if facebookAppID, facebookAppSecret, exists := loadFacebookCredentials(); exists {
-		if err := initFacebookAppAccessToken(facebookAppID, facebookAppSecret); err != nil {
+	if cfg.OembedFacebookAppID != "" && cfg.OembedFacebookAppSecret != "" {
+		if err := initFacebookAppAccessToken(cfg.OembedFacebookAppID, cfg.OembedFacebookAppSecret); err != nil {
 			log.Println("[oEmbed] error loading facebook app access token", err)
 		} else {
 			log.Println("[oEmbed] Extra rich info loading enabled for Instagram and Facebook")
@@ -61,8 +56,8 @@ func New() (resolvers []resolver.CustomURLManager) {
 		Check: func(url *url.URL) bool {
 			return oEmbed.FindItem(url.String()) != nil
 		},
-		Run: func(url *url.URL) ([]byte, error) {
-			apiResponse := oEmbedCache.Get(url.String(), nil)
+		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
+			apiResponse := oEmbedCache.Get(url.String(), r)
 			return json.Marshal(apiResponse)
 		},
 	})

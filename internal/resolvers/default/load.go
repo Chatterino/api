@@ -26,7 +26,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 
 	for _, m := range dr.customResolvers {
 		if m.Check(requestUrl) {
-			data, err := m.Run(requestUrl)
+			data, err := m.Run(requestUrl, r)
 
 			if errors.Is(err, resolver.ErrDontHandle) {
 				break
@@ -57,7 +57,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 	if requestUrl.String() != resp.Request.URL.String() {
 		for _, m := range dr.customResolvers {
 			if m.Check(resp.Request.URL) {
-				data, err := m.Run(resp.Request.URL)
+				data, err := m.Run(resp.Request.URL, r)
 
 				if errors.Is(err, resolver.ErrDontHandle) {
 					break
@@ -73,7 +73,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 		if err != nil {
 			return nil, cache.NoSpecialDur, err
 		}
-		if contentLengthBytes > resolver.MaxContentLength {
+		if uint64(contentLengthBytes) > dr.cfg.MaxContentLength {
 			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}
@@ -83,7 +83,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
-	limiter := &resolver.WriteLimiter{Limit: resolver.MaxContentLength}
+	limiter := &resolver.WriteLimiter{Limit: dr.cfg.MaxContentLength}
 
 	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
 	if err != nil {
@@ -117,7 +117,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 	}
 
 	if thumbnail.IsSupportedThumbnail(resp.Header.Get("content-type")) {
-		response.Thumbnail = utils.FormatThumbnailURL(dr.baseURL, r, resp.Request.URL.String())
+		response.Thumbnail = utils.FormatThumbnailURL(dr.cfg.BaseURL, r, resp.Request.URL.String())
 	}
 
 	return utils.MarshalNoDur(response)

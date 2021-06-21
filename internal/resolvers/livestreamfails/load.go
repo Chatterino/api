@@ -56,7 +56,7 @@ func load(clipID string, r *http.Request) (interface{}, time.Duration, error) {
 		NSFW:         clipData.IsNSFW,
 		Title:        clipData.Label,
 		Category:     clipData.Category.Label,
-		RedditScore:  clipData.RedditScore,
+		RedditScore:  humanize.Number(uint64(clipData.RedditScore)),
 		Platform:     strings.Title(strings.ToLower(clipData.SourcePlatform)),
 		StreamerName: clipData.Streamer.Label,
 		CreationDate: humanize.CreationDate(clipData.CreatedAt),

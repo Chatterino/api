@@ -1,12 +1,9 @@
 package resolver
 
 import (
+	"net/http"
 	"net/url"
 	"time"
-)
-
-const (
-	MaxContentLength = 1024 * 1024 * 5 // 5MB
 )
 
 type Response struct {
@@ -23,7 +20,7 @@ type Response struct {
 
 type CustomURLManager struct {
 	Check func(url *url.URL) bool
-	Run   func(url *url.URL) ([]byte, error)
+	Run   func(url *url.URL, r *http.Request) ([]byte, error)
 }
 
 var NoSpecialDur time.Duration

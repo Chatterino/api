@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -38,7 +39,7 @@ var (
 	seventvEmoteTemplate = template.Must(template.New("seventvEmoteTooltip").Parse(tooltipTemplate))
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Find links matching the SevenTV direct emote link (e.g. https://7tv.app/emotes/60b03e84b254a5e16b439128)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,
