@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -38,7 +39,7 @@ var (
 	tmpl = template.Must(template.New("betterttvEmoteTooltip").Parse(tooltipTemplate))
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Find links matching the BetterTTV direct emote link (e.g. https://betterttv.com/emotes/566ca06065dbbdab32ec054e)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

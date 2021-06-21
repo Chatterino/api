@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-const (
-	MaxContentLength = 1024 * 1024 * 5 // 5MB
-)
-
 type Response struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`

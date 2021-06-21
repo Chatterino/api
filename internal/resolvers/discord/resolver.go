@@ -5,11 +5,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -42,17 +42,16 @@ var (
 
 	discordInviteTemplate = template.Must(template.New("discordInviteTooltip").Parse(discordInviteTooltip))
 
-	discordToken string
+	token string
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	var exists bool
-
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Bot authentication is required for higher ratelimit (250 requests/5s)
-	if discordToken, exists = os.LookupEnv("CHATTERINO_API_DISCORD_TOKEN"); !exists {
-		log.Println("No CHATTERINO_API_DISCORD_TOKEN specified, won't do special responses for Discord invites")
+	if cfg.DiscordToken == "" {
+		log.Println("[Config] discord-token is missing, won't do special responses for Discord invites")
 		return
 	}
+	token = cfg.DiscordToken
 
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
 	resolvers = append(resolvers, resolver.CustomURLManager{

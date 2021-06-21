@@ -28,7 +28,7 @@ func (d *tooltipData) Sanitize() {
 
 // does this really fit in model?
 func (dr *R) defaultTooltipData(doc *goquery.Document, r *http.Request, resp *http.Response) tooltipData {
-	data := tooltipMetaFields(dr.baseURL, doc, r, resp, tooltipData{
+	data := tooltipMetaFields(dr.cfg.BaseURL, doc, r, resp, tooltipData{
 		URL: resolver.CleanResponse(resp.Request.URL.String()),
 	})
 

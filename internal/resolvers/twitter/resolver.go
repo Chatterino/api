@@ -1,14 +1,13 @@
 package twitter
 
 import (
-	"os"
-	"time"
-
 	"log"
 	"regexp"
 	"text/template"
+	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -46,12 +45,12 @@ var (
 	twitterUserCache = cache.New("twitterUsers", loadTwitterUser, 24*time.Hour)
 )
 
-func New() (resolvers []resolver.CustomURLManager) {
-	var exists bool
-	if bearerKey, exists = os.LookupEnv("CHATTERINO_API_TWITTER_BEARER_TOKEN"); !exists {
-		log.Println("No CHATTERINO_API_TWITTER_BEARER_TOKEN specified, won't do special responses for twitter")
+func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	if cfg.TwitterBearerToken == "" {
+		log.Println("[Config] twitter-bearer-token is missing, won't do special responses for twitter")
 		return
 	}
+	bearerKey = cfg.TwitterBearerToken
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

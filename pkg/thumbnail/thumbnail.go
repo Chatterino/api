@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/nfnt/resize"
@@ -23,12 +24,18 @@ import (
 
 var (
 	supportedThumbnails = []string{"image/jpeg", "image/png", "image/gif", "image/webp"}
+
+	cfg config.APIConfig
 )
 
 const (
 	// max width or height the thumbnail will be resized to
 	maxThumbnailSize = 300
 )
+
+func InitializeConfig(passedCfg config.APIConfig) {
+	cfg = passedCfg
+}
 
 // buildStaticThumbnailByteArray is used when we fail to build an animated thumbnail using lilliput
 func buildStaticThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, error) {
@@ -78,7 +85,7 @@ func DoThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 		if err != nil {
 			return nil, cache.NoSpecialDur, err
 		}
-		if contentLengthBytes > resolver.MaxContentLength {
+		if uint64(contentLengthBytes) > cfg.MaxContentLength {
 			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
 		}
 	}
@@ -98,9 +105,17 @@ func DoThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Du
 		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
 	}
 
-	image, err := buildThumbnailByteArray(inputBuf, resp)
-	if err != nil {
-		log.Println("Error trying to build animated thumbnail:", err.Error(), "falling back to static thumbnail building")
+	var image []byte
+	// attempt building an animated image
+	if cfg.EnableLilliput {
+		image, err = buildThumbnailByteArray(inputBuf, resp)
+	}
+
+	// fallback to static image if animated image building failed or is disabled
+	if !cfg.EnableLilliput || err != nil {
+		if err != nil {
+			log.Println("Error trying to build animated thumbnail:", err.Error(), "falling back to static thumbnail building")
+		}
 		image, err = buildStaticThumbnailByteArray(inputBuf, resp)
 		if err != nil {
 			log.Println("Error trying to build static thumbnail:", err.Error())

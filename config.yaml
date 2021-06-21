@@ -1,0 +1,38 @@
+# Base URL to which clients will make their requests.
+# Useful if the API is proxied through reverse proxy like nginx.
+# Value needs to contain full URL with protocol scheme, e.g. https://braize.pajlada.com/chatterino
+#base-url: ""
+
+# Address to which API will bind and start listening on
+#bind-address: ":1234"
+
+# Max content size in bytes - requests with body bigger than this value will be skipped
+#max-content-length: 5242880
+
+# When enabled, will attempt to use lilliput library for building animated thumbnails.
+# Can increase memory usage by a lot.
+#enable-lilliput: true
+
+
+# Discord token, provides rich information for Discord invite links
+#discord-token: ""
+
+# Twitch Developer Application client ID and Twitch Developer Application client secret, provide rich information for Twitch Clips
+#twitch-client-id: ""
+#twitch-client-secret: ""
+
+# YouTube API key, provides rich information for YouTube video links
+#youtube-api-key: ""
+
+# Twitter bearer token, provides rich information for tweet and Twitter user links
+#twitter-bearer-token: ""
+
+# Imgur client ID, provides rich information for imgur image links
+#imgur-client-id: ""
+
+# oEmbed Facebook app ID and app secret, provide rich information for Facebook and Instagram links
+#oembed-facebook-app-id: ""
+#oembed-facebook-app-secret: ""
+
+# Path to a json file containing supported oEmbed resolvers
+#oembed-providers-path: "./data/oembed/providers.json"
