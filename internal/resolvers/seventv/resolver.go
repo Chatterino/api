@@ -37,9 +37,14 @@ var (
 	emoteCache = cache.New("seventv_emotes", load, 1*time.Hour)
 
 	seventvEmoteTemplate = template.Must(template.New("seventvEmoteTooltip").Parse(tooltipTemplate))
+
+	baseURL string
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	// Pass baseURL for thumbnail proxying
+	baseURL = cfg.BaseURL
+
 	// Find links matching the SevenTV direct emote link (e.g. https://7tv.app/emotes/60b03e84b254a5e16b439128)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

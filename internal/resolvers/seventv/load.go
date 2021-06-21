@@ -120,7 +120,7 @@ query fetchEmote($id: String!) {
 	successTooltip := &resolver.Response{
 		Status:    http.StatusOK,
 		Tooltip:   url.PathEscape(tooltip.String()),
-		Thumbnail: fmt.Sprintf(thumbnailFormat, emoteHash),
+		Thumbnail: utils.FormatThumbnailURL(baseURL, r, fmt.Sprintf(thumbnailFormat, emoteHash)),
 		Link:      fmt.Sprintf("https://7tv.app/emotes/%s", emoteHash),
 	}
 
