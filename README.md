@@ -4,10 +4,10 @@
 
 Go web service that serves as a cache to APIs that each Chatterino client could use.
 
-Emote data is served cached from [twitchemotes.com](https://twitchemotes.com/).
+Emote data is served cached from helix.
 
 ## Routes
-`/twitchemotes/set/:setID/`  
+`/helix/chat/emotes`  
 Returns information about a given twitch emote set. Example response:
 ```
 {
