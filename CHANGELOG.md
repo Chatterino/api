@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Skip lilliput if image is below maxThumbnailSize. (#184)
+
 ## 1.2.0
 
 - Breaking: YouTube environment variable has been renamed (`CHATTERINO_API_YOUTUBE_API_KEY`).
