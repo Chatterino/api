@@ -2,19 +2,21 @@ package twitchapiclient
 
 import (
 	"errors"
+	"time"
 
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/nicklaw5/helix"
 )
 
 // New returns a helix.Client that has requested an AppAccessToken and will keep it refreshed every 24h
-func New(cfg config.APIConfig) (*helix.Client, error) {
+func New(cfg config.APIConfig) (*helix.Client, *cache.Cache, error) {
 	if cfg.TwitchClientID == "" {
-		return nil, errors.New("twitch-client-id is missing, can't make Twitch requests")
+		return nil, nil, errors.New("twitch-client-id is missing, can't make Twitch requests")
 	}
 
 	if cfg.TwitchClientSecret == "" {
-		return nil, errors.New("twitch-client-secret is missing, can't make Twitch requests")
+		return nil, nil, errors.New("twitch-client-secret is missing, can't make Twitch requests")
 	}
 
 	apiClient, err := helix.NewClient(&helix.Options{
@@ -23,7 +25,7 @@ func New(cfg config.APIConfig) (*helix.Client, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	waitForFirstAppAccessToken := make(chan struct{})
@@ -32,5 +34,7 @@ func New(cfg config.APIConfig) (*helix.Client, error) {
 	go initAppAccessToken(apiClient, waitForFirstAppAccessToken)
 	<-waitForFirstAppAccessToken
 
-	return apiClient, nil
+	usernameCache := cache.New("helix:username", loadUsername(apiClient), 1*time.Hour)
+
+	return apiClient, usernameCache, nil
 }
