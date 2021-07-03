@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added link preview support for 7tv emote links. (#155)
+- Skip lilliput if image is below maxThumbnailSize. (#184)
 
 ## 1.2.0
 
