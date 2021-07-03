@@ -12,6 +12,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/imgur"
 	"github.com/Chatterino/api/internal/resolvers/livestreamfails"
 	"github.com/Chatterino/api/internal/resolvers/oembed"
+	"github.com/Chatterino/api/internal/resolvers/seventv"
 	"github.com/Chatterino/api/internal/resolvers/supinic"
 	"github.com/Chatterino/api/internal/resolvers/twitch"
 	"github.com/Chatterino/api/internal/resolvers/twitter"
@@ -106,6 +107,7 @@ func New(cfg config.APIConfig) *R {
 	r.customResolvers = append(r.customResolvers, twitter.New(cfg)...)
 	r.customResolvers = append(r.customResolvers, wikipedia.New(cfg)...)
 	r.customResolvers = append(r.customResolvers, youtube.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, seventv.New(cfg)...)
 
 	return r
 }
