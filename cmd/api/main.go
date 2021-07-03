@@ -14,6 +14,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 var (
@@ -67,6 +68,9 @@ func main() {
 	thumbnail.InitializeConfig(cfg)
 
 	router := chi.NewRouter()
+
+	// Strip trailing slashes from API requests
+	router.Use(middleware.StripSlashes)
 
 	var helixUsernameCache *cache.Cache
 

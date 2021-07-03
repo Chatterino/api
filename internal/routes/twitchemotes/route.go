@@ -122,7 +122,7 @@ func Initialize(router *chi.Mux, helixClient *helix.Client, usernameCache *cache
 	helixAPI = helixClient
 	helixUsernameCache = usernameCache
 
-	router.Get("/twitchemotes/set/{setID}/", setHandler)
+	router.Get("/twitchemotes/set/{setID}", setHandler)
 
 	return nil
 }
