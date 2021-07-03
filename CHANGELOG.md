@@ -3,6 +3,9 @@
 ## Unreleased
 
 - Added link preview support for 7tv emote links. (#155)
+
+## 1.2.0
+
 - Breaking: YouTube environment variable has been renamed (`CHATTERINO_API_YOUTUBE_API_KEY`).
 - Added viper as a configuration manager. This allows to set configuration with config files, environment variables or command line flags. There are also new configurable properties. See docs/config.md for detailed information. (#162)
 - Pass http.Request all the way down the pipeline to custom resolvers. (#167)
