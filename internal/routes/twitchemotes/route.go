@@ -115,7 +115,7 @@ func setHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Initialize servers the /twitchemotes/set/{setID}/ route
+// Initialize servers the /twitchemotes/set/{setID} route
 // In newer versions of Chatterino this data is fetched client-side instead.
 // To support older versions of Chattterino that relied on this API we will keep this API functional for some time longer.
 func Initialize(router *chi.Mux, helixClient *helix.Client, usernameCache *cache.Cache) error {
