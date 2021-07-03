@@ -46,43 +46,41 @@ func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, erro
 	// If the final image does not fit within this buffer, then we fall back to providing a static thumbnail
 	outputImg := make([]byte, 2*1024*1024)
 
+	// We don't need to resize image nor does it need to be passed through lilliput.
+	// Only resize if the original image has bigger dimensions than maxThumbnailSize
+	if newWidth < maxThumbnailSize && newHeight < maxThumbnailSize {
+		return inputBuf, nil
+	}
+
 	// don't transcode (use existing type)
 	outputType := "." + strings.ToLower(decoder.Description())
 
-	// We want to default to no resizing.
-	resizeMethod := lilliput.ImageOpsNoResize
+	/* Preserve aspect ratio is from previous module, thanks nfnt/resize.
+	 * (https://github.com/nfnt/resize/blob/83c6a9932646f83e3267f353373d47347b6036b2/thumbnail.go#L27)
+	 */
 
-	// Only trigger if original image has higher values than maxThumbnailSize
-	if newWidth > maxThumbnailSize || newHeight > maxThumbnailSize {
-		resizeMethod = lilliput.ImageOpsResize // We want to resize
-
-		/* Preserve aspect ratio is from previous module, thanks nfnt/resize.
-		 * (https://github.com/nfnt/resize/blob/83c6a9932646f83e3267f353373d47347b6036b2/thumbnail.go#L27)
-		 */
-
-		// Preserve aspect ratio
-		if newWidth > maxThumbnailSize {
-			newHeight = newHeight * maxThumbnailSize / newWidth
-			if newHeight < 1 {
-				newHeight = 1
-			}
-			newWidth = maxThumbnailSize
+	// Preserve aspect ratio
+	if newWidth > maxThumbnailSize {
+		newHeight = newHeight * maxThumbnailSize / newWidth
+		if newHeight < 1 {
+			newHeight = 1
 		}
+		newWidth = maxThumbnailSize
+	}
 
-		if newHeight > maxThumbnailSize {
-			newWidth = newWidth * maxThumbnailSize / newHeight
-			if newWidth < 1 {
-				newWidth = 1
-			}
-			newHeight = maxThumbnailSize
+	if newHeight > maxThumbnailSize {
+		newWidth = newWidth * maxThumbnailSize / newHeight
+		if newWidth < 1 {
+			newWidth = 1
 		}
+		newHeight = maxThumbnailSize
 	}
 
 	opts := &lilliput.ImageOptions{
 		FileType:      outputType,
 		Width:         newWidth,
 		Height:        newHeight,
-		ResizeMethod:  resizeMethod,
+		ResizeMethod:  lilliput.ImageOpsResize,
 		EncodeOptions: encodeOptions[outputType],
 	}
 
