@@ -110,8 +110,10 @@ func TestFoo(t *testing.T) {
 		// TODO: emote not found (404)
 	}
 
+	request, _ := http.NewRequest(http.MethodPost, "https://7tv.app/test", nil)
+
 	for _, test := range tests {
-		iret, _, err := load(test.emoteHash, nil)
+		iret, _, err := load(test.emoteHash, request)
 
 		c.Assert(err, qt.IsNil)
 		c.Assert(iret, qt.Not(qt.IsNil))
