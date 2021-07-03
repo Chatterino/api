@@ -29,6 +29,8 @@ var (
 	imgurCache = cache.New("imgur", load, 1*time.Hour)
 
 	apiClient ImgurClient
+
+	baseURL string
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
@@ -36,6 +38,8 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		log.Println("[Config] imgur-client-id is missing, won't do special responses for imgur")
 		return
 	}
+
+	baseURL = cfg.BaseURL
 
 	apiClient = &imgur.Client{
 		HTTPClient:    resolver.HTTPClient(),
