@@ -23,7 +23,7 @@ func loadUsername(helixClient *helix.Client) func(key string, r *http.Request) (
 		}
 
 		if len(response.Data.Users) != 1 {
-			return nil, cache.NoSpecialDur, errors.New("too many users returned")
+			return nil, cache.NoSpecialDur, errors.New("no user with this ID found")
 		}
 
 		user := response.Data.Users[0]
