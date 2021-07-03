@@ -71,19 +71,29 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Dur
 
 	emote := resp.Data.Emotes[0]
 
-	if username, ok := helixUsernameCache.Get(emote.OwnerID, nil).(string); !ok {
-		return &TwitchEmotesError{
-			Error:  errInvalidEmoteID,
-			Status: 404,
-		}, 0, nil
-	} else {
-		emoteSet := EmoteSet{
-			ChannelName: username,
-			ChannelID:   emote.OwnerID,
-		}
+	var ok bool
+	var username string
 
-		return utils.MarshalNoDur(&emoteSet)
+	// For Emote Sets 0 (global) and 19194 (prime emotes), the Owner ID returns 0
+	// 0 is not a valid Twitch User ID, so hardcode the username to Twitch
+	if emote.OwnerID == "0" {
+		username = "Twitch"
+	} else {
+		// Load username from Helix
+		if username, ok = helixUsernameCache.Get(emote.OwnerID, nil).(string); !ok {
+			return &TwitchEmotesError{
+				Error:  errInvalidEmoteID,
+				Status: 404,
+			}, 0, nil
+		}
 	}
+
+	emoteSet := EmoteSet{
+		ChannelName: username,
+		ChannelID:   emote.OwnerID,
+	}
+
+	return utils.MarshalNoDur(&emoteSet)
 }
 
 func setHandler(w http.ResponseWriter, r *http.Request) {
