@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/Chatterino/api/pkg/utils"
+	"github.com/Chatterino/api/pkg/resolver"
 )
 
 var (
@@ -19,17 +19,18 @@ func check(url *url.URL) bool {
 		return false
 	}
 
+	match, domain := resolver.MatchesHosts(url, domains)
+	if !match {
+		return false
+	}
+
 	// Find clips that look like https://clips.twitch.tv/SlugHere
-	if utils.IsDomain(url, "clips.twitch.tv") {
+	if domain == "clips.twitch.tv" {
 		// matches[1] contains "StreamerName/clip/" - we don't want it in this check though
 		return matches[1] == ""
 	}
 
 	// Find clips that look like https://twitch.tv/StreamerName/clip/SlugHere
-	if utils.IsDomain(url, "twitch.tv") {
-		// matches[1] contains "StreamerName/clip/" - we need it in this check
-		return matches[1] != ""
-	}
-
-	return false
+	// matches[1] contains "StreamerName/clip/" - we need it in this check
+	return matches[1] != ""
 }
