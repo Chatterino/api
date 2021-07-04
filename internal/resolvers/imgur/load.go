@@ -8,6 +8,7 @@ import (
 
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 func buildTooltip(miniData miniImage) (interface{}, time.Duration, error) {
@@ -97,5 +98,7 @@ func load(urlString string, r *http.Request) (interface{}, time.Duration, error)
 		}, cache.NoSpecialDur, nil
 	}
 
+	// Proxy imgur thumbnails
+	miniData.Link = utils.FormatThumbnailURL(baseURL, r, miniData.Link)
 	return buildTooltip(miniData)
 }

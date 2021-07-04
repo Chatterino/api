@@ -91,6 +91,7 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Dur
 	emoteSet := EmoteSet{
 		ChannelName: username,
 		ChannelID:   emote.OwnerID,
+		Type:        emote.EmoteType,
 	}
 
 	return utils.MarshalNoDur(&emoteSet)
