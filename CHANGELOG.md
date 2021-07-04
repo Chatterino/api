@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Twitch clips under `www.twitch.tv` domain work again. (#189)
 - Added link preview support for 7tv emote links. (#155)
 - Skip lilliput if image is below maxThumbnailSize. (#184)
 - Dev: Change Emote Set backend from `twitchemotes.com` to the Twitch Helix API. (#175)
