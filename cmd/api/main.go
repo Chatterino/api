@@ -23,12 +23,10 @@ var (
 	}
 	startTime = time.Now()
 
-	cfg = config.New()
-
 	prefix string
 )
 
-func mountRouter(r *chi.Mux) *chi.Mux {
+func mountRouter(r *chi.Mux, cfg config.APIConfig) *chi.Mux {
 	if cfg.BaseURL == "" {
 		log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", cfg.BindAddress, prefix, cfg.BaseURL)
 		return r
@@ -64,6 +62,8 @@ func listen(bind string, router *chi.Mux) {
 }
 
 func main() {
+	cfg := config.New()
+
 	resolver.InitializeStaticResponses(cfg)
 	thumbnail.InitializeConfig(cfg)
 
@@ -83,5 +83,5 @@ func main() {
 	handleHealth(router)
 	defaultresolver.Initialize(router, cfg, helixClient)
 
-	listen(cfg.BindAddress, mountRouter(router))
+	listen(cfg.BindAddress, mountRouter(router, cfg))
 }
