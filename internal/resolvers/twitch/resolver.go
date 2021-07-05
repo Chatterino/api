@@ -34,6 +34,12 @@ var (
 
 	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
 
+	domains = map[string]struct{}{
+		"twitch.tv":       {},
+		"www.twitch.tv":   {},
+		"clips.twitch.tv": {},
+	}
+
 	clipCache = cache.New("twitchclip", load, 1*time.Hour)
 
 	helixAPI TwitchAPIClient
