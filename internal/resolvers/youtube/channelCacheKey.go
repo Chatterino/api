@@ -26,7 +26,7 @@ func constructCacheKeyFromChannelID(id channelID) string {
 	return string(id.chanType) + ":" + id.ID
 }
 
-func deconstructChannelIdFromCacheKey(cacheKey string) channelID {
+func deconstructChannelIDFromCacheKey(cacheKey string) channelID {
 	splitKey := strings.Split(cacheKey, ":")
 
 	if len(splitKey) < 2 {

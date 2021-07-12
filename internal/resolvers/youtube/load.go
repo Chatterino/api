@@ -78,7 +78,7 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 	log.Println("[YouTube] GET channel", channelCacheKey)
 	builtRequest := youtubeClient.Channels.List(youtubeChannelParts)
 
-	channelID := deconstructChannelIdFromCacheKey(channelCacheKey)
+	channelID := deconstructChannelIDFromCacheKey(channelCacheKey)
 	if channelID.chanType == CustomChannel {
 		// Channels with custom URLs aren't searchable with the channel/list endpoint
 		// The only average way to do this at the moment is to do a YouTube search of that name
