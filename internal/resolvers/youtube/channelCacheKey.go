@@ -9,6 +9,7 @@ type channelID struct {
 	chanType channelType
 }
 
+// Gets the channel type from a cache key type segment - used to identify what YouTube API to use
 func getChannelTypeFromString(channelType string) channelType  {
 	switch channelType {
 		case "c":
