@@ -73,7 +73,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
 			channelID := getYoutubeChannelIdFromURL(url)
 
-			if channelID.channelType == InvalidChannel {
+			if channelID.chanType == InvalidChannel {
 				return resolver.NoLinkInfoFound, nil
 			}
 

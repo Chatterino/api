@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-type ChannelType string
+type channelType string
 const (
 	// InvalidChannel channel isn't of a known type or doesn't exist
-	InvalidChannel ChannelType = ""
+	InvalidChannel channelType = ""
 	// UserChannel channel ID is a username
 	UserChannel = "user"
 	// IdentifierChannel channel uses the YouTube channel ID format (UC*)
@@ -31,7 +31,7 @@ func getYoutubeVideoIDFromURL2(url *url.URL) string {
 	return path.Base(url.Path)
 }
 
-func getChannelTypeFromString(channelType string) ChannelType  {
+func getChannelTypeFromString(channelType string) channelType  {
 	switch channelType {
 		case "c":
 			return CustomChannel
@@ -44,30 +44,30 @@ func getChannelTypeFromString(channelType string) ChannelType  {
 	return InvalidChannel
 }
 
-func constructCacheKeyFromChannelId(id ChannelId) string {
-	return string(id.channelType) + ":" + id.id
+func constructCacheKeyFromChannelId(id channelId) string {
+	return string(id.chanType) + ":" + id.id
 }
 
-func deconstructChannelIdFromCacheKey(cacheKey string) ChannelId  {
+func deconstructChannelIdFromCacheKey(cacheKey string) channelId  {
 	splitKey := strings.Split(cacheKey, ":")
 
 	if len(splitKey) < 2 {
-		return ChannelId{id: "", channelType: InvalidChannel}
+		return channelId{id: "", chanType: InvalidChannel}
 	}
 
-	return ChannelId{id: splitKey[1], channelType: getChannelTypeFromString(splitKey[0])}
+	return channelId{id: splitKey[1], chanType: getChannelTypeFromString(splitKey[0])}
 }
 
-func getYoutubeChannelIdFromURL(url *url.URL) ChannelId {
+func getYoutubeChannelIdFromURL(url *url.URL) channelId {
 	pattern, err := regexp.Compile(`(user|c(?:hannel)?)/([\w-]+)`)
 	if err != nil {
-		return ChannelId{id: "", channelType: InvalidChannel}
+		return channelId{id: "", chanType: InvalidChannel}
 	}
 
 	match := pattern.FindStringSubmatch(url.Path)
 	if match == nil || len(match) < 3 {
-		return ChannelId{id: "", channelType: InvalidChannel}
+		return channelId{id: "", chanType: InvalidChannel}
 	}
 
-	return ChannelId{id: match[2], channelType: getChannelTypeFromString(match[1])}
+	return channelId{id: match[2], chanType: getChannelTypeFromString(match[1])}
 }
