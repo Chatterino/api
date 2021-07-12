@@ -80,7 +80,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 				return resolver.NoLinkInfoFound, nil
 			}
 
-			channelCacheKey := constructCacheKeyFromChannelId(channelID)
+			channelCacheKey := constructCacheKeyFromChannelID(channelID)
 			apiResponse := channelCache.Get(channelCacheKey, r)
 			return json.Marshal(apiResponse)
 		},
