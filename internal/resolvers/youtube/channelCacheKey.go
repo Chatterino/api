@@ -22,8 +22,8 @@ func getChannelTypeFromString(channelType string) channelType  {
 	return InvalidChannel
 }
 
-func constructCacheKeyFromChannelID(id channelID) string {
-	return string(id.chanType) + ":" + id.ID
+func constructCacheKeyFromChannelID(ID channelID) string {
+	return string(ID.chanType) + ":" + ID.ID
 }
 
 func deconstructChannelIDFromCacheKey(cacheKey string) channelID {
