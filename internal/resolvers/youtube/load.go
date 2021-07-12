@@ -43,7 +43,7 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 		Title:        video.Snippet.Title,
 		ChannelTitle: video.Snippet.ChannelTitle,
 		Duration:     humanize.DurationPT(video.ContentDetails.Duration),
-		PublishedDate:  humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
+		PublishDate:  humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
 		Views:        humanize.Number(video.Statistics.ViewCount),
 		LikeCount:    humanize.Number(video.Statistics.LikeCount),
 		DislikeCount: humanize.Number(video.Statistics.DislikeCount),
