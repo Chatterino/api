@@ -65,7 +65,6 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	}
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
-		// TODO(jammeh): handle channels where channel/user segment doesn't exist (e.g. https://www.youtube.com/tranceluv)
 		Check: func(url *url.URL) bool {
 			matches := youtubeChannelRegex.MatchString(url.Path)
 			return utils.IsSubdomainOf(url, "youtube.com") && matches
@@ -77,7 +76,6 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 				return resolver.NoLinkInfoFound, nil
 			}
 
-			// TODO: cache key as channel/id for loading
 			channelCacheKey := constructCacheKeyFromChannelId(channelID)
 			apiResponse := channelCache.Get(channelCacheKey, r)
 			return json.Marshal(apiResponse)
