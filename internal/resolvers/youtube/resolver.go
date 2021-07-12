@@ -64,6 +64,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		return
 	}
 
+	// Handle YouTube channels (youtube.com/c/chan, youtube.com/chan, youtube.com/user/chan)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
 			matches := youtubeChannelRegex.MatchString(url.Path)
@@ -82,6 +83,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		},
 	})
 
+	// Handle YouTube video URLs
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
 			return utils.IsSubdomainOf(url, "youtube.com")
@@ -98,6 +100,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		},
 	})
 
+	// Handle shortened YouTube video URLs
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
 			return url.Host == "youtu.be"
