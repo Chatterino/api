@@ -5,7 +5,7 @@ import (
 )
 
 type channelId struct {
-	id string
+	ID string
 	chanType channelType
 }
 
@@ -23,16 +23,16 @@ func getChannelTypeFromString(channelType string) channelType  {
 }
 
 func constructCacheKeyFromChannelId(id channelId) string {
-	return string(id.chanType) + ":" + id.id
+	return string(id.chanType) + ":" + id.ID
 }
 
 func deconstructChannelIdFromCacheKey(cacheKey string) channelId  {
 	splitKey := strings.Split(cacheKey, ":")
 
 	if len(splitKey) < 2 {
-		return channelId{id: "", chanType: InvalidChannel}
+		return channelId{ID: "", chanType: InvalidChannel}
 	}
 
-	return channelId{id: splitKey[1], chanType: getChannelTypeFromString(splitKey[0])}
+	return channelId{ID: splitKey[1], chanType: getChannelTypeFromString(splitKey[0])}
 }
 

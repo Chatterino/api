@@ -34,13 +34,13 @@ func getYoutubeVideoIDFromURL2(url *url.URL) string {
 func getYoutubeChannelIdFromURL(url *url.URL) channelId {
 	pattern, err := regexp.Compile(`(user|c(?:hannel)?)/([\w-]+)`)
 	if err != nil {
-		return channelId{id: "", chanType: InvalidChannel}
+		return channelId{ID: "", chanType: InvalidChannel}
 	}
 
 	match := pattern.FindStringSubmatch(url.Path)
 	if match == nil || len(match) < 3 {
-		return channelId{id: "", chanType: InvalidChannel}
+		return channelId{ID: "", chanType: InvalidChannel}
 	}
 
-	return channelId{id: match[2], chanType: getChannelTypeFromString(match[1])}
+	return channelId{ID: match[2], chanType: getChannelTypeFromString(match[1])}
 }

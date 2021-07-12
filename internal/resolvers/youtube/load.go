@@ -84,7 +84,7 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 		// The only average way to do this at the moment is to do a YouTube search of that name
 		// and filter for channels. Not ideal...
 
-		searchRequest := youtubeClient.Search.List([]string{"snippet"}).Q(channelID.id).Type("channel")
+		searchRequest := youtubeClient.Search.List([]string{"snippet"}).Q(channelID.ID).Type("channel")
 		response, err := searchRequest.MaxResults(1).Do()
 
 		if err != nil {
@@ -98,16 +98,16 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 			return nil, cache.NoSpecialDur, errors.New("channel search response is not size 1")
 		}
 
-		channelID.id = response.Items[0].Snippet.ChannelId
+		channelID.ID = response.Items[0].Snippet.ChannelId
 	}
 
 	switch channelID.chanType {
 		case UserChannel:
-			builtRequest = builtRequest.ForUsername(channelID.id)
+			builtRequest = builtRequest.ForUsername(channelID.ID)
 		case IdentifierChannel:
-			builtRequest = builtRequest.Id(channelID.id)
+			builtRequest = builtRequest.Id(channelID.ID)
 		case CustomChannel:
-			builtRequest = builtRequest.Id(channelID.id)
+			builtRequest = builtRequest.Id(channelID.ID)
 		case InvalidChannel:
 			return &resolver.Response{
 				Status:  500,
