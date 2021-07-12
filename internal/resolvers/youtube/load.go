@@ -43,7 +43,7 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 		Title:        video.Snippet.Title,
 		ChannelTitle: video.Snippet.ChannelTitle,
 		Duration:     humanize.DurationPT(video.ContentDetails.Duration),
-		PublishDate:  humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
+		PublishedDate:  humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
 		Views:        humanize.Number(video.Statistics.ViewCount),
 		LikeCount:    humanize.Number(video.Statistics.LikeCount),
 		DislikeCount: humanize.Number(video.Statistics.DislikeCount),
@@ -132,7 +132,7 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 
 	data := youtubeChannelTooltipData{
 		Title:        channel.Snippet.Title,
-		PublishDate:  humanize.CreationDateRFC3339(channel.Snippet.PublishedAt),
+		JoinedDate:  humanize.CreationDateRFC3339(channel.Snippet.PublishedAt),
 		Subscribers:  humanize.Number(channel.Statistics.SubscriberCount),
 		Views:        humanize.Number(channel.Statistics.ViewCount),
 	}
