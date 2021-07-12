@@ -1,4 +1,4 @@
-package twitch
+package twitchapiclient
 
 import (
 	"log"

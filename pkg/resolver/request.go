@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -39,6 +40,17 @@ func RequestGETWithHeaders(url string, extraHeaders map[string]string) (response
 	for headerKey, headerValue := range extraHeaders {
 		req.Header.Set(headerKey, headerValue)
 	}
+
+	return httpClient.Do(req)
+}
+
+func RequestPOST(url, body string) (response *http.Response, err error) {
+	req, err := http.NewRequest("POST", url, strings.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
 
 	return httpClient.Do(req)
 }

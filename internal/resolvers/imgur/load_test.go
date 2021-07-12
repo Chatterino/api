@@ -1,6 +1,7 @@
 package imgur
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -12,7 +13,8 @@ import (
 )
 
 func testLoadAndUnescape(c *qt.C, urlString string) (cleanTooltip string) {
-	iret, _, err := load(urlString, nil)
+	r, _ := http.NewRequest("GET", "https://i.imgur.com/kkona.png", nil)
+	iret, _, err := load(urlString, r)
 
 	c.Assert(err, qt.IsNil)
 	c.Assert(iret, qt.Not(qt.IsNil))

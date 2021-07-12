@@ -12,6 +12,7 @@ import (
 	"github.com/Chatterino/api/internal/resolvers/imgur"
 	"github.com/Chatterino/api/internal/resolvers/livestreamfails"
 	"github.com/Chatterino/api/internal/resolvers/oembed"
+	"github.com/Chatterino/api/internal/resolvers/seventv"
 	"github.com/Chatterino/api/internal/resolvers/supinic"
 	"github.com/Chatterino/api/internal/resolvers/twitch"
 	"github.com/Chatterino/api/internal/resolvers/twitter"
@@ -23,6 +24,7 @@ import (
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/go-chi/chi/v5"
+	"github.com/nicklaw5/helix"
 )
 
 const (
@@ -86,7 +88,7 @@ func (dr *R) HandleThumbnailRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func New(cfg config.APIConfig) *R {
+func New(cfg config.APIConfig, helixClient *helix.Client) *R {
 	r := &R{
 		cfg: cfg,
 	}
@@ -102,16 +104,17 @@ func New(cfg config.APIConfig) *R {
 	r.customResolvers = append(r.customResolvers, livestreamfails.New(cfg)...)
 	r.customResolvers = append(r.customResolvers, oembed.New(cfg)...)
 	r.customResolvers = append(r.customResolvers, supinic.New(cfg)...)
-	r.customResolvers = append(r.customResolvers, twitch.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, twitch.New(cfg, helixClient)...)
 	r.customResolvers = append(r.customResolvers, twitter.New(cfg)...)
 	r.customResolvers = append(r.customResolvers, wikipedia.New(cfg)...)
 	r.customResolvers = append(r.customResolvers, youtube.New(cfg)...)
+	r.customResolvers = append(r.customResolvers, seventv.New(cfg)...)
 
 	return r
 }
 
-func Initialize(router *chi.Mux, cfg config.APIConfig) {
-	defaultLinkResolver := New(cfg)
+func Initialize(router *chi.Mux, cfg config.APIConfig, helixClient *helix.Client) {
+	defaultLinkResolver := New(cfg, helixClient)
 
 	router.Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
 	router.Get("/thumbnail/{url}", defaultLinkResolver.HandleThumbnailRequest)

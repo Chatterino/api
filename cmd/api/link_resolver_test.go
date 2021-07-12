@@ -17,7 +17,7 @@ import (
 func TestResolveTwitchClip(t *testing.T) {
 	router := chi.NewRouter()
 	cfg := config.New()
-	defaultresolver.Initialize(router, cfg)
+	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	fmt.Println(ts.URL)
@@ -45,7 +45,7 @@ func TestResolveTwitchClip(t *testing.T) {
 func TestResolveTwitchClip2(t *testing.T) {
 	router := chi.NewRouter()
 	cfg := config.New()
-	defaultresolver.Initialize(router, cfg)
+	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	const url = `https%3A%2F%2Ftwitch.tv%2Fpajlada%2Fclip%2FGorgeousAntsyPizzaSaltBae`

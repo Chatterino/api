@@ -4,11 +4,11 @@
 
 Go web service that serves as a cache to APIs that each Chatterino client could use.
 
-Emote data is served cached from [twitchemotes.com](https://twitchemotes.com/).
-
 ## Routes
-`/twitchemotes/set/:setID/`  
+
+`twitchemotes/set/:setID`  
 Returns information about a given twitch emote set. Example response:
+
 ```
 {
     "channel_name": "forsen", // twitch user name
@@ -21,6 +21,7 @@ Returns information about a given twitch emote set. Example response:
 
 `link_resolver/:url`  
 Resolves a url into a preview tooltip. Example response:
+
 ```
 {
     "status": 200,                                               // status code returned from the page
@@ -33,23 +34,27 @@ Resolves a url into a preview tooltip. Example response:
 
 `health/uptime`  
 Returns API service's uptime. Example response:
+
 ```
 928h2m53.795354922s
 ```
 
 `health/memory`  
 Returns information about memory usage. Example response:
+
 ```
 Alloc=505 MiB, TotalAlloc=17418866 MiB, Sys=3070 MiB, NumGC=111245
 ```
 
 `health/combined`  
 Returns both uptime and information about memory usage. Example response:
+
 ```
 Uptime: 928h5m7.937821282s - Memory: Alloc=510 MiB, TotalAlloc=17419213 MiB, Sys=3070 MiB, NumGC=111246
 ```
 
 ## Using your self-hosted version
+
 If you host your own version of this API, you can modify which url Chatterino2 uses to resolve links and to resolve twitch emote sets.  
 [Change link resolver](https://wiki.chatterino.com/Environment%20Variables/#chatterino2_link_resolver_url)  
 [Change Twitch emote resolver](https://wiki.chatterino.com/Environment%20Variables/#chatterino2_twitch_emote_set_resolver_url)  

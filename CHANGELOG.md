@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Twitch clips under `www.twitch.tv` domain work again. (#189)
+- Imgur thumbnails are now proxied as well. (#187)
+- Added link preview support for 7tv emote links. (#155)
+- Skip lilliput if image is below maxThumbnailSize. (#184)
+- Dev: Change Emote Set backend from `twitchemotes.com` to the Twitch Helix API. (#175, #188)
+
 ## 1.2.0
 
 - Breaking: YouTube environment variable has been renamed (`CHATTERINO_API_YOUTUBE_API_KEY`).
