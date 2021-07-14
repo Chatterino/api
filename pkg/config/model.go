@@ -7,6 +7,7 @@ type APIConfig struct {
 	BindAddress      string `mapstructure:"bind-address" json:"bind-address"`
 	MaxContentLength uint64 `mapstructure:"max-content-length" json:"max-content-length"`
 	EnableLilliput   bool   `mapstructure:"enable-lilliput" json:"enable-lilliput"`
+	MaxThumbnailSize uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
 
 	// Secrets
 

@@ -48,7 +48,7 @@ func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, erro
 
 	// We don't need to resize image nor does it need to be passed through lilliput.
 	// Only resize if the original image has bigger dimensions than maxThumbnailSize
-	if newWidth < maxThumbnailSize && newHeight < maxThumbnailSize {
+	if newWidth < cfg.MaxThumbnailSize && newHeight < cfg.MaxThumbnailSize {
 		return inputBuf, nil
 	}
 
@@ -60,20 +60,20 @@ func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, erro
 	 */
 
 	// Preserve aspect ratio
-	if newWidth > maxThumbnailSize {
-		newHeight = newHeight * maxThumbnailSize / newWidth
+	if newWidth > cfg.MaxThumbnailSize {
+		newHeight = newHeight * cfg.MaxThumbnailSize / newWidth
 		if newHeight < 1 {
 			newHeight = 1
 		}
-		newWidth = maxThumbnailSize
+		newWidth = cfg.MaxThumbnailSize
 	}
 
-	if newHeight > maxThumbnailSize {
-		newWidth = newWidth * maxThumbnailSize / newHeight
+	if newHeight > cfg.MaxThumbnailSize {
+		newWidth = newWidth * cfg.MaxThumbnailSize / newHeight
 		if newWidth < 1 {
 			newWidth = 1
 		}
-		newHeight = maxThumbnailSize
+		newHeight = cfg.MaxThumbnailSize
 	}
 
 	opts := &lilliput.ImageOptions{
