@@ -28,11 +28,6 @@ var (
 	cfg config.APIConfig
 )
 
-const (
-	// max width or height the thumbnail will be resized to
-	maxThumbnailSize = 300
-)
-
 func InitializeConfig(passedCfg config.APIConfig) {
 	cfg = passedCfg
 }
@@ -44,7 +39,7 @@ func buildStaticThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte
 		return []byte{}, fmt.Errorf("could not decode image from url: %s", resp.Request.URL)
 	}
 
-	resized := resize.Thumbnail(maxThumbnailSize, maxThumbnailSize, image, resize.Bilinear)
+	resized := resize.Thumbnail(cfg.MaxThumbnailSize, cfg.MaxThumbnailSize, image, resize.Bilinear)
 	buffer := new(bytes.Buffer)
 	if resp.Header.Get("content-type") == "image/png" {
 		err = png.Encode(buffer, resized)

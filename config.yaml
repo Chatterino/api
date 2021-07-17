@@ -13,6 +13,9 @@
 # Can increase memory usage by a lot.
 #enable-lilliput: true
 
+# Maximum width/height pixel size count of the thumbnails sent to the clients.
+#max-thumbnail-size: 300
+
 
 # Discord token, provides rich information for Discord invite links
 #discord-token: ""

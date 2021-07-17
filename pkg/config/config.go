@@ -64,6 +64,7 @@ func init() {
 	pflag.StringP("bind-address", "l", ":1234", "Address to which API will bind and start listening on")
 	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size in bytes - requests with body bigger than this value will be skipped")
 	pflag.Bool("enable-lilliput", true, "When enabled, will attempt to use lilliput library for building animated thumbnails. Can increase memory usage by a lot")
+	pflag.Uint("max-thumbnail-size", 300, "Maximum width/height pixel size count of the thumbnails sent to the clients.")
 	pflag.String("discord-token", "", "Discord token")
 	pflag.String("twitch-client-id", "", "Twitch client ID")
 	pflag.String("twitch-client-secret", "", "Twitch client secret")
