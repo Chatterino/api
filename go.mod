@@ -11,7 +11,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/koffeinsource/go-imgur v0.3.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	github.com/nicklaw5/helix v1.24.0
+	github.com/nicklaw5/helix v1.24.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.8.1
