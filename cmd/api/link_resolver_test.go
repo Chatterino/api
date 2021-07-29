@@ -72,7 +72,7 @@ func TestResolveTwitchClip2(t *testing.T) {
 func TestResolveYouTubeChannelUserStandard(t *testing.T) {
 	router := chi.NewRouter()
 	cfg := config.New()
-	defaultresolver.Initialize(router, cfg)
+	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	fmt.Println(ts.URL)
@@ -100,7 +100,7 @@ func TestResolveYouTubeChannelUserStandard(t *testing.T) {
 func TestResolveYouTubeChannelUserShortened(t *testing.T) {
 	router := chi.NewRouter()
 	cfg := config.New()
-	defaultresolver.Initialize(router, cfg)
+	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	fmt.Println(ts.URL)
@@ -128,7 +128,7 @@ func TestResolveYouTubeChannelUserShortened(t *testing.T) {
 func TestResolveYouTubeChannelIdentifier(t *testing.T) {
 	router := chi.NewRouter()
 	cfg := config.New()
-	defaultresolver.Initialize(router, cfg)
+	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 	fmt.Println(ts.URL)
