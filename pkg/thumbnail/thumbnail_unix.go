@@ -46,6 +46,9 @@ func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, erro
 	// If the final image does not fit within this buffer, then we fall back to providing a static thumbnail
 	outputImg := make([]byte, 2*1024*1024)
 
+	// lilliput has the height & width values in int, which means we're converting uint to int.
+	maxThumbnailSize := int(cfg.MaxThumbnailSize)
+
 	// We don't need to resize image nor does it need to be passed through lilliput.
 	// Only resize if the original image has bigger dimensions than maxThumbnailSize
 	if newWidth < maxThumbnailSize && newHeight < maxThumbnailSize {
