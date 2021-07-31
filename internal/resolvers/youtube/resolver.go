@@ -48,7 +48,7 @@ var (
 
 	youtubeClient *youtubeAPI.Service
 
-	youtubeVideoTooltipTemplate = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
+	youtubeVideoTooltipTemplate   = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
 	youtubeChannelTooltipTemplate = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
 
 	youtubeChannelRegex = regexp.MustCompile(`/(user|c(hannel)?)/[\w._\-']+`)
@@ -74,7 +74,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 			return utils.IsSubdomainOf(url, "youtube.com") && matches
 		},
 		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
-			channelID := getYoutubeChannelIdFromURL(url)
+			channelID := getYoutubeChannelIDFromURL(url)
 
 			if channelID.chanType == InvalidChannel {
 				return resolver.NoLinkInfoFound, nil

@@ -8,6 +8,7 @@ import (
 )
 
 type channelType string
+
 const (
 	// InvalidChannel channel isn't of a known type or doesn't exist
 	InvalidChannel channelType = ""
@@ -31,7 +32,7 @@ func getYoutubeVideoIDFromURL2(url *url.URL) string {
 	return path.Base(url.Path)
 }
 
-func getYoutubeChannelIdFromURL(url *url.URL) channelID {
+func getYoutubeChannelIDFromURL(url *url.URL) channelID {
 	pattern, err := regexp.Compile(`(user|c(?:hannel)?)/([\w-]+)`)
 	if err != nil {
 		return channelID{ID: "", chanType: InvalidChannel}
