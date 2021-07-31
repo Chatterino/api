@@ -1,6 +1,6 @@
 package youtube
 
-type youtubeTooltipData struct {
+type youtubeVideoTooltipData struct {
 	Title        string
 	ChannelTitle string
 	Duration     string
@@ -8,4 +8,11 @@ type youtubeTooltipData struct {
 	Views        string
 	LikeCount    string
 	DislikeCount string
+}
+
+type youtubeChannelTooltipData struct {
+	Title        string
+	JoinedDate   string
+	Subscribers  string
+	Views        string
 }
