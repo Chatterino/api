@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.1
+
 - MaxThumbnailSize is now configurable using the `max-thumbnail-size` config value. (#195)
 - Twitch clips under `www.twitch.tv` domain work again. (#189)
 - Imgur thumbnails are now proxied as well. (#187)
