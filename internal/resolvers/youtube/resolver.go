@@ -40,7 +40,7 @@ const (
 )
 
 var (
-	// YouTube videos are cahced by video ID
+	// YouTube videos are cached by video ID
 	videoCache = cache.New("youtube_videos", loadVideos, 24*time.Hour)
 	// Channels are cached by <channel_type>:<channel_id>
 	// See channelCacheKey.go for more information
