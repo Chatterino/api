@@ -55,7 +55,7 @@
           "https://www.facebook.com/questions/*",
           "https://www.facebook.com/notes/*/*/*"
         ],
-        "url": "https://graph.facebook.com/v9.0/oembed_post",
+        "url": "https://graph.facebook.com/v10.0/oembed_post",
         "discovery": false
       },
       {
@@ -64,12 +64,12 @@
           "https://www.facebook.com/video.php?id=*",
           "https://www.facebook.com/video.php?v=*"
         ],
-        "url": "https://graph.facebook.com/v9.0/oembed_video",
+        "url": "https://graph.facebook.com/v10.0/oembed_video",
         "discovery": false
       },
       {
         "schemes": ["https://www.facebook.com/*"],
-        "url": "https://graph.facebook.com/v9.0/oembed_page",
+        "url": "https://graph.facebook.com/v10.0/oembed_page",
         "discovery": false
       }
     ]
@@ -168,7 +168,7 @@
           "https://www.instagram.com/tv/*",
           "https://www.instagr.am/tv/*"
         ],
-        "url": "https://graph.facebook.com/v9.0/instagram_oembed",
+        "url": "https://graph.facebook.com/v10.0/instagram_oembed",
         "formats": ["json"]
       }
     ]
