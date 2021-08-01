@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Updated Facebook & Instagram endpoints to oembed v10. (#201)
+
 ## 1.2.1
 
 - MaxThumbnailSize is now configurable using the `max-thumbnail-size` config value. (#195)
