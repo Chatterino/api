@@ -16,5 +16,5 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.8.1
 	google.golang.org/api v0.54.0
-	honnef.co/go/tools v0.2.0
+	honnef.co/go/tools v0.2.1
 )
