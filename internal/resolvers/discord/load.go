@@ -23,7 +23,7 @@ func load(inviteCode string, r *http.Request) (interface{}, time.Duration, error
 
 	apiURL, _ := url.Parse(fmt.Sprintf(discordInviteAPIURL, inviteCode))
 	apiURLVariables := url.Values{}
-	apiURLVariables.Set("with_counts", strconv.FormatBool(true))
+	apiURLVariables.Set("with_counts", "true")
 	apiURL.RawQuery = apiURLVariables.Encode()
 
 	extraHeaders := map[string]string{
