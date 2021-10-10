@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Twitter: Blacklist special pages from being resolved as user pages. (#220)
 - Updated Facebook & Instagram endpoints to oembed v10. (#201)
 
 ## 1.2.1
