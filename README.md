@@ -7,7 +7,7 @@ Go web service that serves as a cache to APIs that each Chatterino client could 
 ## Routes
 
 `twitchemotes/set/:setID`  
-Returns information about a given twitch emote set. Example response:
+Returns information about a given Twitch emote set. Example response:
 
 ```
 {
