@@ -1,7 +1,7 @@
 # Third party open source libraries used
-## github.com/dankeroni/gotwitch
-dankeroni/gotwitch is used for interacting with the Twitch API.  
-dankeroni/gotwitch is licensed under the [**MIT License**](https://github.com/dankeroni/gotwitch/blob/master/LICENSE).
+## github.com/nicklaw5/helix
+nicklaw5/helix is used for making requests to the Twitch API.  
+nicklaw5/helix is licensed under the [**MIT License**](https://github.com/nicklaw5/helix/blob/main/LICENSE).
 
 ## github.com/go-chi/chi
 go-chi/chi is used for routing for the api we serve.  
