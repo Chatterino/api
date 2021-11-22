@@ -13,7 +13,7 @@ func initAppAccessToken(helixAPI *helix.Client, tokenFetched chan struct{}) {
 	response, err := helixAPI.RequestAppAccessToken([]string{})
 
 	if err != nil {
-		log.Fatalf("[Helix] Error requesting app access token: %s , \n %s", err.Error(), response.Error)
+		log.Fatalf("[Helix] Error requesting app access token: %s", err)
 	}
 
 	log.Printf("[Helix] Requested access token, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
@@ -26,7 +26,7 @@ func initAppAccessToken(helixAPI *helix.Client, tokenFetched chan struct{}) {
 	for range ticker.C {
 		response, err := helixAPI.RequestAppAccessToken([]string{})
 		if err != nil {
-			log.Printf("[Helix] Failed to re-request app access token from ticker, status: %d", response.StatusCode)
+			log.Printf("[Helix] Failed to re-request app access token from ticker: %s", err)
 			continue
 		}
 		log.Printf("[Helix] Re-requested access token from ticker, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
