@@ -13,7 +13,7 @@ func initAppAccessToken(helixAPI *helix.Client, tokenFetched chan struct{}) {
 	response, err := helixAPI.RequestAppAccessToken([]string{})
 
 	if err != nil {
-		log.Fatalf("[Helix] Error requesting app access token: %s , \n %s", err.Error(), response.Error)
+		log.Fatalf("[Helix] Error requesting app access token: %s", err.Error())
 	}
 
 	log.Printf("[Helix] Requested access token, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
