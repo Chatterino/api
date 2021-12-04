@@ -2,7 +2,6 @@ package livestreamfails
 
 import (
 	"encoding/json"
-	"errors"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -37,8 +36,7 @@ var (
 
 	clipCache = cache.New("livestreamfailclip", load, 1*time.Hour)
 
-	pathRegex      = regexp.MustCompile(`/clip|post/[0-9]+`)
-	errInvalidPath = errors.New("invalid livestreamfails clips path")
+	pathRegex = regexp.MustCompile(`/clip|post/[0-9]+`)
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
