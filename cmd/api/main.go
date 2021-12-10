@@ -18,9 +18,6 @@ import (
 )
 
 var (
-	httpClient = &http.Client{
-		Timeout: 15 * time.Second,
-	}
 	startTime = time.Now()
 
 	prefix string
