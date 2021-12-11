@@ -24,6 +24,14 @@ var validClips = []string{
 	"https://twitch.tv/pajlada/clip/" + goodSlugV2,
 	"https://twitch.tv/zneix/clip/" + goodSlugV1,
 	"https://twitch.tv/zneix/clip/" + goodSlugV2,
+	"https://m.twitch.tv/pajlada/clip/" + goodSlugV1,
+	"https://m.twitch.tv/pajlada/clip/" + goodSlugV2,
+	"https://m.twitch.tv/zneix/clip/" + goodSlugV1,
+	"https://m.twitch.tv/zneix/clip/" + goodSlugV2,
+	"https://m.twitch.tv/clip/" + goodSlugV1,
+	"https://m.twitch.tv/clip/" + goodSlugV2,
+	"https://m.twitch.tv/clip/clip/" + goodSlugV1,
+	"https://m.twitch.tv/clip/clip/" + goodSlugV2,
 }
 
 var invalidClips = []string{
