@@ -7,13 +7,10 @@ import (
 )
 
 func run(url *url.URL, r *http.Request) ([]byte, error) {
-	matches := clipSlugRegex.FindStringSubmatch(url.Path)
-
-	if len(matches) != 3 {
-		return nil, errInvalidTwitchClip
+	clipSlug, err := parseClipSlug(url)
+	if err != nil {
+		return nil, err
 	}
-
-	clipSlug := matches[2]
 
 	apiResponse := clipCache.Get(clipSlug, r)
 	return json.Marshal(apiResponse)
