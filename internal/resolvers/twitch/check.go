@@ -25,10 +25,14 @@ func check(url *url.URL) bool {
 	}
 
 	if domain == "m.twitch.tv" {
+		// Find clips that look like https://m.twitch.tv/clip/SlugHere
+		// matches[2] contains "clip/" - both this and matches[1] cannot be non-empty at the same time
 		if matches[2] == "clip/" {
 			return matches[1] == ""
 		}
-		// matches[1] contains "StreamerName/clip/" - we don't want it in this check though
+
+		// Find clips that look like https://m.twitch.tv/StreamerName/clip/SlugHere
+		// matches[1] contains "StreamerName/clip/" - we need it in this check
 		return matches[1] != ""
 	}
 

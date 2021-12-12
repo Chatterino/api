@@ -45,6 +45,7 @@ var invalidClips = []string{
 	"https://gql.twitch.tv/ThreeLetterAPI/clip/VastBitterVultureMau5",
 	"https://m.twitch.tv/VastBitterVultureMau5",
 	"https://m.twitch.tv/username/clip/clip/slug",
+	"https://m.twitch.tv/username/notclip/slug",
 }
 
 func testCheck(c *qt.C, urlString string) bool {
