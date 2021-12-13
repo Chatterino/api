@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- YouTube: Removed dislike count from rich tooltips since YouTube removed it. (#243)
 - Twitter: Blacklist special pages from being resolved as user pages. (#220)
 - Updated Facebook & Instagram endpoints to oembed v10. (#201)
 
