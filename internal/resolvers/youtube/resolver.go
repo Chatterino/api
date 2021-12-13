@@ -26,7 +26,7 @@ const (
 <br><b>Duration:</b> {{.Duration}}
 <br><b>Published:</b> {{.PublishDate}}
 <br><b>Views:</b> {{.Views}}
-<br><span style="color: #2ecc71;">{{.LikeCount}} likes</span>&nbsp;•&nbsp;<span style="color: #e74c3c;">{{.DislikeCount}} dislikes</span>
+<br><span style="color: #2ecc71;">{{.LikeCount}} likes</span>
 </div>
 `
 

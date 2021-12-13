@@ -46,7 +46,6 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 		PublishDate:  humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
 		Views:        humanize.Number(video.Statistics.ViewCount),
 		LikeCount:    humanize.Number(video.Statistics.LikeCount),
-		DislikeCount: humanize.Number(video.Statistics.DislikeCount),
 	}
 
 	var tooltip bytes.Buffer
