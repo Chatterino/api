@@ -7,7 +7,6 @@ type youtubeVideoTooltipData struct {
 	PublishDate  string
 	Views        string
 	LikeCount    string
-	DislikeCount string
 }
 
 type youtubeChannelTooltipData struct {
