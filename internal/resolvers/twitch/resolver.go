@@ -37,6 +37,7 @@ var (
 	domains = map[string]struct{}{
 		"twitch.tv":       {},
 		"www.twitch.tv":   {},
+		"m.twitch.tv":     {},
 		"clips.twitch.tv": {},
 	}
 
