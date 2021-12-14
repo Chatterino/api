@@ -41,6 +41,7 @@ var invalidClips = []string{
 	"https://twitch.tv/supinic/clip/",
 	"https://twitch.tv/pajlada/clips/VastBitterVultureMau5",
 	"https://twitch.tv/zneix/clip/ImpossibleOilyAlpacaTF2John-jIlgtnSAQ52BThHhifyouseethisvivon",
+	"https://twitch.tv/clip/slug",
 	"https://gql.twitch.tv/VastBitterVultureMau5",
 	"https://gql.twitch.tv/ThreeLetterAPI/clip/VastBitterVultureMau5",
 	"https://m.twitch.tv/VastBitterVultureMau5",
