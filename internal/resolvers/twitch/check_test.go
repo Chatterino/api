@@ -24,6 +24,14 @@ var validClips = []string{
 	"https://twitch.tv/pajlada/clip/" + goodSlugV2,
 	"https://twitch.tv/zneix/clip/" + goodSlugV1,
 	"https://twitch.tv/zneix/clip/" + goodSlugV2,
+	"https://m.twitch.tv/pajlada/clip/" + goodSlugV1,
+	"https://m.twitch.tv/pajlada/clip/" + goodSlugV2,
+	"https://m.twitch.tv/zneix/clip/" + goodSlugV1,
+	"https://m.twitch.tv/zneix/clip/" + goodSlugV2,
+	"https://m.twitch.tv/clip/" + goodSlugV1,
+	"https://m.twitch.tv/clip/" + goodSlugV2,
+	"https://m.twitch.tv/clip/clip/" + goodSlugV1,
+	"https://m.twitch.tv/clip/clip/" + goodSlugV2,
 }
 
 var invalidClips = []string{
@@ -33,10 +41,12 @@ var invalidClips = []string{
 	"https://twitch.tv/supinic/clip/",
 	"https://twitch.tv/pajlada/clips/VastBitterVultureMau5",
 	"https://twitch.tv/zneix/clip/ImpossibleOilyAlpacaTF2John-jIlgtnSAQ52BThHhifyouseethisvivon",
+	"https://twitch.tv/clip/slug",
 	"https://gql.twitch.tv/VastBitterVultureMau5",
 	"https://gql.twitch.tv/ThreeLetterAPI/clip/VastBitterVultureMau5",
 	"https://m.twitch.tv/VastBitterVultureMau5",
 	"https://m.twitch.tv/username/clip/clip/slug",
+	"https://m.twitch.tv/username/notclip/slug",
 }
 
 func testCheck(c *qt.C, urlString string) bool {
