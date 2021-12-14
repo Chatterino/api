@@ -4,7 +4,7 @@
 
 - YouTube: Removed dislike count from rich tooltips since YouTube removed it. (#243)
 - Twitter: Blacklist special pages from being resolved as user pages. (#220)
-- Twitch: Handle twitch clips from `m.twitch.tv` domain. (#239)
+- Twitch: Handle Twitch clips from `m.twitch.tv` domain. (#239)
 - Updated Facebook & Instagram endpoints to oembed v10. (#201)
 
 ## 1.2.1
