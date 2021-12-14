@@ -16,8 +16,6 @@ func testParseClipSlug(urlString string) (string, error) {
 	return parseClipSlug(u)
 }
 
-// TODO: Test m.twitch.tv/username/clip/clip/slug and make sure it doesn't work
-
 func TestParseClipSlug(t *testing.T) {
 	c := qt.New(t)
 
