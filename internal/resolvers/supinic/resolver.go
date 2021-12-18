@@ -14,7 +14,7 @@ import (
 const trackListAPIURL = "https://supinic.com/api/track/detail/%d"
 
 var (
-	trackListTemplate = template.Must(template.New("trackListEntryTooltip").Parse(tooltipTemplate))
+	templateSupinicTrack = template.Must(template.New("trackListEntryTooltip").Parse(templateStringSupinicTrack))
 
 	trackListCache = cache.New("supinic_track_list_tracks", load, 1*time.Hour)
 
