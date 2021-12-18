@@ -56,7 +56,7 @@ func load(requestedURL string, r *http.Request) (interface{}, time.Duration, err
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
-	if err := oEmbedTemplate.Execute(&tooltip, infoTooltipData); err != nil {
+	if err := templateOEmbed.Execute(&tooltip, infoTooltipData); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "oEmbed template error: " + resolver.CleanResponse(err.Error()),

@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	oEmbedTemplate = template.Must(template.New("oEmbedTemplateTooltip").Parse(oEmbedTooltipString))
+	templateOEmbed = template.Must(template.New("oEmbedTemplateTooltip").Parse(templateStringOEmbed))
 
 	oEmbedCache = cache.New("oEmbed", load, 1*time.Hour)
 
