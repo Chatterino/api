@@ -27,17 +27,6 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
-const (
-	defaultTooltipString = `<div style="text-align: left;">
-{{if .Title}}
-<b>{{.Title}}</b><hr>
-{{end}}
-{{if .Description}}
-<span>{{.Description}}</span><hr>
-{{end}}
-<b>URL:</b> {{.URL}}</div>`
-)
-
 var (
 	defaultTooltip = template.Must(template.New("default_tooltip").Parse(defaultTooltipString))
 )
