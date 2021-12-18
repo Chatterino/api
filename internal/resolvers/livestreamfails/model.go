@@ -42,7 +42,7 @@ type LivestreamfailsAPIResponse struct {
 	} `json:"streamer"`
 }
 
-const livestreamfailsTooltipString = `<div style="text-align: left;">
+const templateStringLivestreamFailsClips = `<div style="text-align: left;">
 {{ if .NSFW }}<li><b><span style="color: red">NSFW</span></b></li>{{ end }}
 <b>{{.Title}}</b><hr>
 <b>Streamer:</b> {{.StreamerName}}<br>

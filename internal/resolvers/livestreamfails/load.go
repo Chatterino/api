@@ -64,7 +64,7 @@ func load(clipID string, r *http.Request) (interface{}, time.Duration, error) {
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
-	if err := livestreamfailsClipsTemplate.Execute(&tooltip, data); err != nil {
+	if err := templateLivestreamFailsClips.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Livestreamfails template error " + resolver.CleanResponse(err.Error()),

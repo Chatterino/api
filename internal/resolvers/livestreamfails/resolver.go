@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	livestreamfailsClipsTemplate = template.Must(template.New("livestreamfailsclipsTooltip").Parse(livestreamfailsTooltipString))
+	templateLivestreamFailsClips = template.Must(template.New("livestreamfailsclipsTooltip").Parse(templateStringLivestreamFailsClips))
 
 	clipCache = cache.New("livestreamfailclip", load, 1*time.Hour)
 
