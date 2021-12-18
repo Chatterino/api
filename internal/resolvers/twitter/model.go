@@ -45,7 +45,7 @@ type twitterUserTooltipData struct {
 }
 
 const (
-	tweetTooltip = `<div style="text-align: left;">
+	templateStringTweet = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
 <span style="white-space: pre-wrap; word-wrap: break-word;">
 {{.Text}}
@@ -54,7 +54,7 @@ const (
 </div>
 `
 
-	twitterUserTooltip = `<div style="text-align: left;">
+	templateStringTwitterUser = `<div style="text-align: left;">
 <b>{{.Name}} (@{{.Username}})</b>
 <span style="white-space: pre-wrap; word-wrap: break-word;">
 {{.Description}}

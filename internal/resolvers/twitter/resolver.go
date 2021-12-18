@@ -35,9 +35,9 @@ var (
 		"privacy",
 	})
 
-	tweetTooltipTemplate = template.Must(template.New("tweetTooltip").Parse(tweetTooltip))
+	tweetTooltipTemplate = template.Must(template.New("tweetTooltip").Parse(templateStringTweet))
 
-	twitterUserTooltipTemplate = template.Must(template.New("twitterUserTooltip").Parse(twitterUserTooltip))
+	twitterUserTooltipTemplate = template.Must(template.New("twitterUserTooltip").Parse(templateStringTwitterUser))
 
 	bearerKey string
 
