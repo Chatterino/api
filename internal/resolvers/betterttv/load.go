@@ -60,9 +60,9 @@ func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error)
 		data.Type = "Global"
 	}
 
-	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
+	// Build a tooltip using the template string with the data we massaged above
 	var tooltip bytes.Buffer
-	if err := tmpl.Execute(&tooltip, data); err != nil {
+	if err := templateBTTVEmote.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "youtube template error " + resolver.CleanResponse(err.Error()),

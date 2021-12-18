@@ -28,7 +28,7 @@ type TooltipData struct {
 	Uploader string
 }
 
-const tooltipTemplate = `<div style="text-align: left;">` +
+const templateStringBTTVEmote = `<div style="text-align: left;">` +
 	`<b>{{.Code}}</b><br>` +
 	`<b>{{.Type}} BetterTTV Emote</b><br>` +
 	`<b>By:</b> {{.Uploader}}` +

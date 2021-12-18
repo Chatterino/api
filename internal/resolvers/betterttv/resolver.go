@@ -28,7 +28,7 @@ var (
 
 	emoteCache = cache.New("betterttv_emotes", load, 1*time.Hour)
 
-	tmpl = template.Must(template.New("betterttvEmoteTooltip").Parse(tooltipTemplate))
+	templateBTTVEmote = template.Must(template.New("betterttvEmoteTooltip").Parse(templateStringBTTVEmote))
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
