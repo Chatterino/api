@@ -101,17 +101,17 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 	}
 
 	switch channelID.chanType {
-		case UserChannel:
-			builtRequest = builtRequest.ForUsername(channelID.ID)
-		case IdentifierChannel:
-			builtRequest = builtRequest.Id(channelID.ID)
-		case CustomChannel:
-			builtRequest = builtRequest.Id(channelID.ID)
-		case InvalidChannel:
-			return &resolver.Response{
-				Status:  500,
-				Message: "cached channel ID is invalid",
-			}, 1 * time.Hour, nil
+	case UserChannel:
+		builtRequest = builtRequest.ForUsername(channelID.ID)
+	case IdentifierChannel:
+		builtRequest = builtRequest.Id(channelID.ID)
+	case CustomChannel:
+		builtRequest = builtRequest.Id(channelID.ID)
+	case InvalidChannel:
+		return &resolver.Response{
+			Status:  500,
+			Message: "cached channel ID is invalid",
+		}, 1 * time.Hour, nil
 	}
 
 	youtubeResponse, err := builtRequest.Do()
@@ -130,10 +130,10 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 	channel := youtubeResponse.Items[0]
 
 	data := youtubeChannelTooltipData{
-		Title:        channel.Snippet.Title,
+		Title:       channel.Snippet.Title,
 		JoinedDate:  humanize.CreationDateRFC3339(channel.Snippet.PublishedAt),
-		Subscribers:  humanize.Number(channel.Statistics.SubscriberCount),
-		Views:        humanize.Number(channel.Statistics.ViewCount),
+		Subscribers: humanize.Number(channel.Statistics.SubscriberCount),
+		Views:       humanize.Number(channel.Statistics.ViewCount),
 	}
 
 	var tooltip bytes.Buffer

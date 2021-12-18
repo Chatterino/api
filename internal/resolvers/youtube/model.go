@@ -10,8 +10,8 @@ type youtubeVideoTooltipData struct {
 }
 
 type youtubeChannelTooltipData struct {
-	Title        string
-	JoinedDate   string
-	Subscribers  string
-	Views        string
+	Title       string
+	JoinedDate  string
+	Subscribers string
+	Views       string
 }
