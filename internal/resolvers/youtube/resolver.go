@@ -28,8 +28,8 @@ var (
 
 	youtubeClient *youtubeAPI.Service
 
-	youtubeVideoTooltipTemplate   = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
-	youtubeChannelTooltipTemplate = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
+	templateYoutubeVideo   = template.Must(template.New("youtubeVideoTooltip").Parse(templateStringYoutubeVideo))
+	templateYoutubeChannel = template.Must(template.New("youtubeChannelTooltip").Parse(templateStringYoutubeChannel))
 
 	youtubeChannelRegex = regexp.MustCompile(`/(user|c(hannel)?)/[\w._\-']+`)
 )

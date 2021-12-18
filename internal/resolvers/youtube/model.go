@@ -17,7 +17,7 @@ type youtubeChannelTooltipData struct {
 }
 
 const (
-	youtubeVideoTooltip = `<div style="text-align: left;">
+	templateStringYoutubeVideo = `<div style="text-align: left;">
 <b>{{.Title}}</b>
 <br><b>Channel:</b> {{.ChannelTitle}}
 <br><b>Duration:</b> {{.Duration}}
@@ -27,7 +27,7 @@ const (
 </div>
 `
 
-	youtubeChannelTooltip = `<div style="text-align: left;">
+	templateStringYoutubeChannel = `<div style="text-align: left;">
 <b>{{.Title}}</b>
 <br><b>Joined Date:</b> {{.JoinedDate}}
 <br><b>Subscribers:</b> {{.Subscribers}}

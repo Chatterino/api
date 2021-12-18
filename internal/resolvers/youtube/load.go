@@ -49,7 +49,7 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 	}
 
 	var tooltip bytes.Buffer
-	if err := youtubeVideoTooltipTemplate.Execute(&tooltip, data); err != nil {
+	if err := templateYoutubeVideo.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "youtube template error " + resolver.CleanResponse(err.Error()),
@@ -137,7 +137,7 @@ func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Du
 	}
 
 	var tooltip bytes.Buffer
-	if err := youtubeChannelTooltipTemplate.Execute(&tooltip, data); err != nil {
+	if err := templateYoutubeChannel.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "youtube template error " + resolver.CleanResponse(err.Error()),
