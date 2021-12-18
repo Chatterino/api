@@ -40,7 +40,7 @@ const (
 	EmoteVisibilityAll int32 = (1 << iota) - 1
 )
 
-const tooltipTemplate = `<div style="text-align: left;">
+const templateStringSevenTVEmote = `<div style="text-align: left;">
 <b>{{.Code}}</b><br>
 <b>{{.Type}} SevenTV Emote</b><br>
 <b>By:</b> {{.Uploader}}` +

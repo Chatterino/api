@@ -26,7 +26,7 @@ var (
 
 	emoteCache = cache.New("seventv_emotes", load, 1*time.Hour)
 
-	seventvEmoteTemplate = template.Must(template.New("seventvEmoteTooltip").Parse(tooltipTemplate))
+	templateSevenTVEmote = template.Must(template.New("seventvEmoteTooltip").Parse(templateStringSevenTVEmote))
 
 	baseURL string
 )

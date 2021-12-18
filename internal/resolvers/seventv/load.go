@@ -109,7 +109,7 @@ query fetchEmote($id: String!) {
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
-	if err := seventvEmoteTemplate.Execute(&tooltip, data); err != nil {
+	if err := templateSevenTVEmote.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "SevenTV emote template error " + resolver.CleanResponse(err.Error()),
