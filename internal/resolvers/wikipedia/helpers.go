@@ -77,7 +77,7 @@ func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
 func buildTooltip(pageInfo *wikipediaTooltipData) (response, time.Duration, error) {
 	var tooltip bytes.Buffer
 
-	if err := wikipediaTooltipTemplate.Execute(&tooltip, pageInfo); err != nil {
+	if err := templateWikipedia.Execute(&tooltip, pageInfo); err != nil {
 		return response{
 			resolverResponse: &resolver.Response{
 				Status:  http.StatusInternalServerError,

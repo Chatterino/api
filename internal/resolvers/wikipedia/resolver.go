@@ -15,7 +15,7 @@ var (
 	localeRegexp = regexp.MustCompile(`(?i)([a-z]+)\.wikipedia\.org`)
 	titleRegexp  = regexp.MustCompile(`\/wiki\/(.+)`)
 
-	wikipediaTooltipTemplate = template.Must(template.New("wikipediaTooltipTemplate").Parse(wikipediaTooltip))
+	templateWikipedia = template.Must(template.New("wikipediaTooltipTemplate").Parse(templateStringWikipedia))
 
 	wikipediaCache = cache.New("wikipedia", load, 1*time.Hour)
 
