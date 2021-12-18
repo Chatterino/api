@@ -11,15 +11,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-const (
-	thumbnailFormat = "https://cdn.betterttv.net/emote/%s/3x"
-
-	tooltipTemplate = `<div style="text-align: left;">` +
-		`<b>{{.Code}}</b><br>` +
-		`<b>{{.Type}} BetterTTV Emote</b><br>` +
-		`<b>By:</b> {{.Uploader}}` +
-		`</div>`
-)
+const thumbnailFormat = "https://cdn.betterttv.net/emote/%s/3x"
 
 var (
 	emoteAPIURL = "https://api.betterttv.net/3/emotes/%s"

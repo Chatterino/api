@@ -39,3 +39,11 @@ const (
 
 	EmoteVisibilityAll int32 = (1 << iota) - 1
 )
+
+const tooltipTemplate = `<div style="text-align: left;">
+<b>{{.Code}}</b><br>
+<b>{{.Type}} SevenTV Emote</b><br>
+<b>By:</b> {{.Uploader}}` +
+	`{{ if .Unlisted }}` + `
+<li><b><span style="color: red;">UNLISTED</span></b></li>{{ end }}
+</div>`

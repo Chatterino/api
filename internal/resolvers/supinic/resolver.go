@@ -11,17 +11,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-const (
-	trackListAPIURL = "https://supinic.com/api/track/detail/%d"
-
-	tooltipTemplate = `<div style="text-align: left;">
-<b>{{.Name}}</b><br>
-<br>
-<b>By:</b> {{.AuthorName}}<br>
-<b>Track ID:</b> {{.ID}}<br>
-<b>Duration:</b> {{.Duration}}<br>
-<b>Tags:</b> {{.Tags}}</div>`
-)
+const trackListAPIURL = "https://supinic.com/api/track/detail/%d"
 
 var (
 	trackListTemplate = template.Must(template.New("trackListEntryTooltip").Parse(tooltipTemplate))

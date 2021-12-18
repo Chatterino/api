@@ -28,3 +28,14 @@ type DiscordInviteData struct {
 	OnlineCount uint64 `json:"approximate_presence_count,omitempty"`
 	TotalCount  uint64 `json:"approximate_member_count,omitempty"`
 }
+
+const discordInviteTooltip = `<div style="text-align: left;">
+<b>{{.ServerName}}</b>
+<br>
+<br><b>Server Created:</b> {{.ServerCreated}}
+<br><b>Channel:</b> {{.InviteChannel}}
+{{ if .InviterTag}}<br><b>Inviter:</b> {{.InviterTag}}{{end}}
+{{ if .ServerPerks}}<br><b>Server Perks:</b> {{.ServerPerks}}{{end}}
+<br><b>Members:</b> <span style="color: #43b581;">{{.OnlineCount}} online</span>&nbsp;•&nbsp;<span style="color: #808892;">{{.TotalCount}} total</span>
+</div>
+`

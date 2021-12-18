@@ -41,3 +41,13 @@ type LivestreamfailsAPIResponse struct {
 		Label string `json:"label"`
 	} `json:"streamer"`
 }
+
+const livestreamfailsTooltipString = `<div style="text-align: left;">
+{{ if .NSFW }}<li><b><span style="color: red">NSFW</span></b></li>{{ end }}
+<b>{{.Title}}</b><hr>
+<b>Streamer:</b> {{.StreamerName}}<br>
+<b>Category:</b> {{.Category}}<br>
+<b>Platform:</b> {{.Platform}}<br>
+<b>Reddit score:</b> {{.RedditScore}}<br>
+<b>Created:</b> {{.CreationDate}}
+</div>`

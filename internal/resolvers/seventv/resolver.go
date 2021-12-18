@@ -11,17 +11,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-const (
-	thumbnailFormat = "https://cdn.7tv.app/emote/%s/4x"
-
-	tooltipTemplate = `<div style="text-align: left;">
-<b>{{.Code}}</b><br>
-<b>{{.Type}} SevenTV Emote</b><br>
-<b>By:</b> {{.Uploader}}` +
-		`{{ if .Unlisted }}` + `
-<li><b><span style="color: red;">UNLISTED</span></b></li>{{ end }}
-</div>`
-)
+const thumbnailFormat = "https://cdn.7tv.app/emote/%s/4x"
 
 var (
 	seventvAPIURL = "https://api.7tv.app/v2/gql"

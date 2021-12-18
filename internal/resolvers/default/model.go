@@ -38,3 +38,14 @@ func (dr *R) defaultTooltipData(doc *goquery.Document, r *http.Request, resp *ht
 
 	return data
 }
+
+const (
+	defaultTooltipString = `<div style="text-align: left;">
+{{if .Title}}
+<b>{{.Title}}</b><hr>
+{{end}}
+{{if .Description}}
+<span>{{.Description}}</span><hr>
+{{end}}
+<b>URL:</b> {{.URL}}</div>`
+)

@@ -11,14 +11,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-const (
-	thumbnailFormat = "https://cdn.frankerfacez.com/emoticon/%s/4"
-
-	tooltipTemplate = `<div style="text-align: left;">
-<b>{{.Code}}</b><br>
-<b>FrankerFaceZ Emote</b><br>
-<b>By:</b> {{.Uploader}}</div>`
-)
+const thumbnailFormat = "https://cdn.frankerfacez.com/emoticon/%s/4"
 
 var (
 	emoteAPIURL = "https://api.frankerfacez.com/v1/emote/%s"

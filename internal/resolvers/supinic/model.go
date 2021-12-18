@@ -33,3 +33,11 @@ type TrackData struct {
 type TrackListAPIResponse struct {
 	Data TrackData `json:"data"`
 }
+
+const tooltipTemplate = `<div style="text-align: left;">
+<b>{{.Name}}</b><br>
+<br>
+<b>By:</b> {{.AuthorName}}<br>
+<b>Track ID:</b> {{.ID}}<br>
+<b>Duration:</b> {{.Duration}}<br>
+<b>Tags:</b> {{.Tags}}</div>`

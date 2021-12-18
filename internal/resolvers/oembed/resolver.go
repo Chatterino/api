@@ -16,15 +16,6 @@ import (
 	"github.com/dyatlov/go-oembed/oembed"
 )
 
-const (
-	oEmbedTooltipString = `<div style="text-align: left;">
-<b>{{.ProviderName}}{{ if .Title }} - {{.Title}}{{ end }}</b><hr>
-{{ if .Description }}{{.Description}}{{ end }}
-{{ if .AuthorName }}<br><b>Author:</b> {{.AuthorName}}{{ end }}
-<br><b>URL:</b> {{.RequestedURL}}
-</div>`
-)
-
 var (
 	oEmbedTemplate = template.Must(template.New("oEmbedTemplateTooltip").Parse(oEmbedTooltipString))
 

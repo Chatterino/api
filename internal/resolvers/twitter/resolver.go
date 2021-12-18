@@ -12,26 +12,6 @@ import (
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-const (
-	tweetTooltip = `<div style="text-align: left;">
-<b>{{.Name}} (@{{.Username}})</b>
-<span style="white-space: pre-wrap; word-wrap: break-word;">
-{{.Text}}
-</span>
-<span style="color: #808892;">{{.Likes}} likes&nbsp;•&nbsp;{{.Retweets}} retweets&nbsp;•&nbsp;{{.Timestamp}}</span>
-</div>
-`
-
-	twitterUserTooltip = `<div style="text-align: left;">
-<b>{{.Name}} (@{{.Username}})</b>
-<span style="white-space: pre-wrap; word-wrap: break-word;">
-{{.Description}}
-</span>
-<span style="color: #808892;">{{.Followers}} followers</span>
-</div>
-`
-)
-
 var (
 	tweetRegexp       = regexp.MustCompile(`(?i)\/.*\/status(?:es)?\/([^\/\?]+)`)
 	twitterUserRegexp = regexp.MustCompile(`(?i)twitter\.com\/([^\/\?\s]+)(\/?$|(\?).*)`)

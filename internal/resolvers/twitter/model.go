@@ -43,3 +43,23 @@ type twitterUserTooltipData struct {
 	Followers   string
 	Thumbnail   string
 }
+
+const (
+	tweetTooltip = `<div style="text-align: left;">
+<b>{{.Name}} (@{{.Username}})</b>
+<span style="white-space: pre-wrap; word-wrap: break-word;">
+{{.Text}}
+</span>
+<span style="color: #808892;">{{.Likes}} likes&nbsp;•&nbsp;{{.Retweets}} retweets&nbsp;•&nbsp;{{.Timestamp}}</span>
+</div>
+`
+
+	twitterUserTooltip = `<div style="text-align: left;">
+<b>{{.Name}} (@{{.Username}})</b>
+<span style="white-space: pre-wrap; word-wrap: break-word;">
+{{.Description}}
+</span>
+<span style="color: #808892;">{{.Followers}} followers</span>
+</div>
+`
+)

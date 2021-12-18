@@ -13,20 +13,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-const (
-	discordInviteAPIURL = "https://discord.com/api/v9/invites/%s"
-
-	discordInviteTooltip = `<div style="text-align: left;">
-<b>{{.ServerName}}</b>
-<br>
-<br><b>Server Created:</b> {{.ServerCreated}}
-<br><b>Channel:</b> {{.InviteChannel}}
-{{ if .InviterTag}}<br><b>Inviter:</b> {{.InviterTag}}{{end}}
-{{ if .ServerPerks}}<br><b>Server Perks:</b> {{.ServerPerks}}{{end}}
-<br><b>Members:</b> <span style="color: #43b581;">{{.OnlineCount}} online</span>&nbsp;•&nbsp;<span style="color: #808892;">{{.TotalCount}} total</span>
-</div>
-`
-)
+const discordInviteAPIURL = "https://discord.com/api/v9/invites/%s"
 
 var (
 	discordInviteURLRegex = regexp.MustCompile(`^(www\.)?discord\.(gg|com\/invite)\/([a-zA-Z0-9-]+)`)
