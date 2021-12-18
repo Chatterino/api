@@ -27,7 +27,7 @@ var (
 
 	errInvalidDiscordInvite = errors.New("invalid Discord invite Path")
 
-	discordInviteTemplate = template.Must(template.New("discordInviteTooltip").Parse(discordInviteTooltip))
+	templateDiscordInvite = template.Must(template.New("discordInviteTooltip").Parse(templateStringDiscordInvite))
 
 	token string
 )

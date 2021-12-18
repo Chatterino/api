@@ -106,7 +106,7 @@ func load(inviteCode string, r *http.Request) (interface{}, time.Duration, error
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
-	if err := discordInviteTemplate.Execute(&tooltip, data); err != nil {
+	if err := templateDiscordInvite.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "Discord Invite template error " + resolver.CleanResponse(err.Error()),

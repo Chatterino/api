@@ -29,7 +29,7 @@ type DiscordInviteData struct {
 	TotalCount  uint64 `json:"approximate_member_count,omitempty"`
 }
 
-const discordInviteTooltip = `<div style="text-align: left;">
+const templateStringDiscordInvite = `<div style="text-align: left;">
 <b>{{.ServerName}}</b>
 <br>
 <br><b>Server Created:</b> {{.ServerCreated}}
