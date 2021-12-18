@@ -26,7 +26,7 @@ var (
 
 	emoteCache = cache.New("ffz_emotes", load, 1*time.Hour)
 
-	tmpl = template.Must(template.New("frankerfacezEmoteTooltip").Parse(tooltipTemplate))
+	templateFrankerFaceZEmote = template.Must(template.New("frankerfacezEmoteTooltip").Parse(templateStringFrankerFaceZEmote))
 
 	errInvalidFrankerFaceZEmotePath = errors.New("invalid FrankerFaceZ emote path")
 )
