@@ -40,7 +40,7 @@ func (dr *R) defaultTooltipData(doc *goquery.Document, r *http.Request, resp *ht
 }
 
 const (
-	defaultTooltipString = `<div style="text-align: left;">
+	templateStringDefault = `<div style="text-align: left;">
 {{if .Title}}
 <b>{{.Title}}</b><hr>
 {{end}}

@@ -28,7 +28,7 @@ import (
 )
 
 var (
-	defaultTooltip = template.Must(template.New("default_tooltip").Parse(defaultTooltipString))
+	templateDefault = template.Must(template.New("default_tooltip").Parse(templateStringDefault))
 )
 
 type R struct {

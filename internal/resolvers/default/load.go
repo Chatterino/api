@@ -102,7 +102,7 @@ func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration
 	data.Sanitize()
 
 	var tooltip bytes.Buffer
-	if err := defaultTooltip.Execute(&tooltip, data); err != nil {
+	if err := templateDefault.Execute(&tooltip, data); err != nil {
 		return utils.MarshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "template error " + resolver.CleanResponse(err.Error()),
