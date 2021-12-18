@@ -42,7 +42,7 @@ func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) 
 	}
 
 	var tooltip bytes.Buffer
-	if err := twitchClipsTooltip.Execute(&tooltip, data); err != nil {
+	if err := templateTwitchClips.Execute(&tooltip, data); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "twitch clip template error " + resolver.CleanResponse(err.Error()),

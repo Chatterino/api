@@ -21,7 +21,7 @@ type TwitchAPIClient interface {
 var (
 	errInvalidTwitchClip = errors.New("invalid Twitch clip link")
 
-	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
+	templateTwitchClips = template.Must(template.New("twitchclipsTooltip").Parse(templateStringTwitchClips))
 
 	domains = map[string]struct{}{
 		"twitch.tv":       {},
