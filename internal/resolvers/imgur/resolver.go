@@ -24,7 +24,7 @@ var (
 	// max size of an image before we use a small thumbnail of it
 	maxRawImageSize = 50 * 1024
 
-	imageTooltipTemplate = template.Must(template.New("imageTooltipTemplate").Parse(imageTooltip))
+	templateImgur = template.Must(template.New("imageTooltipTemplate").Parse(templateStringImgur))
 
 	imgurCache = cache.New("imgur", load, 1*time.Hour)
 

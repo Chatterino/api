@@ -21,7 +21,7 @@ type miniImage struct {
 	Link string
 }
 
-const imageTooltip = `<div style="text-align: left;">` +
+const templateStringImgur = `<div style="text-align: left;">` +
 	`{{ if .Title }}<li><b>Title:</b> {{ .Title }}</li>{{ end }}` +
 	`{{ if .Description }}<li><b>Description:</b> {{.Description}}</li>{{ end }}` +
 	`<li><b>Uploaded:</b> {{.UploadDate}}</li>` +

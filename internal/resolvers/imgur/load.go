@@ -14,7 +14,7 @@ import (
 func buildTooltip(miniData miniImage) (interface{}, time.Duration, error) {
 	var tooltip bytes.Buffer
 
-	if err := imageTooltipTemplate.Execute(&tooltip, &miniData); err != nil {
+	if err := templateImgur.Execute(&tooltip, &miniData); err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "imgur image template error: " + resolver.CleanResponse(err.Error()),
