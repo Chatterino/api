@@ -59,7 +59,7 @@ func loadTwitterUser(userName string, r *http.Request) (interface{}, time.Durati
 		if err.Error() == "50" {
 			return &resolver.Response{
 				Status:  http.StatusNotFound,
-				Message: "Error: User not found.",
+				Message: "Error: Twitter user not found.",
 			}, cache.NoSpecialDur, nil
 		}
 
