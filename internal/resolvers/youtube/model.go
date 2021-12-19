@@ -7,6 +7,7 @@ type youtubeVideoTooltipData struct {
 	PublishDate   string
 	Views         string
 	LikeCount     string
+	CommentCount  string
 	AgeRestricted bool
 }
 
