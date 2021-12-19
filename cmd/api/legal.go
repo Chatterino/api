@@ -77,7 +77,7 @@ func legalPrivacyPolicy(w http.ResponseWriter, r *http.Request) {
   <p>
     The Chatterino API uses the following external APIs to provide users with tooltips:
     <ul>
-    <li>YouTube Videos and Channels through the YouTube Data API. Google's Privacy policy can be found here: <a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a>. Note that no data is forwarded about you the user to the YouTube Data API.</li>
+    <li>YouTube Videos and Channels through the YouTube Data API. Google's Privacy Policy can be found here: <a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a>. Note that no data is forwarded about you the user to the YouTube Data API.</li>
     </ul>
 	This list of external APIs is not exhaustive.<br>
   </p>
