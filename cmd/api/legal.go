@@ -16,7 +16,7 @@ func legalTermsOfService(w http.ResponseWriter, r *http.Request) {
 <body>
   <h1>Chatterino API - Terms of Service</h1>
   <p>
-    Using the Chatterino API from the Chatterino Client is perfectly fine.
+    Usage of the Chatterino API from the Chatterino Client is perfectly fine.
 	If you intend on using the Chatterino API from outside the Chatterino Client, or from a modified version of the Chatterino Client, please reach out to the API owner with details of what you want to do to ensure you don't end up DoSing the API.
   </p>
   <p>
