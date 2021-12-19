@@ -93,7 +93,7 @@ Views: 425,717
 	</ul>
   </p>
   <p>
-	If you have any questions about this privacy policy, you can <a href="https://github.com/Chatterino/api/issues/new">contact us</a>.
+	If you have any questions about this Privacy Policy, you can <a href="https://github.com/Chatterino/api/issues/new">contact us</a>.
   </p>
   <p>
     Privacy Policy changelog:
