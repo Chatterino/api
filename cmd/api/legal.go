@@ -27,7 +27,7 @@ func legalTermsOfService(w http.ResponseWriter, r *http.Request) {
 	This list of external APIs is not exhaustive.
   </p>
   <p>
-	If you have any questions about this terms of service, you can <a href="https://github.com/Chatterino/api/issues/new">contact us</a>.
+	If you have any questions about these Terms of Service, you can <a href="https://github.com/Chatterino/api/issues/new">contact us</a>.
   </p>
   <p>
     Terms of Service changelog:
