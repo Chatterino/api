@@ -54,14 +54,13 @@ func loadTwitterUser(userName string, r *http.Request) (interface{}, time.Durati
 
 	userResp, err := getUserByName(userName, bearerKey)
 	if err != nil {
+		// Error code for "User not found.", as described here:
+		// https://developer.twitter.com/en/support/twitter-api/error-troubleshooting#error-codes
 		if err.Error() == "50" {
-			var response resolver.Response
-			unmarshalErr := json.Unmarshal(resolver.NoLinkInfoFound, &response)
-			if unmarshalErr != nil {
-				log.Println("Error unmarshalling prebuilt response:", unmarshalErr.Error())
-			}
-
-			return &response, 1 * time.Hour, nil
+			return &resolver.Response{
+				Status:  http.StatusNotFound,
+				Message: "Error: Twitter user not found.",
+			}, cache.NoSpecialDur, nil
 		}
 
 		return &resolver.Response{
