@@ -78,6 +78,7 @@ func main() {
 
 	twitchemotes.Initialize(router, helixClient, helixUsernameCache)
 	handleHealth(router)
+	handleLegal(router)
 	defaultresolver.Initialize(router, cfg, helixClient)
 
 	listen(cfg.BindAddress, mountRouter(router, cfg))
