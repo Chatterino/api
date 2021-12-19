@@ -82,7 +82,7 @@ func legalPrivacyPolicy(w http.ResponseWriter, r *http.Request) {
 	This list of external APIs is not exhaustive.<br>
   </p>
   <p>
-	The Chatterino API uses thee above-mentioned external APIs to serve content to you, sometimes in a transformative way. Examples:
+	The Chatterino API uses these above-mentioned external APIs to serve content to you, sometimes in a transformative way. Examples:
 	<ul>
 	<li>When the Chatterino Client makes a request to the Chatterino API about a YouTube video link (e.g. https://www.youtube.com/watch?v=7fnTxm1u_34), we will make a request about that video (7fnTxm1u_34) to the YouTube Data API and read data such as the video title, the channel the video is uploaded by, the duration of the video, thumbnail link, and more to provide the user with that data in a tooltip format like this: <pre>William Onyeabor - When the Going is Smooth &amp; Good (Official Audio)
 Channel: Luaka Bop
