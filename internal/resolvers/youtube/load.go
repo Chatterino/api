@@ -39,13 +39,22 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 		return &resolver.Response{Status: 500, Message: "video unavailable"}, cache.NoSpecialDur, nil
 	}
 
+	// Check if a video is age resricted: https://stackoverflow.com/a/33750307
+	var ageRestricted = false
+	if video.ContentDetails.ContentRating != nil {
+		if video.ContentDetails.ContentRating.YtRating == "ytAgeRestricted" {
+			ageRestricted = true
+		}
+	}
+
 	data := youtubeVideoTooltipData{
-		Title:        video.Snippet.Title,
-		ChannelTitle: video.Snippet.ChannelTitle,
-		Duration:     humanize.DurationPT(video.ContentDetails.Duration),
-		PublishDate:  humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
-		Views:        humanize.Number(video.Statistics.ViewCount),
-		LikeCount:    humanize.Number(video.Statistics.LikeCount),
+		Title:         video.Snippet.Title,
+		ChannelTitle:  video.Snippet.ChannelTitle,
+		Duration:      humanize.DurationPT(video.ContentDetails.Duration),
+		PublishDate:   humanize.CreationDateRFC3339(video.Snippet.PublishedAt),
+		Views:         humanize.Number(video.Statistics.ViewCount),
+		LikeCount:     humanize.Number(video.Statistics.LikeCount),
+		AgeRestricted: ageRestricted,
 	}
 
 	var tooltip bytes.Buffer
