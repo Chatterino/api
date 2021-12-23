@@ -27,7 +27,7 @@ const (
 <br><b>Published:</b> {{.PublishDate}}
 <br><b>Views:</b> {{.Views}}
 {{ if .AgeRestricted }}<br><b><span style="color: red;">AGE RESTRICTED</span></b>{{ end }}
-<br><span style="color: #2ecc71;">{{.LikeCount}} likes</span>
+<br><span style="color: #2ecc71;">{{.LikeCount}} likes</span>&nbsp;•&nbsp;<span style="color: #808892;">{{.CommentCount}} comments</span>
 </div>
 `
 
