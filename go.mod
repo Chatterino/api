@@ -15,6 +15,6 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
-	google.golang.org/api v0.64.0
+	google.golang.org/api v0.65.0
 	honnef.co/go/tools v0.2.2
 )
