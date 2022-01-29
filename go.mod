@@ -6,7 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/discord/lilliput v0.0.0-20210410064651-6e127f25858d
 	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
-	github.com/frankban/quicktest v1.14.0
+	github.com/frankban/quicktest v1.14.1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/golang/mock v1.6.0
 	github.com/koffeinsource/go-imgur v0.3.0
