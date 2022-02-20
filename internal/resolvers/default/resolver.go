@@ -1,6 +1,7 @@
 package defaultresolver
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -24,6 +25,7 @@ import (
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/stampede"
 	"github.com/nicklaw5/helix"
 )
 
@@ -47,11 +49,12 @@ type R struct {
 
 	customResolvers []resolver.CustomURLManager
 
-	defaultResolverCache          *cache.Cache
-	defaultResolverThumbnailCache *cache.Cache
+	defaultResolverCache          cache.Cache
+	defaultResolverThumbnailCache cache.Cache
 }
 
 func (dr *R) HandleRequest(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("HANDLE REQUEST", r.URL.Path)
 	w.Header().Set("Content-Type", "application/json")
 	url, err := utils.UnescapeURLArgument(r, "url")
 	if err != nil {
@@ -93,7 +96,8 @@ func New(cfg config.APIConfig, helixClient *helix.Client) *R {
 		cfg: cfg,
 	}
 
-	r.defaultResolverCache = cache.New("linkResolver", r.load, 10*time.Minute)
+	r.defaultResolverCache = cache.NewPostgreSQLCache(cfg, "linkResolver", r.load, 10*time.Minute)
+	// r.defaultResolverCache = cache.NewMemoryCache("linkResolver", r.load, 10*time.Minute)
 	r.defaultResolverThumbnailCache = cache.New("thumbnail", thumbnail.DoThumbnailRequest, 10*time.Minute)
 
 	// Register Link Resolvers from internal/resolvers/
@@ -116,6 +120,8 @@ func New(cfg config.APIConfig, helixClient *helix.Client) *R {
 func Initialize(router *chi.Mux, cfg config.APIConfig, helixClient *helix.Client) {
 	defaultLinkResolver := New(cfg, helixClient)
 
-	router.Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
+	cached := stampede.Handler(512, 10*time.Second)
+
+	router.With(cached).Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
 	router.Get("/thumbnail/{url}", defaultLinkResolver.HandleThumbnailRequest)
 }

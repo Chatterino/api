@@ -20,4 +20,6 @@ type APIConfig struct {
 	OembedFacebookAppID     string `mapstructure:"oembed-facebook-app-id" json:"oembed-facebook-app-id"`
 	OembedFacebookAppSecret string `mapstructure:"oembed-facebook-app-secret" json:"oembed-facebook-app-secret"`
 	OembedProvidersPath     string `mapstructure:"oembed-providers-path" json:"oembed-providers-path"`
+
+	DSN string `mapstructure:"dsn" json:"dsn"`
 }

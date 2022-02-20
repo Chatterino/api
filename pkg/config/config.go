@@ -74,6 +74,7 @@ func init() {
 	pflag.String("oembed-facebook-app-id", "", "oEmbed Facebook app ID")
 	pflag.String("oembed-facebook-app-secret", "", "oEmbed Facebook app secret")
 	pflag.String("oembed-providers-path", "./data/oembed/providers.json", "Path to a json file containing supported oEmbed resolvers")
+	pflag.String("dsn", "", "Connection string for the PostgreSQL cache")
 	pflag.Parse()
 }
 

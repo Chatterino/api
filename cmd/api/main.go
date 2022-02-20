@@ -69,7 +69,7 @@ func main() {
 	// Strip trailing slashes from API requests
 	router.Use(middleware.StripSlashes)
 
-	var helixUsernameCache *cache.Cache
+	var helixUsernameCache cache.Cache
 
 	helixClient, helixUsernameCache, err := twitchapiclient.New(cfg)
 	if err != nil {
