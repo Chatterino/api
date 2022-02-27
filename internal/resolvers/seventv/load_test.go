@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/go-chi/chi/v5"
 
 	qt "github.com/frankban/quicktest"
@@ -113,13 +112,9 @@ func TestFoo(t *testing.T) {
 	request, _ := http.NewRequest(http.MethodPost, "https://7tv.app/test", nil)
 
 	for _, test := range tests {
-		iret, _, err := load(test.emoteHash, request)
+		response, _, err := load(test.emoteHash, request)
 
 		c.Assert(err, qt.IsNil)
-		c.Assert(iret, qt.Not(qt.IsNil))
-
-		response := iret.(*resolver.Response)
-
 		c.Assert(response, qt.Not(qt.IsNil))
 
 		c.Assert(response.Status, qt.Equals, 200)

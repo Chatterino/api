@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/mocks"
 	"github.com/Chatterino/api/pkg/resolver"
 	qt "github.com/frankban/quicktest"
@@ -11,14 +12,14 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
+func init() {
+	resolver.SetLogger(logger.New())
+}
+
 func testLoadAndUnescape(c *qt.C, clipSlug string) (cleanTooltip string) {
-	iret, _, err := load(clipSlug, nil)
+	response, _, err := load(clipSlug, nil)
 
 	c.Assert(err, qt.IsNil)
-	c.Assert(iret, qt.Not(qt.IsNil))
-
-	response := iret.(*resolver.Response)
-
 	c.Assert(response, qt.Not(qt.IsNil))
 
 	cleanTooltip, unescapeErr := url.PathUnescape(response.Tooltip)

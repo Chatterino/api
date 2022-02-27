@@ -15,8 +15,6 @@ import (
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 var (
@@ -61,15 +59,8 @@ func listen(bind string, router *chi.Mux, log logger.Logger) {
 }
 
 func main() {
-	zapConfig := zap.NewDevelopmentConfig()
-	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	logger, _ := zapConfig.Build()
-	defer logger.Sync()
-
-	// Just until we've remove default log package usage in the project
-	zap.RedirectStdLog(logger)
-
-	log := logger.Sugar()
+	log := logger.New()
+	defer log.Sync()
 
 	cache.SetLogger(log)
 	resolver.SetLogger(log)

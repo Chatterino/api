@@ -26,7 +26,8 @@ var (
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
-	log = cfg.Logger
+	SetLogger(cfg.Logger)
+
 	wikipediaCache = cache.NewPostgreSQLCache(cfg, "wikipedia", resolver.MarshalResponse(load), 1*time.Hour)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

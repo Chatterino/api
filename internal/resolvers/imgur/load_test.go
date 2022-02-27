@@ -14,19 +14,12 @@ import (
 
 func testLoadAndUnescape(c *qt.C, urlString string) (cleanTooltip string) {
 	r, _ := http.NewRequest("GET", "https://i.imgur.com/kkona.png", nil)
-	iret, _, err := load(urlString, r)
+	response, _, err := load(urlString, r)
 
 	c.Assert(err, qt.IsNil)
-	c.Assert(iret, qt.Not(qt.IsNil))
-
-	response := iret.(response)
-
 	c.Assert(response, qt.Not(qt.IsNil))
-	c.Assert(response.err, qt.IsNil)
 
-	c.Assert(response.resolverResponse, qt.Not(qt.IsNil))
-
-	cleanTooltip, unescapeErr := url.PathUnescape(response.resolverResponse.Tooltip)
+	cleanTooltip, unescapeErr := url.PathUnescape(response.Tooltip)
 	c.Assert(unescapeErr, qt.IsNil)
 
 	return cleanTooltip

@@ -8,11 +8,16 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/go-chi/chi/v5"
 
 	qt "github.com/frankban/quicktest"
 )
+
+func init() {
+	resolver.SetLogger(logger.New())
+}
 
 func TestFoo(t *testing.T) {
 	c := qt.New(t)
@@ -39,13 +44,9 @@ func TestFoo(t *testing.T) {
 	defer ts.Close()
 	emoteAPIURL = ts.URL + "/v1/emote/%s"
 
-	iret, _, err := load("testemote", nil)
+	response, _, err := load("testemote", nil)
 
 	c.Assert(err, qt.IsNil)
-	c.Assert(iret, qt.Not(qt.IsNil))
-
-	response := iret.(*resolver.Response)
-
 	c.Assert(response, qt.Not(qt.IsNil))
 
 	c.Assert(response.Status, qt.Equals, 200)

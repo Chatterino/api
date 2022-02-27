@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
 	"github.com/go-chi/chi/v5"
@@ -44,23 +46,21 @@ func init() {
 		Thumbnail:   nil,
 		Description: nil,
 	}
+
+	log := logger.New()
+
+	resolver.SetLogger(log)
+	SetLogger(log)
 }
 
 func testLoadAndUnescape(c *qt.C, locale, page string) (cleanTooltip string) {
 	urlString := fmt.Sprintf("https://%s.wikipedia.org/wiki/%s", locale, page)
-	iret, _, err := load(urlString, nil)
+	response, _, err := load(urlString, nil)
 
 	c.Assert(err, qt.IsNil)
-	c.Assert(iret, qt.Not(qt.IsNil))
-
-	response := iret.(response)
-
 	c.Assert(response, qt.Not(qt.IsNil))
-	c.Assert(response.err, qt.IsNil)
 
-	c.Assert(response.resolverResponse, qt.Not(qt.IsNil))
-
-	cleanTooltip, unescapeErr := url.PathUnescape(response.resolverResponse.Tooltip)
+	cleanTooltip, unescapeErr := url.PathUnescape(response.Tooltip)
 	c.Assert(unescapeErr, qt.IsNil)
 
 	return cleanTooltip

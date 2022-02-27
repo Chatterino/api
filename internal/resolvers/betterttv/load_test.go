@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/resolver"
 	qt "github.com/frankban/quicktest"
 	"github.com/go-chi/chi/v5"
@@ -46,16 +47,14 @@ func init() {
 			DisplayName: "<b>pajlada</b>",
 		},
 	}
+
+	resolver.SetLogger(logger.New())
 }
 
 func testLoadAndUnescape(c *qt.C, emote string) (cleanTooltip string) {
-	iret, _, err := load(emote, nil)
+	response, _, err := load(emote, nil)
 
 	c.Assert(err, qt.IsNil)
-	c.Assert(iret, qt.Not(qt.IsNil))
-
-	response := iret.(*resolver.Response)
-
 	c.Assert(response, qt.Not(qt.IsNil))
 
 	cleanTooltip, unescapeErr := url.PathUnescape(response.Tooltip)

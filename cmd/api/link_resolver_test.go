@@ -8,15 +8,26 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/go-chi/chi/v5"
 )
 
+var (
+	log = logger.New()
+)
+
+func init() {
+	resolver.SetLogger(log)
+	cache.SetLogger(log)
+}
+
 func TestResolveTwitchClip(t *testing.T) {
 	router := chi.NewRouter()
-	cfg := config.New()
+	cfg := config.New(log)
 	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
@@ -44,7 +55,7 @@ func TestResolveTwitchClip(t *testing.T) {
 
 func TestResolveTwitchClip2(t *testing.T) {
 	router := chi.NewRouter()
-	cfg := config.New()
+	cfg := config.New(log)
 	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
@@ -71,7 +82,7 @@ func TestResolveTwitchClip2(t *testing.T) {
 
 func TestResolveYouTubeChannelUserStandard(t *testing.T) {
 	router := chi.NewRouter()
-	cfg := config.New()
+	cfg := config.New(log)
 	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
@@ -99,7 +110,7 @@ func TestResolveYouTubeChannelUserStandard(t *testing.T) {
 
 func TestResolveYouTubeChannelUserShortened(t *testing.T) {
 	router := chi.NewRouter()
-	cfg := config.New()
+	cfg := config.New(log)
 	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
@@ -127,7 +138,7 @@ func TestResolveYouTubeChannelUserShortened(t *testing.T) {
 
 func TestResolveYouTubeChannelIdentifier(t *testing.T) {
 	router := chi.NewRouter()
-	cfg := config.New()
+	cfg := config.New(log)
 	defaultresolver.Initialize(router, cfg, nil)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
