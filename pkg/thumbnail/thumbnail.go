@@ -2,7 +2,6 @@ package thumbnail
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"image"
 	"image/gif"
@@ -54,11 +53,6 @@ func buildStaticThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte
 	}
 
 	return buffer.Bytes(), nil
-}
-
-func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, error) {
-	// Since the lilliput library currently does not support Windows, we error out early and fall back to the static thumbnail generation
-	return nil, errors.New("cannot build animated thumbnails on windows")
 }
 
 func DoThumbnailRequest(urlString string, r *http.Request) ([]byte, time.Duration, error) {
