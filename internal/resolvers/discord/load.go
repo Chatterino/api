@@ -18,7 +18,7 @@ import (
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-func load(inviteCode string, r *http.Request) (interface{}, time.Duration, error) {
+func load(inviteCode string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	log.Println("[DiscordInvite] GET", inviteCode)
 
 	apiURL, _ := url.Parse(fmt.Sprintf(discordInviteAPIURL, inviteCode))

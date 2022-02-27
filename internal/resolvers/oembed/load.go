@@ -15,7 +15,7 @@ import (
 	"github.com/dyatlov/go-oembed/oembed"
 )
 
-func load(requestedURL string, r *http.Request) (interface{}, time.Duration, error) {
+func load(requestedURL string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	extraOpts := url.Values{}
 
 	item := oEmbed.FindItem(requestedURL)

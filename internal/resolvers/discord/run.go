@@ -1,7 +1,6 @@
 package discord
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -16,6 +15,5 @@ func run(url *url.URL, r *http.Request) ([]byte, error) {
 
 	inviteCode := matches[3]
 
-	apiResponse := inviteCache.Get(inviteCode, r)
-	return json.Marshal(apiResponse)
+	return inviteCache.Get(inviteCode, r)
 }

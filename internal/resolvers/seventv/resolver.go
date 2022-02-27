@@ -34,7 +34,7 @@ var (
 
 	emotePathRegex = regexp.MustCompile(`/emotes/([a-f0-9]+)`)
 
-	emoteCache = cache.New("seventv_emotes", load, 1*time.Hour)
+	emoteCache cache.Cache
 
 	seventvEmoteTemplate = template.Must(template.New("seventvEmoteTooltip").Parse(tooltipTemplate))
 
@@ -44,6 +44,8 @@ var (
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	// Pass baseURL for thumbnail proxying
 	baseURL = cfg.BaseURL
+
+	emoteCache = cache.NewPostgreSQLCache(cfg, "seventv_emotes", resolver.MarshalResponse(load), 1*time.Hour)
 
 	// Find links matching the SevenTV direct emote link (e.g. https://7tv.app/emotes/60b03e84b254a5e16b439128)
 	resolvers = append(resolvers, resolver.CustomURLManager{

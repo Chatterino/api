@@ -1,7 +1,6 @@
 package livestreamfails
 
 import (
-	"encoding/json"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -34,12 +33,13 @@ const (
 var (
 	livestreamfailsClipsTemplate = template.Must(template.New("livestreamfailsclipsTooltip").Parse(livestreamfailsTooltipString))
 
-	clipCache = cache.New("livestreamfailclip", load, 1*time.Hour)
+	clipCache cache.Cache
 
 	pathRegex = regexp.MustCompile(`/clip|post/[0-9]+`)
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	clipCache = cache.NewPostgreSQLCache(cfg, "livestreamfailclip", resolver.MarshalResponse(load), 1*time.Hour)
 	// Find clips that look like https://livestreamfails.com/clip/IdHere
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
@@ -57,8 +57,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 			pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
 			clipId := pathParts[1]
 
-			apiResponse := clipCache.Get(clipId, r)
-			return json.Marshal(apiResponse)
+			return clipCache.Get(clipId, r)
 		},
 	})
 

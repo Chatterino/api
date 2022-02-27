@@ -16,7 +16,7 @@ import (
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-func load(emoteHash string, r *http.Request) (interface{}, time.Duration, error) {
+func load(emoteHash string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	log.Println("[SevenTV] GET", emoteHash)
 
 	queryMap := map[string]interface{}{

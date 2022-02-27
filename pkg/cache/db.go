@@ -2,23 +2,46 @@ package cache
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
+	"github.com/Chatterino/api/internal/migration"
 	"github.com/Chatterino/api/pkg/config"
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-// TODO: For hot cache, check out https://github.com/go-chi/stampede
+var (
+	cacheHits = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "db_cache_hits_total",
+			Help: "Number of DB cache hits",
+		},
+	)
+	cacheMisses = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "db_cache_misses_total",
+			Help: "Number of DB cache misses",
+		},
+	)
+	clearedEntries = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "db_cache_cleared_entries_total",
+			Help: "Number of cache entries cleared",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(cacheHits)
+	prometheus.MustRegister(cacheMisses)
+	prometheus.MustRegister(clearedEntries)
+}
 
 type PostgreSQLCache struct {
 	loader Loader
-
-	requestsMutex sync.Mutex
-	requests      map[string][]chan interface{}
 
 	cacheDuration time.Duration
 
@@ -33,85 +56,102 @@ var (
 	tooltipInternalError = []byte("internal error")
 )
 
-func clearOldTooltips(ctx context.Context, conn *pgx.Conn) error {
-	const query = "DELETE FROM tooltips WHERE now() > cached_until;"
-	_, err := conn.Exec(ctx, query)
-	return err
+func clearOldTooltips(ctx context.Context) (pgconn.CommandTag, error) {
+	const query = "DELETE FROM cache WHERE now() > cached_until;"
+	return pool.Exec(ctx, query)
 }
 
-func startTooltipClearer() {
-	go func() {
+func startTooltipClearer(ctx context.Context) {
+	ticker := time.NewTicker(1 * time.Minute)
+	for {
+		select {
+		case <-ctx.Done():
+			return
 
-	}()
+		case <-ticker.C:
+			if ct, err := clearOldTooltips(ctx); err != nil {
+				log.Errorw("Error clearing old tooltips")
+			} else {
+				clearedEntries.Add(float64(ct.RowsAffected()))
+				log.Debugw("Cleared old tooltips", "rowsAffected", ct.RowsAffected())
+			}
+		}
+	}
 }
 
-func (c *PostgreSQLCache) load(key string, r *http.Request) {
-	fmt.Println("Load", key)
-	value, overrideDuration, err := c.loader(key, r)
+func (c *PostgreSQLCache) load(key string, r *http.Request) ([]byte, error) {
+	valueBytes, overrideDuration, err := c.loader(key, r)
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {
 		dur = overrideDuration
 	}
 
-	// Cache it
-	if err == nil {
-		cacheKey := c.prefix + ":" + key
-		_, err := pool.Query(context.Background(), "INSERT INTO tooltips (url, tooltip, cached_until) VALUES ($1, $2, $3)", cacheKey, value, time.Now().Add(dur))
-		if err != nil {
-			fmt.Println("Error inserting tooltip into cache:", err)
-		}
-		// kvCache.Set(cacheKey, value, dur)
-	} else {
-		fmt.Println("Error when some load function was called:", err)
+	if err != nil {
+		return nil, err
 	}
 
-	c.requestsMutex.Lock()
-	for _, ch := range c.requests[key] {
-		ch <- value
+	cacheKey := c.prefix + ":" + key
+	if _, err := pool.Exec(context.Background(), "INSERT INTO cache (key, value, cached_until) VALUES ($1, $2, $3)", cacheKey, valueBytes, time.Now().Add(dur)); err != nil {
+		log.Errorw("Error inserting tooltip into cache",
+			"prefix", c.prefix,
+			"key", key,
+			"error", err,
+		)
 	}
-	delete(c.requests, key)
-	c.requestsMutex.Unlock()
+	return valueBytes, nil
 }
 
-func (c *PostgreSQLCache) Get(key string, r *http.Request) (value interface{}) {
-	cacheKey := c.prefix + ":" + key
-	ctx := context.Background()
-
-	var tooltip string
-	err := pool.QueryRow(ctx, "SELECT tooltip FROM tooltips WHERE url=$1", cacheKey).Scan(&tooltip)
+func (c *PostgreSQLCache) loadFromDatabase(ctx context.Context, cacheKey string) ([]byte, error) {
+	var value []byte
+	err := pool.QueryRow(ctx, "SELECT value FROM cache WHERE key=$1", cacheKey).Scan(&value)
 	if err == nil {
-		return []byte(tooltip)
+		return value, nil
 	}
 
 	if err != pgx.ErrNoRows {
-		fmt.Println("Unhandled sql error:", err)
-		return tooltipInternalError
+		return nil, err
 	}
 
-	// Tooltip for this key not found
+	return nil, nil
+}
 
-	fmt.Println(tooltip)
+func (c *PostgreSQLCache) Get(key string, r *http.Request) ([]byte, error) {
+	cacheKey := c.prefix + ":" + key
+	ctx := context.Background()
 
-	responseChannel := make(chan interface{})
-
-	c.requestsMutex.Lock()
-
-	c.requests[key] = append(c.requests[key], responseChannel)
-
-	first := len(c.requests[key]) == 1
-
-	c.requestsMutex.Unlock()
-
-	if first {
-		go c.load(key, r)
+	value, err := c.loadFromDatabase(ctx, cacheKey)
+	if err != nil {
+		log.Warnw("Unhandled sql error", "error", err)
+		return tooltipInternalError, err
+	} else if value != nil {
+		cacheHits.Inc()
+		log.Debugw("DB Get cache hit", "prefix", c.prefix, "key", key)
+		return value, nil
 	}
 
-	value = <-responseChannel
+	cacheMisses.Inc()
+	log.Debugw("DB Get cache miss", "prefix", c.prefix, "key", key)
+	return c.load(key, r)
+}
 
-	// If key is not in cache, sign up as a listener and ensure loader is only called once
-	// Wait for loader to complete, then return value from loader
-	return
+func (c *PostgreSQLCache) GetOnly(key string) []byte {
+	cacheKey := c.prefix + ":" + key
+	ctx := context.Background()
+
+	value, err := c.loadFromDatabase(ctx, cacheKey)
+	if err != nil {
+		log.Warnw("Unhandled sql error", "error", err)
+		return nil
+	} else if value != nil {
+		cacheHits.Inc()
+		log.Debugw("DB GetOnly cache hit", "prefix", c.prefix, "key", key)
+		return value
+	}
+
+	cacheMisses.Inc()
+	log.Debugw("DB GetOnly cache miss", "prefix", c.prefix, "key", key)
+	return nil
 }
 
 func initPool(ctx context.Context, dsn string) {
@@ -122,15 +162,39 @@ func initPool(ctx context.Context, dsn string) {
 
 	var err error
 
+	log.Debugw("Initialize pool")
 	pool, err = pgxpool.Connect(ctx, dsn)
 
 	if err != nil {
-		fmt.Println("Error connecting to pool:", err)
+		log.Fatalw("Error connecting to pool", "dsn", dsn, "error", err)
 	}
 
 	if err := pool.Ping(ctx); err != nil {
-		fmt.Println("Error pinging pool:", err)
+		log.Fatalw("Error pinging pool", "dsn", dsn, "error", err)
 	}
+
+	conn, err := pool.Acquire(ctx)
+	if err != nil {
+		log.Fatalw("Error acquiring connection from pool",
+			"dsn", dsn,
+			"error", err,
+		)
+	}
+	defer conn.Release()
+
+	if oldVersion, newVersion, err := migration.Run(ctx, conn.Conn()); err != nil {
+		log.Fatalw("Error running database migrations",
+			"dsn", dsn,
+			"error", err,
+		)
+	} else {
+		log.Infow("Ran database migrations",
+			"oldVersion", oldVersion,
+			"newVersion", newVersion,
+		)
+	}
+
+	go startTooltipClearer(ctx)
 
 	// TODO: We currently don't close the connection pool
 }
@@ -143,7 +207,6 @@ func NewPostgreSQLCache(cfg config.APIConfig, prefix string, loader Loader, cach
 	return &PostgreSQLCache{
 		prefix:        prefix,
 		loader:        loader,
-		requests:      make(map[string][]chan interface{}),
 		cacheDuration: cacheDuration,
 	}
 }

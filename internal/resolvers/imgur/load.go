@@ -11,7 +11,7 @@ import (
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-func buildTooltip(miniData miniImage) (interface{}, time.Duration, error) {
+func buildTooltip(miniData miniImage) (*resolver.Response, time.Duration, error) {
 	var tooltip bytes.Buffer
 
 	if err := imageTooltipTemplate.Execute(&tooltip, &miniData); err != nil {
@@ -21,31 +21,20 @@ func buildTooltip(miniData miniImage) (interface{}, time.Duration, error) {
 		}, cache.NoSpecialDur, nil
 	}
 
-	return response{
-		resolverResponse: &resolver.Response{
-			Status:    http.StatusOK,
-			Tooltip:   url.PathEscape(tooltip.String()),
-			Thumbnail: miniData.Link,
-		},
-		err: nil,
+	return &resolver.Response{
+		Status:    http.StatusOK,
+		Tooltip:   url.PathEscape(tooltip.String()),
+		Thumbnail: miniData.Link,
 	}, cache.NoSpecialDur, nil
 }
 
-type response struct {
-	resolverResponse *resolver.Response
-	err              error
-}
-
-func load(urlString string, r *http.Request) (interface{}, time.Duration, error) {
+func load(urlString string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	genericInfo, _, err := apiClient.GetInfoFromURL(urlString)
 	if err != nil {
-		return response{
-			resolverResponse: &resolver.Response{
-				Status:  http.StatusOK,
-				Tooltip: "Error getting imgur API information for URL",
-			},
-			err: resolver.ErrDontHandle,
-		}, cache.NoSpecialDur, nil
+		return &resolver.Response{
+			Status:  http.StatusOK,
+			Tooltip: "Error getting imgur API information for URL",
+		}, cache.NoSpecialDur, resolver.ErrDontHandle
 	}
 
 	var miniData miniImage
@@ -57,12 +46,9 @@ func load(urlString string, r *http.Request) (interface{}, time.Duration, error)
 	} else if genericInfo.Album != nil {
 		ptr := genericInfo.Album
 		if len(ptr.Images) == 0 {
-			return response{
-				resolverResponse: &resolver.Response{
-					Status:  http.StatusOK,
-					Tooltip: "Empty album",
-				},
-				err: nil,
+			return &resolver.Response{
+				Status:  http.StatusOK,
+				Tooltip: "Empty album",
 			}, cache.NoSpecialDur, nil
 		}
 
@@ -74,12 +60,9 @@ func load(urlString string, r *http.Request) (interface{}, time.Duration, error)
 	} else if genericInfo.GAlbum != nil {
 		ptr := genericInfo.GAlbum
 		if len(ptr.Images) == 0 {
-			return response{
-				resolverResponse: &resolver.Response{
-					Status:  http.StatusOK,
-					Tooltip: "Empty album",
-				},
-				err: nil,
+			return &resolver.Response{
+				Status:  http.StatusOK,
+				Tooltip: "Empty album",
 			}, cache.NoSpecialDur, nil
 		}
 
@@ -89,12 +72,9 @@ func load(urlString string, r *http.Request) (interface{}, time.Duration, error)
 		miniData.Title = ptr.Title
 		miniData.Description = ptr.Description
 	} else {
-		return response{
-			resolverResponse: &resolver.Response{
-				Status:  http.StatusOK,
-				Tooltip: "Error getting imgur API information for URL",
-			},
-			err: nil,
+		return &resolver.Response{
+			Status:  http.StatusOK,
+			Tooltip: "Error getting imgur API information for URL",
 		}, cache.NoSpecialDur, nil
 	}
 

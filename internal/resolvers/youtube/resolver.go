@@ -2,7 +2,6 @@ package youtube
 
 import (
 	"context"
-	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -42,10 +41,10 @@ const (
 
 var (
 	// YouTube videos are cached by video ID
-	videoCache = cache.New("youtube_videos", loadVideos, 24*time.Hour)
+	videoCache cache.Cache
 	// Channels are cached by <channel_type>:<channel_id>
 	// See channelCacheKey.go for more information
-	channelCache = cache.New("youtube_channels", loadChannels, 24*time.Hour)
+	channelCache cache.Cache
 
 	youtubeClient *youtubeAPI.Service
 
@@ -68,6 +67,9 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		return
 	}
 
+	videoCache = cache.NewPostgreSQLCache(cfg, "youtube_videos", resolver.MarshalResponse(loadVideos), 24*time.Hour)
+	channelCache = cache.NewPostgreSQLCache(cfg, "youtube_channels", resolver.MarshalResponse(loadChannels), 24*time.Hour)
+
 	// Handle YouTube channels (youtube.com/c/chan, youtube.com/chan, youtube.com/user/chan)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: func(url *url.URL) bool {
@@ -82,8 +84,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 			}
 
 			channelCacheKey := constructCacheKeyFromChannelID(channelID)
-			apiResponse := channelCache.Get(channelCacheKey, r)
-			return json.Marshal(apiResponse)
+			return channelCache.Get(channelCacheKey, r)
 		},
 	})
 
@@ -99,8 +100,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 				return resolver.NoLinkInfoFound, nil
 			}
 
-			apiResponse := videoCache.Get(videoID, r)
-			return json.Marshal(apiResponse)
+			return videoCache.Get(videoID, r)
 		},
 	})
 
@@ -116,8 +116,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 				return resolver.NoLinkInfoFound, nil
 			}
 
-			apiResponse := videoCache.Get(videoID, r)
-			return json.Marshal(apiResponse)
+			return videoCache.Get(videoID, r)
 		},
 	})
 

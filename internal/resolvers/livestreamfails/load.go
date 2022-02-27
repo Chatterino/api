@@ -15,7 +15,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(clipID string, r *http.Request) (interface{}, time.Duration, error) {
+func load(clipID string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	apiURL := fmt.Sprintf(livestreamfailsAPIURL, clipID)
 
 	// Execute Livestreamfails API request

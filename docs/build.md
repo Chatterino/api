@@ -1,5 +1,9 @@
 # How to build and host the Chatterino 2 API
 
+## Prerequisites
+
+1. Resolved links are stored in PostgreSQL, so you must have PostgreSQL installed and accessible for the user running the API. For Ubuntu, you would install it with `sudo apt install postgresql`, create a DB user for your system user (`sudo -upostgres createuser pajlada`), then create a db for the api (`sudo -upostgres createdb chatterino-api --owner pajlada`).
+
 ## Build
 
 1. Clone the repo: `git pull https://github.com/Chatterino/api.git`

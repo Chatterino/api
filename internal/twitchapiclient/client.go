@@ -34,7 +34,7 @@ func New(cfg config.APIConfig) (*helix.Client, cache.Cache, error) {
 	go initAppAccessToken(apiClient, waitForFirstAppAccessToken)
 	<-waitForFirstAppAccessToken
 
-	usernameCache := cache.New("helix:username", loadUsername(apiClient), 1*time.Hour)
+	usernameCache := cache.NewPostgreSQLCache(cfg, "helix:username", loadUsername(apiClient), 1*time.Hour)
 
 	return apiClient, usernameCache, nil
 }

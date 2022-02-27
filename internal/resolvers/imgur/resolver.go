@@ -26,7 +26,7 @@ var (
 
 	imageTooltipTemplate = template.Must(template.New("imageTooltipTemplate").Parse(imageTooltip))
 
-	imgurCache = cache.New("imgur", load, 1*time.Hour)
+	imgurCache cache.Cache
 
 	apiClient ImgurClient
 
@@ -40,6 +40,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 	}
 
 	baseURL = cfg.BaseURL
+	imgurCache = cache.NewPostgreSQLCache(cfg, "imgur", resolver.MarshalResponse(load), 1*time.Hour)
 
 	apiClient = &imgur.Client{
 		HTTPClient:    resolver.HTTPClient(),

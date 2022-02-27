@@ -13,7 +13,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(emoteID string, r *http.Request) (interface{}, time.Duration, error) {
+func load(emoteID string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	apiURL := fmt.Sprintf(emoteAPIURL, emoteID)
 	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteID)
 

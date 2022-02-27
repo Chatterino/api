@@ -4,32 +4,24 @@ import (
 	"net/http"
 	"time"
 
-	"log"
-
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-type response struct {
-	resolverResponse *resolver.Response
-	err              error
-}
-
-func load(urlString string, r *http.Request) (interface{}, time.Duration, error) {
-	log.Println("[Wikipedia] GET", urlString)
+func load(urlString string, r *http.Request) (*resolver.Response, time.Duration, error) {
+	log.Debugw("[Wikipedia] GET",
+		"url", urlString,
+	)
 
 	tooltipData, err := getPageInfo(urlString)
 
 	if err != nil {
-		log.Println("[Wikipedia] ERROR resolving URL", urlString, ":", err.Error())
+		log.Debugw("[Wikipedia] Unable to get page info",
+			"url", urlString,
+			"error", err,
+		)
 
-		return response{
-			resolverResponse: &resolver.Response{
-				Status:  http.StatusOK,
-				Tooltip: "Error getting Wikipedia API information for URL",
-			},
-			err: resolver.ErrDontHandle,
-		}, cache.NoSpecialDur, nil
+		return nil, cache.NoSpecialDur, resolver.ErrDontHandle
 	}
 
 	return buildTooltip(tooltipData)

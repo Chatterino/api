@@ -1,7 +1,6 @@
 package supinic
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/url"
 )
@@ -14,6 +13,5 @@ func run(url *url.URL, r *http.Request) ([]byte, error) {
 
 	trackID := matches[1]
 
-	apiResponse := trackListCache.Get(trackID, r)
-	return json.Marshal(apiResponse)
+	return trackListCache.Get(trackID, r)
 }

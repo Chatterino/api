@@ -16,6 +16,16 @@
 # Maximum width/height pixel size count of the thumbnails sent to the clients.
 #max-thumbnail-size: 300
 
+# Database connection string for connecting to your PostgreSQL instance
+# Example value: "host=/var/run/postgresql user=pajlada database=chatterino-api"
+# See https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING for more details
+#dsn: ""
+
+# When enabled, will host a Prometheus metrics HTTP server on the prometheus-bind-address.
+#enable-prometheus: true
+
+# Address to which the API will host its Prometheus metrics
+#prometheus-bind-address: "127.0.0.1:9382"
 
 # Discord token, provides rich information for Discord invite links
 #discord-token: ""

@@ -3,11 +3,13 @@ package twitchemotes
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/nicklaw5/helix"
@@ -17,16 +19,9 @@ var (
 	errInvalidEmoteID = errors.New("invalid emote id")
 	errUnableToHandle = errors.New("unable to handle twitchemotes requests")
 
-	twitchemotesCache = cache.New("twitchemotes", doTwitchemotesRequest, time.Duration(30)*time.Minute)
-
 	helixAPI           *helix.Client
 	helixUsernameCache cache.Cache
 )
-
-type TwitchEmotesError struct {
-	Status int
-	Error  error
-}
 
 type TwitchEmotesErrorResponse struct {
 	Status  int
@@ -41,12 +36,12 @@ type EmoteSet struct {
 	Custom      bool   `json:"custom"`
 }
 
-func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Duration, error) {
+func doTwitchemotesRequest(setID string, r *http.Request) ([]byte, time.Duration, error) {
 	if helixAPI == nil || helixUsernameCache == nil {
-		return &TwitchEmotesError{
-			Error:  errUnableToHandle,
-			Status: 500,
-		}, 0, nil
+		return nil, 0, &twitchEmotesError{
+			UnderlyingError: errUnableToHandle,
+			Status:          500,
+		}
 	}
 
 	params := &helix.GetEmoteSetsParams{
@@ -56,22 +51,21 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Dur
 	}
 	resp, err := helixAPI.GetEmoteSets(params)
 	if err != nil {
-		return &TwitchEmotesError{
-			Error:  err,
-			Status: 500,
-		}, 0, nil
+		return nil, 0, &twitchEmotesError{
+			UnderlyingError: err,
+			Status:          500,
+		}
 	}
 
 	if len(resp.Data.Emotes) == 0 {
-		return &TwitchEmotesError{
-			Error:  errInvalidEmoteID,
-			Status: 404,
-		}, 0, nil
+		return nil, 0, &twitchEmotesError{
+			UnderlyingError: errInvalidEmoteID,
+			Status:          404,
+		}
 	}
 
 	emote := resp.Data.Emotes[0]
 
-	var ok bool
 	var username string
 
 	// For Emote Sets 0 (global) and 19194 (prime emotes), the Owner ID returns 0
@@ -80,11 +74,13 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Dur
 		username = "Twitch"
 	} else {
 		// Load username from Helix
-		if username, ok = helixUsernameCache.Get(emote.OwnerID, nil).(string); !ok {
-			return &TwitchEmotesError{
-				Error:  errInvalidEmoteID,
-				Status: 404,
-			}, 0, nil
+		if usernameBytes, err := helixUsernameCache.Get(emote.OwnerID, nil); err != nil {
+			return nil, 0, &twitchEmotesError{
+				UnderlyingError: err,
+				Status:          404,
+			}
+		} else {
+			username = string(usernameBytes)
 		}
 	}
 
@@ -97,43 +93,58 @@ func doTwitchemotesRequest(setID string, r *http.Request) (interface{}, time.Dur
 	return utils.MarshalNoDur(&emoteSet)
 }
 
-func setHandler(w http.ResponseWriter, r *http.Request) {
+type twitchEmotesError struct {
+	Status          int
+	UnderlyingError error
+}
+
+func (e *twitchEmotesError) Error() string {
+	return e.UnderlyingError.Error()
+}
+
+func setHandler(helixUsernameCache, twitchemotesCache cache.Cache, w http.ResponseWriter, r *http.Request) {
 	setID := chi.URLParam(r, "setID")
 	w.Header().Set("Content-Type", "application/json")
 
-	response := twitchemotesCache.Get(setID, nil)
-
-	switch v := response.(type) {
-	case []byte:
-		_, err := w.Write(v)
-		if err != nil {
-			log.Println("Error writing response:", err)
+	response, err := twitchemotesCache.Get(setID, nil)
+	if err != nil {
+		var perr *twitchEmotesError
+		if errors.As(err, &perr) {
+			w.WriteHeader(perr.Status)
+			data, err := json.Marshal(&TwitchEmotesErrorResponse{
+				Status:  perr.Status,
+				Message: perr.Error(),
+			})
+			if err != nil {
+				log.Println("Error marshalling twitch emotes error response:", err)
+			}
+			_, err = w.Write(data)
+			if err != nil {
+				log.Println("Error writing response:", err)
+			}
+		} else {
+			fmt.Println("Unknown error in twitchemotes set handler:", err)
 		}
 
-	case *TwitchEmotesError:
-		w.WriteHeader(v.Status)
-		data, err := json.Marshal(&TwitchEmotesErrorResponse{
-			Status:  v.Status,
-			Message: v.Error.Error(),
-		})
-		if err != nil {
-			log.Println("Error marshalling twitch emotes error response:", err)
-		}
-		_, err = w.Write(data)
-		if err != nil {
-			log.Println("Error writing response:", err)
-		}
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		log.Println("Error writing response:", err)
 	}
 }
 
 // Initialize servers the /twitchemotes/set/{setID} route
 // In newer versions of Chatterino this data is fetched client-side instead.
 // To support older versions of Chattterino that relied on this API we will keep this API functional for some time longer.
-func Initialize(router *chi.Mux, helixClient *helix.Client, usernameCache cache.Cache) error {
+func Initialize(cfg config.APIConfig, router *chi.Mux, helixClient *helix.Client, helisUsernameCache cache.Cache) error {
 	helixAPI = helixClient
-	helixUsernameCache = usernameCache
+	twitchemotesCache := cache.NewPostgreSQLCache(cfg, "twitchemotes", doTwitchemotesRequest, time.Duration(30)*time.Minute)
 
-	router.Get("/twitchemotes/set/{setID}", setHandler)
+	router.Get("/twitchemotes/set/{setID}", func(w http.ResponseWriter, r *http.Request) {
+		setHandler(helixUsernameCache, twitchemotesCache, w, r)
+	})
 
 	return nil
 }

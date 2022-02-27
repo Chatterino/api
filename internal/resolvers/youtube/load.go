@@ -13,7 +13,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, error) {
+func loadVideos(videoID string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	youtubeVideoParts := []string{
 		"statistics",
 		"snippet",
@@ -78,7 +78,7 @@ func loadVideos(videoID string, r *http.Request) (interface{}, time.Duration, er
 	}, cache.NoSpecialDur, nil
 }
 
-func loadChannels(channelCacheKey string, r *http.Request) (interface{}, time.Duration, error) {
+func loadChannels(channelCacheKey string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	youtubeChannelParts := []string{
 		"statistics",
 		"snippet",

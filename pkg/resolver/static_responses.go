@@ -3,9 +3,7 @@ package resolver
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/Chatterino/api/pkg/config"
 )
@@ -25,8 +23,9 @@ func InitializeStaticResponses(cfg config.APIConfig) {
 
 	NoLinkInfoFound, err = json.Marshal(r)
 	if err != nil {
-		log.Println("Error marshalling prebuilt response:", err)
-		os.Exit(1)
+		log.Fatalw("Error marshalling prebuilt response",
+			"error", err,
+		)
 	}
 
 	r = &Response{
@@ -35,8 +34,9 @@ func InitializeStaticResponses(cfg config.APIConfig) {
 	}
 	InvalidURL, err = json.Marshal(r)
 	if err != nil {
-		log.Println("Error marshalling prebuilt response:", err)
-		os.Exit(1)
+		log.Fatalw("Error marshalling prebuilt response",
+			"error", err,
+		)
 	}
 
 	r = &Response{
@@ -45,7 +45,8 @@ func InitializeStaticResponses(cfg config.APIConfig) {
 	}
 	ResponseTooLarge, err = json.Marshal(r)
 	if err != nil {
-		log.Println("Error marshalling prebuilt response:", err)
-		os.Exit(1)
+		log.Fatalw("Error marshalling prebuilt response",
+			"error", err,
+		)
 	}
 }

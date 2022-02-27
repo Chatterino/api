@@ -1,7 +1,6 @@
 package twitter
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"strings"
@@ -16,8 +15,7 @@ func run(url *url.URL, r *http.Request) ([]byte, error) {
 			return resolver.NoLinkInfoFound, nil
 		}
 
-		apiResponse := tweetCache.Get(tweetID, r)
-		return json.Marshal(apiResponse)
+		return tweetCache.Get(tweetID, r)
 	}
 
 	if twitterUserRegexp.MatchString(url.String()) {
@@ -28,9 +26,9 @@ func run(url *url.URL, r *http.Request) ([]byte, error) {
 			return resolver.NoLinkInfoFound, nil
 		}
 
-		apiResponse := twitterUserCache.Get(userName, r)
-		return json.Marshal(apiResponse)
+		return twitterUserCache.Get(userName, r)
 	}
 
+	// TODO: Return "do not handle" here?
 	return resolver.NoLinkInfoFound, nil
 }

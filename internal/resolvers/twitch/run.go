@@ -1,7 +1,6 @@
 package twitch
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/url"
 )
@@ -12,6 +11,5 @@ func run(url *url.URL, r *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
-	apiResponse := clipCache.Get(clipSlug, r)
-	return json.Marshal(apiResponse)
+	return clipCache.Get(clipSlug, r)
 }

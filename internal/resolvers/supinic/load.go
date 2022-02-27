@@ -16,7 +16,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func load(rawTrackID string, r *http.Request) (interface{}, time.Duration, error) {
+func load(rawTrackID string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	trackID, _ := strconv.ParseInt(rawTrackID, 10, 32)
 	apiURL := fmt.Sprintf(trackListAPIURL, trackID)
 

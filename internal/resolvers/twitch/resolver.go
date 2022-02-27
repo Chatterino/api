@@ -41,7 +41,7 @@ var (
 		"clips.twitch.tv": {},
 	}
 
-	clipCache = cache.New("twitchclip", load, 1*time.Hour)
+	clipCache cache.Cache
 
 	helixAPI TwitchAPIClient
 )
@@ -53,6 +53,7 @@ func New(cfg config.APIConfig, helixClient *helix.Client) (resolvers []resolver.
 	}
 
 	helixAPI = helixClient
+	clipCache = cache.NewPostgreSQLCache(cfg, "twitchclip", resolver.MarshalResponse(load), 1*time.Hour)
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

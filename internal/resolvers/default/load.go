@@ -18,22 +18,10 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (dr *R) load(urlString string, r *http.Request) (interface{}, time.Duration, error) {
+func (dr *R) load(urlString string, r *http.Request) ([]byte, time.Duration, error) {
 	requestUrl, err := url.Parse(urlString)
 	if err != nil {
 		return resolver.InvalidURL, cache.NoSpecialDur, nil
-	}
-
-	for _, m := range dr.customResolvers {
-		if m.Check(requestUrl) {
-			data, err := m.Run(requestUrl, r)
-
-			if errors.Is(err, resolver.ErrDontHandle) {
-				break
-			}
-
-			return data, cache.NoSpecialDur, err
-		}
 	}
 
 	resp, err := resolver.RequestGET(requestUrl.String())

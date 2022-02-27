@@ -61,8 +61,8 @@ var (
 
 	bearerKey string
 
-	tweetCache       = cache.New("tweets", loadTweet, 24*time.Hour)
-	twitterUserCache = cache.New("twitterUsers", loadTwitterUser, 24*time.Hour)
+	tweetCache       cache.Cache
+	twitterUserCache cache.Cache
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
@@ -71,6 +71,9 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		return
 	}
 	bearerKey = cfg.TwitterBearerToken
+
+	tweetCache = cache.NewPostgreSQLCache(cfg, "tweets", resolver.MarshalResponse(loadTweet), 24*time.Hour)
+	twitterUserCache = cache.NewPostgreSQLCache(cfg, "twitterUsers", resolver.MarshalResponse(loadTwitterUser), 24*time.Hour)
 
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

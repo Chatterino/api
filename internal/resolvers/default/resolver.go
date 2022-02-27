@@ -1,12 +1,13 @@
 package defaultresolver
 
 import (
-	"fmt"
-	"log"
+	"errors"
 	"net/http"
+	"net/url"
 	"text/template"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/resolvers/betterttv"
 	"github.com/Chatterino/api/internal/resolvers/discord"
 	"github.com/Chatterino/api/internal/resolvers/frankerfacez"
@@ -51,26 +52,89 @@ type R struct {
 
 	defaultResolverCache          cache.Cache
 	defaultResolverThumbnailCache cache.Cache
+
+	logger logger.Logger
 }
 
 func (dr *R) HandleRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HANDLE REQUEST", r.URL.Path)
+	dr.logger.Debugw("Handle request",
+		"path", r.URL.Path,
+	)
 	w.Header().Set("Content-Type", "application/json")
-	url, err := utils.UnescapeURLArgument(r, "url")
+	urlString, err := utils.UnescapeURLArgument(r, "url")
 	if err != nil {
 		_, err = w.Write(resolver.InvalidURL)
 		if err != nil {
-			log.Println("Error writing response:", err)
+			dr.logger.Errorw("Error writing response",
+				"error", err,
+			)
 		}
 		return
 	}
 
-	response := dr.defaultResolverCache.Get(url, r)
-
-	_, err = w.Write(response.([]byte))
+	requestUrl, err := url.Parse(urlString)
 	if err != nil {
-		log.Println("Error writing response:", err)
+		dr.logger.Errorw("Error parsing url",
+			"url", urlString,
+			"error", err,
+		)
+		if _, err = w.Write(resolver.InvalidURL); err != nil {
+			dr.logger.Errorw("Error writing response",
+				"error", err,
+			)
+		}
 	}
+
+	for _, m := range dr.customResolvers {
+		if m.Check(requestUrl) {
+			// TODO: include custom resolver info
+			dr.logger.Debugw("Run url on custom resolver",
+				"url", requestUrl,
+			)
+			data, err := m.Run(requestUrl, r)
+
+			if errors.Is(err, resolver.ErrDontHandle) {
+				break
+			}
+
+			// TODO: Replace custom with the name of the resolver
+			resolverHits.WithLabelValues("custom").Inc()
+
+			if err != nil {
+				dr.logger.Errorw("Error in custom resolver, falling back to default",
+					"url", requestUrl,
+					"error", err,
+				)
+				break
+			}
+
+			_, err = w.Write(data)
+			if err != nil {
+				dr.logger.Errorw("Error writing response",
+					"error", err,
+				)
+			}
+			return
+		}
+	}
+
+	resolverHits.WithLabelValues("default").Inc()
+
+	response, err := dr.defaultResolverCache.Get(urlString, r)
+	if err != nil {
+		dr.logger.Errorw("Error in default resolver",
+			"url", requestUrl,
+			"error", err,
+		)
+	} else {
+		_, err = w.Write(response)
+		if err != nil {
+			dr.logger.Errorw("Error writing response",
+				"error", err,
+			)
+		}
+	}
+
 }
 
 func (dr *R) HandleThumbnailRequest(w http.ResponseWriter, r *http.Request) {
@@ -78,27 +142,39 @@ func (dr *R) HandleThumbnailRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		_, err = w.Write(resolver.InvalidURL)
 		if err != nil {
-			log.Println("Error writing thumbnail response:", err)
+			dr.logger.Errorw("Error writing response",
+				"error", err,
+			)
 		}
 		return
 	}
 
-	response := dr.defaultResolverThumbnailCache.Get(url, r)
+	response, err := dr.defaultResolverThumbnailCache.Get(url, r)
 
-	_, err = w.Write(response.([]byte))
 	if err != nil {
-		log.Println("Error writing thumbnail response:", err)
+		dr.logger.Errorw("Error in thumbnail request",
+			"url", url,
+			"error", err,
+		)
+		return
+	}
+
+	_, err = w.Write(response)
+	if err != nil {
+		dr.logger.Errorw("Error writing response",
+			"error", err,
+		)
 	}
 }
 
 func New(cfg config.APIConfig, helixClient *helix.Client) *R {
 	r := &R{
-		cfg: cfg,
+		cfg:    cfg,
+		logger: cfg.Logger,
 	}
 
 	r.defaultResolverCache = cache.NewPostgreSQLCache(cfg, "linkResolver", r.load, 10*time.Minute)
-	// r.defaultResolverCache = cache.NewMemoryCache("linkResolver", r.load, 10*time.Minute)
-	r.defaultResolverThumbnailCache = cache.New("thumbnail", thumbnail.DoThumbnailRequest, 10*time.Minute)
+	r.defaultResolverThumbnailCache = cache.NewPostgreSQLCache(cfg, "thumbnail", thumbnail.DoThumbnailRequest, 10*time.Minute)
 
 	// Register Link Resolvers from internal/resolvers/
 	r.customResolvers = append(r.customResolvers, betterttv.New(cfg)...)
@@ -121,7 +197,8 @@ func Initialize(router *chi.Mux, cfg config.APIConfig, helixClient *helix.Client
 	defaultLinkResolver := New(cfg, helixClient)
 
 	cached := stampede.Handler(512, 10*time.Second)
+	imageCached := stampede.Handler(256, 2*time.Second)
 
 	router.With(cached).Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
-	router.Get("/thumbnail/{url}", defaultLinkResolver.HandleThumbnailRequest)
+	router.With(imageCached).Get("/thumbnail/{url}", defaultLinkResolver.HandleThumbnailRequest)
 }

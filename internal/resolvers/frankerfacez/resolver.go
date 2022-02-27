@@ -31,7 +31,7 @@ var (
 
 	emotePathRegex = regexp.MustCompile(`/emoticon/([0-9]+)(-(.+)?)?$`)
 
-	emoteCache = cache.New("ffz_emotes", load, 1*time.Hour)
+	emoteCache cache.Cache
 
 	tmpl = template.Must(template.New("frankerfacezEmoteTooltip").Parse(tooltipTemplate))
 
@@ -39,6 +39,7 @@ var (
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	emoteCache = cache.NewPostgreSQLCache(cfg, "ffz_emotes", resolver.MarshalResponse(load), 1*time.Hour)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,
 

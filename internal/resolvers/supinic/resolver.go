@@ -26,7 +26,7 @@ const (
 var (
 	trackListTemplate = template.Must(template.New("trackListEntryTooltip").Parse(tooltipTemplate))
 
-	trackListCache = cache.New("supinic_track_list_tracks", load, 1*time.Hour)
+	trackListCache cache.Cache
 
 	errInvalidTrackPath = errors.New("invalid track list track path")
 
@@ -39,6 +39,7 @@ var (
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	trackListCache = cache.NewPostgreSQLCache(cfg, "supinic_track_list_tracks", resolver.MarshalResponse(load), 1*time.Hour)
 	// Find links matching the Track list link (e.g. https://supinic.com/track/detail/1883)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

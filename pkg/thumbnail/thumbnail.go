@@ -61,7 +61,7 @@ func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, erro
 	return nil, errors.New("cannot build animated thumbnails on windows")
 }
 
-func DoThumbnailRequest(urlString string, r *http.Request) (interface{}, time.Duration, error) {
+func DoThumbnailRequest(urlString string, r *http.Request) ([]byte, time.Duration, error) {
 	url, err := url.Parse(urlString)
 	if err != nil {
 		return resolver.InvalidURL, cache.NoSpecialDur, nil

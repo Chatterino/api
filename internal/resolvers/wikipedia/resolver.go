@@ -17,7 +17,7 @@ var (
 
 	wikipediaTooltipTemplate = template.Must(template.New("wikipediaTooltipTemplate").Parse(wikipediaTooltip))
 
-	wikipediaCache = cache.New("wikipedia", load, 1*time.Hour)
+	wikipediaCache cache.Cache
 
 	errLocaleMatch = errors.New("could not find locale from URL")
 	errTitleMatch  = errors.New("could not find title from URL")
@@ -26,6 +26,8 @@ var (
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	log = cfg.Logger
+	wikipediaCache = cache.NewPostgreSQLCache(cfg, "wikipedia", resolver.MarshalResponse(load), 1*time.Hour)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,
 

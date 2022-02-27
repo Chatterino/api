@@ -31,7 +31,7 @@ const (
 var (
 	discordInviteURLRegex = regexp.MustCompile(`^(www\.)?discord\.(gg|com\/invite)\/([a-zA-Z0-9-]+)`)
 
-	inviteCache = cache.New("discord_invites", load, 6*time.Hour) // Often calls quickly result in 429's
+	inviteCache cache.Cache
 
 	inviteNotFoundResponse = &resolver.Response{
 		Status:  http.StatusNotFound,
@@ -52,6 +52,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		return
 	}
 	token = cfg.DiscordToken
+	inviteCache = cache.NewPostgreSQLCache(cfg, "discord_invites", resolver.MarshalResponse(load), 6*time.Hour) // Often calls quickly result in 429's
 
 	// Find links matching the Discord invite link (e.g. https://discord.com/invite/mlp, https://discord.gg/mlp)
 	resolvers = append(resolvers, resolver.CustomURLManager{

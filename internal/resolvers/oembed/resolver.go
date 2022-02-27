@@ -2,7 +2,6 @@ package oembed
 
 import (
 	"bytes"
-	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -28,7 +27,7 @@ const (
 var (
 	oEmbedTemplate = template.Must(template.New("oEmbedTemplateTooltip").Parse(oEmbedTooltipString))
 
-	oEmbedCache = cache.New("oEmbed", load, 1*time.Hour)
+	oEmbedCache cache.Cache
 
 	oEmbed = oembed.NewOembed()
 )
@@ -41,6 +40,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 		log.Println("[oEmbed] No providers.json file found, won't do oEmbed parsing")
 		return
 	}
+	oEmbedCache = cache.NewPostgreSQLCache(cfg, "oEmbed", resolver.MarshalResponse(load), 1*time.Hour)
 
 	if cfg.OembedFacebookAppID != "" && cfg.OembedFacebookAppSecret != "" {
 		if err := initFacebookAppAccessToken(cfg.OembedFacebookAppID, cfg.OembedFacebookAppSecret); err != nil {
@@ -57,8 +57,7 @@ func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
 			return oEmbed.FindItem(url.String()) != nil
 		},
 		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
-			apiResponse := oEmbedCache.Get(url.String(), r)
-			return json.Marshal(apiResponse)
+			return oEmbedCache.Get(url.String(), r)
 		},
 	})
 

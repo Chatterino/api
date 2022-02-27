@@ -2,12 +2,12 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -47,10 +47,13 @@ func readFromPath(path string) (values map[string]interface{}, err error) {
 // file in the cwd and merge those in. If a value is not set in the cwd config
 // file, but one is set in the system config file then the system config file
 // value will be used
-func mergeConfig(v *viper.Viper, configPaths []string) {
+func mergeConfig(v *viper.Viper, configPaths []string, log logger.Logger) {
 	for _, configPath := range configPaths {
 		if configMap, err := readFromPath(configPath); err != nil {
-			fmt.Printf("Error reading config file from %s.yaml: %s\n", filepath.Join(configPath, configName), err)
+			log.Errorw("Error reading config file",
+				"file", filepath.Join(configPath, configName),
+				"error", err,
+			)
 			return
 		} else {
 			v.MergeConfigMap(configMap)
@@ -75,10 +78,12 @@ func init() {
 	pflag.String("oembed-facebook-app-secret", "", "oEmbed Facebook app secret")
 	pflag.String("oembed-providers-path", "./data/oembed/providers.json", "Path to a json file containing supported oEmbed resolvers")
 	pflag.String("dsn", "", "Connection string for the PostgreSQL cache")
+	pflag.Bool("enable-prometheus", true, "When enabled, will host a Prometheus metrics HTTP server on the prometheus-bind-address")
+	pflag.String("prometheus-bind-address", "127.0.0.1:9382", "Address to which the API will host its Prometheus metrics")
 	pflag.Parse()
 }
 
-func New() (cfg APIConfig) {
+func New(log logger.Logger) (cfg APIConfig) {
 	v := viper.New()
 
 	v.BindPFlags(pflag.CommandLine)
@@ -102,7 +107,7 @@ func New() (cfg APIConfig) {
 	configPaths = append(configPaths, filepath.Join(xdgConfigHome, appName))
 	configPaths = append(configPaths, ".")
 
-	mergeConfig(v, configPaths)
+	mergeConfig(v, configPaths, log)
 
 	// Environment
 	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
@@ -110,6 +115,8 @@ func New() (cfg APIConfig) {
 	v.AutomaticEnv()
 
 	v.UnmarshalExact(&cfg)
+
+	cfg.Logger = log
 
 	//fmt.Printf("%# v\n", cfg) // uncomment for debugging purposes
 	return

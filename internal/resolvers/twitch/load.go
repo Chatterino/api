@@ -2,6 +2,8 @@ package twitch
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"net/url"
@@ -13,7 +15,25 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
-func load(clipSlug string, r *http.Request) (interface{}, time.Duration, error) {
+func actuallyLoad(clipSlug string, r *http.Request) (interface{}, time.Duration, error) {
+	value, specialDur, err := load(clipSlug, r)
+	if err != nil {
+		return nil, specialDur, err
+	}
+
+	if value == nil {
+		return nil, specialDur, errors.New("inner load value must not be nil when error is nil")
+	}
+
+	valueBytes, marshalErr := json.Marshal(value)
+	if marshalErr != nil {
+		return nil, specialDur, marshalErr
+	}
+
+	return valueBytes, specialDur, nil
+}
+
+func load(clipSlug string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	log.Println("[TwitchClip] GET", clipSlug)
 
 	response, err := helixAPI.GetClips(&helix.ClipsParams{IDs: []string{clipSlug}})

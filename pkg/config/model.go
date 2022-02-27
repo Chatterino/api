@@ -1,5 +1,7 @@
 package config
 
+import "github.com/Chatterino/api/internal/logger"
+
 type APIConfig struct {
 	// Core
 
@@ -8,6 +10,11 @@ type APIConfig struct {
 	MaxContentLength uint64 `mapstructure:"max-content-length" json:"max-content-length"`
 	EnableLilliput   bool   `mapstructure:"enable-lilliput" json:"enable-lilliput"`
 	MaxThumbnailSize uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
+
+	DSN string `mapstructure:"dsn" json:"dsn"`
+
+	EnablePrometheus      bool   `mapstructure:"enable-prometheus" json:"enable-prometheus"`
+	PrometheusBindAddress string `mapstructure:"prometheus-bind-address" json:"prometheus-bind-address"`
 
 	// Secrets
 
@@ -21,5 +28,6 @@ type APIConfig struct {
 	OembedFacebookAppSecret string `mapstructure:"oembed-facebook-app-secret" json:"oembed-facebook-app-secret"`
 	OembedProvidersPath     string `mapstructure:"oembed-providers-path" json:"oembed-providers-path"`
 
-	DSN string `mapstructure:"dsn" json:"dsn"`
+	// Temporarily pass logger along for easier use in custom resolvers
+	Logger logger.Logger
 }

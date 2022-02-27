@@ -14,10 +14,18 @@ func FormatThumbnailURL(baseURL string, r *http.Request, urlString string) strin
 		return fmt.Sprintf("%s/thumbnail/%s", strings.TrimSuffix(baseURL, "/"), url.QueryEscape(urlString))
 	}
 
+	forwardedProtocol := r.Header.Get("X-Forwarded-Proto")
+
 	scheme := "https://"
-	if r.TLS == nil {
+
+	if forwardedProtocol == "https" {
+		scheme = "https://"
+	} else if forwardedProtocol == "http" {
+		scheme = "http://"
+	} else if r.TLS == nil {
 		scheme = "http://" // https://github.com/golang/go/issues/28940#issuecomment-441749380
 	}
+
 	return fmt.Sprintf("%s%s/thumbnail/%s", scheme, r.Host, url.QueryEscape(urlString))
 }
 

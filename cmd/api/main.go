@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/Chatterino/api/internal/routes/twitchemotes"
 	"github.com/Chatterino/api/internal/twitchapiclient"
@@ -15,6 +15,8 @@ import (
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var (
@@ -23,16 +25,16 @@ var (
 	prefix string
 )
 
-func mountRouter(r *chi.Mux, cfg config.APIConfig) *chi.Mux {
+func mountRouter(r *chi.Mux, cfg config.APIConfig, log logger.Logger) *chi.Mux {
 	if cfg.BaseURL == "" {
-		log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", cfg.BindAddress, prefix, cfg.BaseURL)
+		log.Debugw("Listening", "host", cfg.BindAddress, "prefix", prefix, "baseURL", cfg.BaseURL)
 		return r
 	}
 
 	// figure out prefix from address
 	u, err := url.Parse(cfg.BaseURL)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalw("Unable to parse base URL", "baseURL", cfg.BaseURL, "error", err)
 	}
 	if u.Scheme != "http" && u.Scheme != "https" {
 		log.Fatal("Scheme must be included in base url")
@@ -42,12 +44,12 @@ func mountRouter(r *chi.Mux, cfg config.APIConfig) *chi.Mux {
 	ur := chi.NewRouter()
 	ur.Mount(prefix, r)
 
-	log.Printf("Listening on %s (Prefix=%s, BaseURL=%s)\n", cfg.BindAddress, prefix, cfg.BaseURL)
+	log.Debugw("Listening", "host", cfg.BindAddress, "prefix", prefix, "baseURL", cfg.BaseURL)
 
 	return ur
 }
 
-func listen(bind string, router *chi.Mux) {
+func listen(bind string, router *chi.Mux, log logger.Logger) {
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         bind,
@@ -59,7 +61,20 @@ func listen(bind string, router *chi.Mux) {
 }
 
 func main() {
-	cfg := config.New()
+	zapConfig := zap.NewDevelopmentConfig()
+	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	logger, _ := zapConfig.Build()
+	defer logger.Sync()
+
+	// Just until we've remove default log package usage in the project
+	zap.RedirectStdLog(logger)
+
+	log := logger.Sugar()
+
+	cache.SetLogger(log)
+	resolver.SetLogger(log)
+
+	cfg := config.New(log)
 
 	resolver.InitializeStaticResponses(cfg)
 	thumbnail.InitializeConfig(cfg)
@@ -73,14 +88,19 @@ func main() {
 
 	helixClient, helixUsernameCache, err := twitchapiclient.New(cfg)
 	if err != nil {
-		log.Printf("[Twitch] %s\n", err.Error())
+		log.Warnw("Error initializing Twitch API client", "error", err)
 	}
 
-	twitchemotes.Initialize(router, helixClient, helixUsernameCache)
+	if cfg.EnablePrometheus {
+		// Host a prometheus metrics instance on cfg.PrometheusBindAddress (127.0.0.1:9382 by default)
+		listenPrometheus(cfg)
+	}
+
+	twitchemotes.Initialize(cfg, router, helixClient, helixUsernameCache)
 	handleRoot(router)
 	handleHealth(router)
 	handleLegal(router)
 	defaultresolver.Initialize(router, cfg, helixClient)
 
-	listen(cfg.BindAddress, mountRouter(router, cfg))
+	listen(cfg.BindAddress, mountRouter(router, cfg, log), log)
 }

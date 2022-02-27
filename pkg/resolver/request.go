@@ -13,6 +13,9 @@ var (
 )
 
 func RequestGET(url string) (response *http.Response, err error) {
+	log.Debugw("[resolver] GET",
+		"url", url,
+	)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

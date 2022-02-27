@@ -9,8 +9,8 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
-func loadUsername(helixClient *helix.Client) func(key string, r *http.Request) (interface{}, time.Duration, error) {
-	return func(twitchUserID string, r *http.Request) (interface{}, time.Duration, error) {
+func loadUsername(helixClient *helix.Client) func(key string, r *http.Request) ([]byte, time.Duration, error) {
+	return func(twitchUserID string, r *http.Request) ([]byte, time.Duration, error) {
 		params := &helix.UsersParams{
 			IDs: []string{
 				twitchUserID,
@@ -28,6 +28,6 @@ func loadUsername(helixClient *helix.Client) func(key string, r *http.Request) (
 
 		user := response.Data.Users[0]
 
-		return user.Login, cache.NoSpecialDur, nil
+		return []byte(user.Login), cache.NoSpecialDur, nil
 	}
 }

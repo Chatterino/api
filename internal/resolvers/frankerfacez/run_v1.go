@@ -1,7 +1,6 @@
 package frankerfacez
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/url"
 )
@@ -14,7 +13,6 @@ func run(url *url.URL, r *http.Request) ([]byte, error) {
 
 	emoteHash := matches[1]
 
-	apiResponse := emoteCache.Get(emoteHash, r)
-	return json.Marshal(apiResponse)
+	return emoteCache.Get(emoteHash, r)
 
 }

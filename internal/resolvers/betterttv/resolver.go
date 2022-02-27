@@ -34,12 +34,13 @@ var (
 
 	emotePathRegex = regexp.MustCompile(`/emotes/([a-f0-9]+)`)
 
-	emoteCache = cache.New("betterttv_emotes", load, 1*time.Hour)
+	emoteCache cache.Cache
 
 	tmpl = template.Must(template.New("betterttvEmoteTooltip").Parse(tooltipTemplate))
 )
 
 func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+	emoteCache = cache.NewPostgreSQLCache(cfg, "betterttv_emotes", resolver.MarshalResponse(load), 1*time.Hour)
 	// Find links matching the BetterTTV direct emote link (e.g. https://betterttv.com/emotes/566ca06065dbbdab32ec054e)
 	resolvers = append(resolvers, resolver.CustomURLManager{
 		Check: check,

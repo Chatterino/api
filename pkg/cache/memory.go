@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Chatterino/api/pkg/config"
 	pCache "github.com/patrickmn/go-cache"
 )
 
@@ -19,7 +20,7 @@ type MemoryCache struct {
 	loader Loader
 
 	requestsMutex sync.Mutex
-	requests      map[string][]chan interface{}
+	requests      map[string][]chan []byte
 
 	cacheDuration time.Duration
 
@@ -50,16 +51,16 @@ func (c *MemoryCache) load(key string, r *http.Request) {
 	c.requestsMutex.Unlock()
 }
 
-func (c *MemoryCache) Get(key string, r *http.Request) (value interface{}) {
-	var found bool
+func (c *MemoryCache) Get(key string, r *http.Request) []byte {
 	cacheKey := c.prefix + ":" + key
 
 	// If key is in cache, return value
-	if value, found = kvCache.Get(cacheKey); found {
-		return
+	if value, found := kvCache.Get(cacheKey); found && value != nil {
+		log.Debugw("Memory Get cache hit", "prefix", c.prefix, "key", key)
+		return value.([]byte)
 	}
 
-	responseChannel := make(chan interface{})
+	responseChannel := make(chan []byte)
 
 	c.requestsMutex.Lock()
 
@@ -70,21 +71,32 @@ func (c *MemoryCache) Get(key string, r *http.Request) (value interface{}) {
 	c.requestsMutex.Unlock()
 
 	if first {
+		log.Debugw("Memory Get cache miss", "prefix", c.prefix, "key", key)
 		go c.load(key, r)
 	}
 
-	value = <-responseChannel
-
 	// If key is not in cache, sign up as a listener and ensure loader is only called once
 	// Wait for loader to complete, then return value from loader
-	return
+	return <-responseChannel
 }
 
-func NewMemoryCache(prefix string, loader Loader, cacheDuration time.Duration) *MemoryCache {
+func (c *MemoryCache) GetOnly(key string) []byte {
+	cacheKey := c.prefix + ":" + key
+
+	if value, _ := kvCache.Get(cacheKey); value != nil {
+		log.Debugw("Memory GetOnly cache hit", "prefix", c.prefix, "key", key)
+		return value.([]byte)
+	}
+
+	log.Debugw("Memory GetOnly cache miss", "prefix", c.prefix, "key", key)
+	return nil
+}
+
+func NewMemoryCache(cfg config.APIConfig, prefix string, loader Loader, cacheDuration time.Duration) *MemoryCache {
 	return &MemoryCache{
 		prefix:        prefix,
 		loader:        loader,
-		requests:      make(map[string][]chan interface{}),
+		requests:      make(map[string][]chan []byte),
 		cacheDuration: cacheDuration,
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func loadTweet(tweetID string, r *http.Request) (interface{}, time.Duration, error) {
+func loadTweet(tweetID string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	log.Println("[Twitter] GET", tweetID)
 
 	tweetResp, err := getTweetByID(tweetID, bearerKey)
@@ -49,7 +49,7 @@ func loadTweet(tweetID string, r *http.Request) (interface{}, time.Duration, err
 	}, cache.NoSpecialDur, nil
 }
 
-func loadTwitterUser(userName string, r *http.Request) (interface{}, time.Duration, error) {
+func loadTwitterUser(userName string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	log.Println("[Twitter] GET", userName)
 
 	userResp, err := getUserByName(userName, bearerKey)
