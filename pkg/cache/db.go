@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/migration"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/jackc/pgconn"
@@ -62,6 +63,8 @@ func clearOldTooltips(ctx context.Context) (pgconn.CommandTag, error) {
 }
 
 func startTooltipClearer(ctx context.Context) {
+	log := logger.FromContext(ctx)
+
 	ticker := time.NewTicker(1 * time.Minute)
 	for {
 		select {
@@ -79,8 +82,10 @@ func startTooltipClearer(ctx context.Context) {
 	}
 }
 
-func (c *PostgreSQLCache) load(key string, r *http.Request) ([]byte, error) {
-	valueBytes, overrideDuration, err := c.loader(key, r)
+func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request) ([]byte, error) {
+	log := logger.FromContext(ctx)
+
+	valueBytes, overrideDuration, err := c.loader.Load(ctx, key, r)
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {
@@ -92,7 +97,7 @@ func (c *PostgreSQLCache) load(key string, r *http.Request) ([]byte, error) {
 	}
 
 	cacheKey := c.prefix + ":" + key
-	if _, err := pool.Exec(context.Background(), "INSERT INTO cache (key, value, cached_until) VALUES ($1, $2, $3)", cacheKey, valueBytes, time.Now().Add(dur)); err != nil {
+	if _, err := pool.Exec(ctx, "INSERT INTO cache (key, value, cached_until) VALUES ($1, $2, $3)", cacheKey, valueBytes, time.Now().Add(dur)); err != nil {
 		log.Errorw("Error inserting tooltip into cache",
 			"prefix", c.prefix,
 			"key", key,
@@ -116,9 +121,9 @@ func (c *PostgreSQLCache) loadFromDatabase(ctx context.Context, cacheKey string)
 	return nil, nil
 }
 
-func (c *PostgreSQLCache) Get(key string, r *http.Request) ([]byte, error) {
+func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) ([]byte, error) {
+	log := logger.FromContext(ctx)
 	cacheKey := c.prefix + ":" + key
-	ctx := context.Background()
 
 	value, err := c.loadFromDatabase(ctx, cacheKey)
 	if err != nil {
@@ -132,12 +137,12 @@ func (c *PostgreSQLCache) Get(key string, r *http.Request) ([]byte, error) {
 
 	cacheMisses.Inc()
 	log.Debugw("DB Get cache miss", "prefix", c.prefix, "key", key)
-	return c.load(key, r)
+	return c.load(ctx, key, r)
 }
 
-func (c *PostgreSQLCache) GetOnly(key string) []byte {
+func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) []byte {
+	log := logger.FromContext(ctx)
 	cacheKey := c.prefix + ":" + key
-	ctx := context.Background()
 
 	value, err := c.loadFromDatabase(ctx, cacheKey)
 	if err != nil {
@@ -159,6 +164,8 @@ func initPool(ctx context.Context, dsn string) {
 		// connection pool already initialized
 		return
 	}
+
+	log := logger.FromContext(ctx)
 
 	var err error
 
@@ -188,10 +195,12 @@ func initPool(ctx context.Context, dsn string) {
 			"error", err,
 		)
 	} else {
-		log.Infow("Ran database migrations",
-			"oldVersion", oldVersion,
-			"newVersion", newVersion,
-		)
+		if newVersion != oldVersion {
+			log.Infow("Ran database migrations",
+				"oldVersion", oldVersion,
+				"newVersion", newVersion,
+			)
+		}
 	}
 
 	go startTooltipClearer(ctx)
@@ -199,8 +208,7 @@ func initPool(ctx context.Context, dsn string) {
 	// TODO: We currently don't close the connection pool
 }
 
-func NewPostgreSQLCache(cfg config.APIConfig, prefix string, loader Loader, cacheDuration time.Duration) *PostgreSQLCache {
-	ctx := context.Background()
+func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, prefix string, loader Loader, cacheDuration time.Duration) *PostgreSQLCache {
 	initPool(ctx, cfg.DSN)
 
 	// Create connection pool if it's not already initialized

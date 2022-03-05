@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/caches/twitchusernamecache"
 	"github.com/Chatterino/api/internal/logger"
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/Chatterino/api/internal/routes/twitchemotes"
@@ -15,6 +19,7 @@ import (
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.uber.org/zap"
 )
 
 var (
@@ -47,27 +52,38 @@ func mountRouter(r *chi.Mux, cfg config.APIConfig, log logger.Logger) *chi.Mux {
 	return ur
 }
 
-func listen(bind string, router *chi.Mux, log logger.Logger) {
+func listen(ctx context.Context, bind string, router *chi.Mux, log logger.Logger) {
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         bind,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
+		BaseContext: func(l net.Listener) context.Context {
+			return ctx
+		},
 	}
 
 	log.Fatal(srv.ListenAndServe())
 }
 
 func main() {
-	log := logger.New()
+
+	cfg := config.New()
+
+	var atomicLogLevel zap.AtomicLevel
+	var err error
+
+	if atomicLogLevel, err = zap.ParseAtomicLevel(cfg.LogLevel); err != nil {
+		fmt.Printf("Invalid log level supplied (%s), defaulting to info\n", err)
+		atomicLogLevel = zap.NewAtomicLevelAt(zap.InfoLevel)
+	}
+	log := logger.New(atomicLogLevel, cfg.LogDevelopment)
 	defer log.Sync()
 
-	cache.SetLogger(log)
-	resolver.SetLogger(log)
+	// attach logger to context
+	ctx := context.WithValue(context.Background(), logger.ContextKey, log)
 
-	cfg := config.New(log)
-
-	resolver.InitializeStaticResponses(cfg)
+	resolver.InitializeStaticResponses(ctx, cfg)
 	thumbnail.InitializeConfig(cfg)
 
 	router := chi.NewRouter()
@@ -77,9 +93,13 @@ func main() {
 
 	var helixUsernameCache cache.Cache
 
-	helixClient, helixUsernameCache, err := twitchapiclient.New(cfg)
+	helixClient, err := twitchapiclient.New(ctx, cfg)
 	if err != nil {
-		log.Warnw("Error initializing Twitch API client", "error", err)
+		log.Warnw("Error initializing Twitch API client",
+			"error", err,
+		)
+	} else {
+		helixUsernameCache = twitchusernamecache.New(ctx, cfg, helixClient)
 	}
 
 	if cfg.EnablePrometheus {
@@ -87,11 +107,11 @@ func main() {
 		listenPrometheus(cfg)
 	}
 
-	twitchemotes.Initialize(cfg, router, helixClient, helixUsernameCache)
+	twitchemotes.Initialize(ctx, cfg, router, helixClient, helixUsernameCache)
 	handleRoot(router)
 	handleHealth(router)
 	handleLegal(router)
-	defaultresolver.Initialize(router, cfg, helixClient)
+	defaultresolver.Initialize(ctx, router, cfg, helixClient)
 
-	listen(cfg.BindAddress, mountRouter(router, cfg, log), log)
+	listen(ctx, cfg.BindAddress, mountRouter(router, cfg, log), log)
 }

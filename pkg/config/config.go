@@ -2,12 +2,12 @@ package config
 
 import (
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	"github.com/Chatterino/api/internal/logger"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -47,13 +47,10 @@ func readFromPath(path string) (values map[string]interface{}, err error) {
 // file in the cwd and merge those in. If a value is not set in the cwd config
 // file, but one is set in the system config file then the system config file
 // value will be used
-func mergeConfig(v *viper.Viper, configPaths []string, log logger.Logger) {
+func mergeConfig(v *viper.Viper, configPaths []string) {
 	for _, configPath := range configPaths {
 		if configMap, err := readFromPath(configPath); err != nil {
-			log.Errorw("Error reading config file",
-				"file", filepath.Join(configPath, configName),
-				"error", err,
-			)
+			log.Fatalf("Error reading config file at %s: %s\n", filepath.Join(configPath, configName), err)
 			return
 		} else {
 			v.MergeConfigMap(configMap)
@@ -68,6 +65,8 @@ func init() {
 	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size in bytes - requests with body bigger than this value will be skipped")
 	pflag.Bool("enable-lilliput", true, "When enabled, will attempt to use lilliput library for building animated thumbnails. Can increase memory usage by a lot")
 	pflag.Uint("max-thumbnail-size", 300, "Maximum width/height pixel size count of the thumbnails sent to the clients.")
+	pflag.String("log-level", "info", "Log level")
+	pflag.Bool("log-development", false, "Enable development logging for warnings and above, this includes stack traces")
 	pflag.String("discord-token", "", "Discord token")
 	pflag.String("twitch-client-id", "", "Twitch client ID")
 	pflag.String("twitch-client-secret", "", "Twitch client secret")
@@ -83,7 +82,7 @@ func init() {
 	pflag.Parse()
 }
 
-func New(log logger.Logger) (cfg APIConfig) {
+func New() (cfg APIConfig) {
 	v := viper.New()
 
 	v.BindPFlags(pflag.CommandLine)
@@ -107,7 +106,7 @@ func New(log logger.Logger) (cfg APIConfig) {
 	configPaths = append(configPaths, filepath.Join(xdgConfigHome, appName))
 	configPaths = append(configPaths, ".")
 
-	mergeConfig(v, configPaths, log)
+	mergeConfig(v, configPaths)
 
 	// Environment
 	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
@@ -115,8 +114,6 @@ func New(log logger.Logger) (cfg APIConfig) {
 	v.AutomaticEnv()
 
 	v.UnmarshalExact(&cfg)
-
-	cfg.Logger = log
 
 	//fmt.Printf("%# v\n", cfg) // uncomment for debugging purposes
 	return

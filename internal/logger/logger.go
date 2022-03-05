@@ -1,6 +1,9 @@
 package logger
 
 import (
+	"context"
+	"log"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -22,8 +25,30 @@ type Logger interface {
 	Sync() error
 }
 
-func New() Logger {
-	zapConfig := zap.NewDevelopmentConfig()
+type ContextKeyType string
+
+var (
+	ContextKey = ContextKeyType("logger")
+)
+
+func FromContext(ctx context.Context) Logger {
+	if v := ctx.Value(ContextKey); v != nil {
+		return v.(Logger)
+	}
+
+	log.Fatal("No logger found in context")
+	return nil
+}
+
+func New(logLevel zap.AtomicLevel, logDevelopment bool) Logger {
+	zapConfig := zap.Config{
+		Level:            logLevel,
+		Development:      logDevelopment,
+		Encoding:         "console",
+		EncoderConfig:    zap.NewDevelopmentEncoderConfig(),
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
 	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	logger, _ := zapConfig.Build()
 

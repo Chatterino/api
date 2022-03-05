@@ -1,9 +1,12 @@
 package resolver
 
 import (
+	"context"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/Chatterino/api/internal/logger"
 )
 
 var (
@@ -12,7 +15,9 @@ var (
 	}
 )
 
-func RequestGET(url string) (response *http.Response, err error) {
+func RequestGET(ctx context.Context, url string) (response *http.Response, err error) {
+	log := logger.FromContext(ctx)
+
 	log.Debugw("[resolver] GET",
 		"url", url,
 	)

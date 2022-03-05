@@ -1,11 +1,13 @@
 package cache
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	pCache "github.com/patrickmn/go-cache"
 )
@@ -27,8 +29,9 @@ type MemoryCache struct {
 	prefix string
 }
 
-func (c *MemoryCache) load(key string, r *http.Request) {
-	value, overrideDuration, err := c.loader(key, r)
+func (c *MemoryCache) load(ctx context.Context, key string, r *http.Request) {
+
+	value, overrideDuration, err := c.loader.Load(ctx, key, r)
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {
@@ -51,7 +54,8 @@ func (c *MemoryCache) load(key string, r *http.Request) {
 	c.requestsMutex.Unlock()
 }
 
-func (c *MemoryCache) Get(key string, r *http.Request) []byte {
+func (c *MemoryCache) Get(ctx context.Context, key string, r *http.Request) []byte {
+	log := logger.FromContext(ctx)
 	cacheKey := c.prefix + ":" + key
 
 	// If key is in cache, return value
@@ -72,7 +76,7 @@ func (c *MemoryCache) Get(key string, r *http.Request) []byte {
 
 	if first {
 		log.Debugw("Memory Get cache miss", "prefix", c.prefix, "key", key)
-		go c.load(key, r)
+		go c.load(ctx, key, r)
 	}
 
 	// If key is not in cache, sign up as a listener and ensure loader is only called once
@@ -80,7 +84,8 @@ func (c *MemoryCache) Get(key string, r *http.Request) []byte {
 	return <-responseChannel
 }
 
-func (c *MemoryCache) GetOnly(key string) []byte {
+func (c *MemoryCache) GetOnly(ctx context.Context, key string) []byte {
+	log := logger.FromContext(ctx)
 	cacheKey := c.prefix + ":" + key
 
 	if value, _ := kvCache.Get(cacheKey); value != nil {

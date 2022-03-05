@@ -2,6 +2,7 @@ package wikipedia
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
+func getPageInfo(ctx context.Context, urlString string) (*wikipediaTooltipData, error) {
 	u, err := url.Parse(urlString)
 	if err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func getPageInfo(urlString string) (*wikipediaTooltipData, error) {
 
 	requestURL := fmt.Sprintf(endpointURL, localeCode, canonicalName)
 
-	resp, err := resolver.RequestGET(requestURL)
+	resp, err := resolver.RequestGET(ctx, requestURL)
 	if err != nil {
 		return nil, err
 	}

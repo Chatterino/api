@@ -2,8 +2,7 @@ package oembed
 
 import (
 	"bytes"
-	"html/template"
-	"io/ioutil"
+	"context"
 	"log"
 	"net/http"
 	"net/url"
@@ -15,51 +14,43 @@ import (
 	"github.com/dyatlov/go-oembed/oembed"
 )
 
-const (
-	oEmbedTooltipString = `<div style="text-align: left;">
-<b>{{.ProviderName}}{{ if .Title }} - {{.Title}}{{ end }}</b><hr>
-{{ if .Description }}{{.Description}}{{ end }}
-{{ if .AuthorName }}<br><b>Author:</b> {{.AuthorName}}{{ end }}
-<br><b>URL:</b> {{.RequestedURL}}
-</div>`
-)
-
-var (
-	oEmbedTemplate = template.Must(template.New("oEmbedTemplateTooltip").Parse(oEmbedTooltipString))
-
+type Resolver struct {
 	oEmbedCache cache.Cache
+	oEmbed      *oembed.Oembed
+}
 
-	oEmbed = oembed.NewOembed()
-)
+func (r *Resolver) Check(ctx context.Context, url *url.URL) bool {
+	return r.oEmbed.FindItem(url.String()) != nil
+}
 
-func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
+func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+	return r.oEmbedCache.Get(ctx, url.String(), req)
+}
 
-	data, err := ioutil.ReadFile(cfg.OembedProvidersPath)
-
-	if err != nil {
-		log.Println("[oEmbed] No providers.json file found, won't do oEmbed parsing")
-		return
-	}
-	oEmbedCache = cache.NewPostgreSQLCache(cfg, "oEmbed", resolver.MarshalResponse(load), 1*time.Hour)
+func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) *Resolver {
+	var err error
+	var facebookAppAccessToken string
 
 	if cfg.OembedFacebookAppID != "" && cfg.OembedFacebookAppSecret != "" {
-		if err := initFacebookAppAccessToken(cfg.OembedFacebookAppID, cfg.OembedFacebookAppSecret); err != nil {
+		if facebookAppAccessToken, err = getFacebookAppAccessToken(cfg.OembedFacebookAppID, cfg.OembedFacebookAppSecret); err != nil {
 			log.Println("[oEmbed] error loading facebook app access token", err)
 		} else {
 			log.Println("[oEmbed] Extra rich info loading enabled for Instagram and Facebook")
 		}
 	}
 
+	oEmbed := oembed.NewOembed()
 	oEmbed.ParseProviders(bytes.NewReader(data))
 
-	resolvers = append(resolvers, resolver.CustomURLManager{
-		Check: func(url *url.URL) bool {
-			return oEmbed.FindItem(url.String()) != nil
-		},
-		Run: func(url *url.URL, r *http.Request) ([]byte, error) {
-			return oEmbedCache.Get(url.String(), r)
-		},
-	})
+	loader := &Loader{
+		oEmbed:                 oEmbed,
+		facebookAppAccessToken: facebookAppAccessToken,
+	}
 
-	return
+	r := &Resolver{
+		oEmbedCache: cache.NewPostgreSQLCache(ctx, cfg, "oembed", resolver.NewResponseMarshaller(loader), 1*time.Hour),
+		oEmbed:      oEmbed,
+	}
+
+	return r
 }

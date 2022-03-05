@@ -1,10 +1,12 @@
 package resolver
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 )
 
@@ -14,7 +16,9 @@ var (
 	ResponseTooLarge []byte
 )
 
-func InitializeStaticResponses(cfg config.APIConfig) {
+func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
+	log := logger.FromContext(ctx)
+
 	var err error
 	r := &Response{
 		Status:  404,

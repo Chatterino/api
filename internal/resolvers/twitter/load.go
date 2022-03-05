@@ -2,26 +2,37 @@ package twitter
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func loadTweet(tweetID string, r *http.Request) (*resolver.Response, time.Duration, error) {
-	log.Println("[Twitter] GET", tweetID)
+type TweetLoader struct {
+	bearerKey string
+}
 
-	tweetResp, err := getTweetByID(tweetID, bearerKey)
+func (l *TweetLoader) Load(ctx context.Context, tweetID string, r *http.Request) (*resolver.Response, time.Duration, error) {
+	log := logger.FromContext(ctx)
+
+	log.Debugw("[Twitter] Get tweet",
+		"tweetID", tweetID,
+	)
+
+	tweetResp, err := getTweetByID(tweetID, l.bearerKey)
 	if err != nil {
 		if err.Error() == "404" {
 			var response resolver.Response
 			unmarshalErr := json.Unmarshal(resolver.NoLinkInfoFound, &response)
 			if unmarshalErr != nil {
-				log.Println("Error unmarshalling prebuilt response:", unmarshalErr.Error())
+				log.Errorw("Error unmarshalling prebuilt response",
+					"error", unmarshalErr.Error(),
+				)
 			}
 
 			return &response, 1 * time.Hour, nil
@@ -49,10 +60,18 @@ func loadTweet(tweetID string, r *http.Request) (*resolver.Response, time.Durati
 	}, cache.NoSpecialDur, nil
 }
 
-func loadTwitterUser(userName string, r *http.Request) (*resolver.Response, time.Duration, error) {
-	log.Println("[Twitter] GET", userName)
+type UserLoader struct {
+	bearerKey string
+}
 
-	userResp, err := getUserByName(userName, bearerKey)
+func (l *UserLoader) Load(ctx context.Context, userName string, r *http.Request) (*resolver.Response, time.Duration, error) {
+	log := logger.FromContext(ctx)
+
+	log.Debugw("[Twitter] Get user",
+		"userName", userName,
+	)
+
+	userResp, err := getUserByName(userName, l.bearerKey)
 	if err != nil {
 		// Error code for "User not found.", as described here:
 		// https://developer.twitter.com/en/support/twitter-api/error-troubleshooting#error-codes

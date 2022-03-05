@@ -1,7 +1,5 @@
 package config
 
-import "github.com/Chatterino/api/internal/logger"
-
 type APIConfig struct {
 	// Core
 
@@ -10,6 +8,9 @@ type APIConfig struct {
 	MaxContentLength uint64 `mapstructure:"max-content-length" json:"max-content-length"`
 	EnableLilliput   bool   `mapstructure:"enable-lilliput" json:"enable-lilliput"`
 	MaxThumbnailSize uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
+
+	LogLevel       string `mapstructure:"log-level" json:"log-level"`
+	LogDevelopment bool   `mapstructure:"log-development" json:"log-development"`
 
 	DSN string `mapstructure:"dsn" json:"dsn"`
 
@@ -27,7 +28,4 @@ type APIConfig struct {
 	OembedFacebookAppID     string `mapstructure:"oembed-facebook-app-id" json:"oembed-facebook-app-id"`
 	OembedFacebookAppSecret string `mapstructure:"oembed-facebook-app-secret" json:"oembed-facebook-app-secret"`
 	OembedProvidersPath     string `mapstructure:"oembed-providers-path" json:"oembed-providers-path"`
-
-	// Temporarily pass logger along for easier use in custom resolvers
-	Logger logger.Logger
 }
