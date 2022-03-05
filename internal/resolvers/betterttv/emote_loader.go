@@ -13,6 +13,42 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
+// Static responses
+var (
+	emoteNotFoundResponse = &resolver.Response{
+		Status:  http.StatusNotFound,
+		Message: "No BetterTTV emote with this hash found",
+	}
+)
+
+// API structs
+type EmoteAPIUser struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	DisplayName string `json:"displayName"`
+	ProviderID  string `json:"providerId"`
+}
+
+type EmoteAPIResponse struct {
+	ID             string       `json:"id"`
+	Code           string       `json:"code"`
+	ImageType      string       `json:"imageType"`
+	CreatedAt      time.Time    `json:"createdAt"`
+	UpdatedAt      time.Time    `json:"updatedAt"`
+	Global         bool         `json:"global"`
+	Live           bool         `json:"live"`
+	Sharing        bool         `json:"sharing"`
+	ApprovalStatus string       `json:"approvalStatus"`
+	User           EmoteAPIUser `json:"user"`
+}
+
+// TODO: Should this live elsewhere?
+type TooltipData struct {
+	Code     string
+	Type     string
+	Uploader string
+}
+
 type EmoteLoader struct {
 	emoteAPIURL string
 }
