@@ -53,20 +53,28 @@ type TooltipData struct {
 }
 
 type EmoteLoader struct {
-	emoteAPIURL string
+	baseURL *url.URL
+}
+
+func (l *EmoteLoader) buildURL(emoteHash string) string {
+	relativeURL := &url.URL{
+		Path: emoteHash,
+	}
+	finalURL := l.baseURL.ResolveReference(relativeURL)
+
+	return finalURL.String()
 }
 
 func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Request) (*resolver.Response, time.Duration, error) {
-	// TODO: Build URL smarter
 	log := logger.FromContext(ctx)
 	log.Debugw("Load BetterTTV emote",
 		"emoteHash", emoteHash,
 	)
-	apiURL := fmt.Sprintf(l.emoteAPIURL, emoteHash)
+	emoteURL := l.buildURL(emoteHash)
 	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteHash)
 
 	// Create and execute BetterTTV API request
-	resp, err := resolver.RequestGET(ctx, apiURL)
+	resp, err := resolver.RequestGET(ctx, emoteURL)
 	if err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
@@ -124,4 +132,17 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 		Thumbnail: thumbnailURL,
 	}, resolver.NoSpecialDur, nil
 
+}
+
+func NewEmoteLoader(baseURLString string) (*EmoteLoader, error) {
+	baseURL, err := url.Parse(baseURLString)
+	if err != nil {
+		return nil, err
+	}
+
+	l := &EmoteLoader{
+		baseURL: baseURL,
+	}
+
+	return l, nil
 }

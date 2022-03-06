@@ -21,7 +21,7 @@ const (
 )
 
 var (
-	errInvalidBTTVEmotePath = errors.New("invalid BetterTTV emote path")
+	ErrInvalidBTTVEmotePath = errors.New("invalid BetterTTV emote path")
 
 	// BetterTTV hosts we're doing our smart things on
 	domains = map[string]struct{}{

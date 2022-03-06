@@ -34,15 +34,15 @@ type LinkResolver struct {
 	thumbnailCache cache.Cache
 }
 
-func (dr *LinkResolver) HandleRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
 	log := logger.FromContext(ctx)
 
 	log.Debugw("Handle request",
-		"path", r.URL.Path,
+		"path", req.URL.Path,
 	)
 	w.Header().Set("Content-Type", "application/json")
-	urlString, err := utils.UnescapeURLArgument(r, "url")
+	urlString, err := utils.UnescapeURLArgument(req, "url")
 	if err != nil {
 		_, err = w.Write(resolver.InvalidURL)
 		if err != nil {
@@ -66,13 +66,13 @@ func (dr *LinkResolver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	for _, m := range dr.customResolvers {
+	for _, m := range r.customResolvers {
 		if m.Check(ctx, requestUrl) {
 			// TODO: include custom resolver info
 			log.Debugw("Run url on custom resolver",
 				"url", requestUrl,
 			)
-			data, err := m.Run(ctx, requestUrl, r)
+			data, err := m.Run(ctx, requestUrl, req)
 
 			if errors.Is(err, resolver.ErrDontHandle) {
 				break
@@ -101,7 +101,7 @@ func (dr *LinkResolver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 	resolverHits.WithLabelValues("default").Inc()
 
-	response, err := dr.linkCache.Get(ctx, urlString, r)
+	response, err := r.linkCache.Get(ctx, urlString, req)
 	if err != nil {
 		log.Errorw("Error in default resolver",
 			"url", requestUrl,
@@ -117,11 +117,11 @@ func (dr *LinkResolver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (dr *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
 	log := logger.FromContext(ctx)
 
-	url, err := utils.UnescapeURLArgument(r, "url")
+	url, err := utils.UnescapeURLArgument(req, "url")
 	if err != nil {
 		_, err = w.Write(resolver.InvalidURL)
 		if err != nil {
@@ -132,7 +132,7 @@ func (dr *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	response, err := dr.thumbnailCache.Get(ctx, url, r)
+	response, err := r.thumbnailCache.Get(ctx, url, req)
 
 	if err != nil {
 		log.Errorw("Error in thumbnail request",

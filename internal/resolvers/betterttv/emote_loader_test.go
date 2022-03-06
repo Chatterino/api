@@ -49,10 +49,7 @@ func init() {
 	}
 }
 
-func testLoadAndUnescape(ctx context.Context, emoteAPIURL string, c *qt.C, emoteHash string) (cleanTooltip string) {
-	loader := &EmoteLoader{
-		emoteAPIURL: emoteAPIURL,
-	}
+func testLoadAndUnescape(ctx context.Context, loader *EmoteLoader, c *qt.C, emoteHash string) (cleanTooltip string) {
 	response, _, err := loader.Load(ctx, emoteHash, nil)
 
 	c.Assert(err, qt.IsNil)
@@ -62,6 +59,46 @@ func testLoadAndUnescape(ctx context.Context, emoteAPIURL string, c *qt.C, emote
 	c.Assert(unescapeErr, qt.IsNil)
 
 	return cleanTooltip
+}
+
+func TestBuildURL(t *testing.T) {
+	c := qt.New(t)
+
+	tests := []struct {
+		label     string
+		baseURL   string
+		emoteHash string
+		expected  string
+	}{
+		{
+			"Emote 1 real url",
+			"https://api.betterttv.net/3/emotes/",
+			"KKona",
+			"https://api.betterttv.net/3/emotes/KKona",
+		},
+		{
+			"Emote 2 real url",
+			"https://api.betterttv.net/3/emotes/",
+			"566ca04265dbbdab32ec054a",
+			"https://api.betterttv.net/3/emotes/566ca04265dbbdab32ec054a",
+		},
+		{
+			"Emote 1 fake url",
+			"http://127.0.0.1:5934/3/emotes/",
+			"566ca04265dbbdab32ec054a",
+			"http://127.0.0.1:5934/3/emotes/566ca04265dbbdab32ec054a",
+		},
+	}
+
+	for _, t := range tests {
+		c.Run(t.label, func(c *qt.C) {
+			loader, err := NewEmoteLoader(t.baseURL)
+			c.Assert(err, qt.IsNil, qt.Commentf("Failed to initialize loader with base url %s", t.baseURL))
+
+			actual := loader.buildURL(t.emoteHash)
+			c.Assert(actual, qt.Equals, t.expected)
+		})
+	}
 }
 
 func TestLoad(t *testing.T) {
@@ -87,14 +124,15 @@ func TestLoad(t *testing.T) {
 	})
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	baseURL := ts.URL + "/3/emotes/%s"
+	loader, err := NewEmoteLoader(ts.URL + "/3/emotes/")
+	c.Assert(err, qt.IsNil)
 
 	c.Run("Global emote", func(c *qt.C) {
 		const emote = "kkona"
 
 		const expectedTooltip = `<div style="text-align: left;"><b>KKona</b><br><b>Global BetterTTV Emote</b><br><b>By:</b> zneix</div>`
 
-		cleanTooltip := testLoadAndUnescape(ctx, baseURL, c, emote)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, emote)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -104,7 +142,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>&lt;b&gt;KKona&lt;/b&gt;</b><br><b>Global BetterTTV Emote</b><br><b>By:</b> &lt;b&gt;zneix&lt;/b&gt;</div>`
 
-		cleanTooltip := testLoadAndUnescape(ctx, baseURL, c, emote)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, emote)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -114,7 +152,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>forsenGa</b><br><b>Shared BetterTTV Emote</b><br><b>By:</b> pajlada</div>`
 
-		cleanTooltip := testLoadAndUnescape(ctx, baseURL, c, emote)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, emote)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -124,7 +162,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>&lt;b&gt;forsenGa&lt;/b&gt;</b><br><b>Shared BetterTTV Emote</b><br><b>By:</b> &lt;b&gt;pajlada&lt;/b&gt;</div>`
 
-		cleanTooltip := testLoadAndUnescape(ctx, baseURL, c, emote)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, emote)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})

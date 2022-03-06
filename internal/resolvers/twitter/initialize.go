@@ -62,7 +62,7 @@ var (
 func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
 	if cfg.TwitterBearerToken == "" {
-		log.Warnw("Twitter credentials missing, won't do special responses for Twitte")
+		log.Warnw("Twitter credentials missing, won't do special responses for Twitter")
 		return
 	}
 
