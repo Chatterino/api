@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
-	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	qt "github.com/frankban/quicktest"
 )
@@ -23,9 +22,7 @@ func TestCheck(t *testing.T) {
 	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
 
-	resolver := NewResolver(ctx, config.APIConfig{
-		TwitterBearerToken: "fake",
-	})
+	resolver := &Resolver{}
 
 	shouldCheck := []string{
 		"https://imgur.com",
