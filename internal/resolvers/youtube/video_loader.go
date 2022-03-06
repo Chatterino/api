@@ -15,6 +15,17 @@ import (
 	youtubeAPI "google.golang.org/api/youtube/v3"
 )
 
+type youtubeVideoTooltipData struct {
+	Title         string
+	ChannelTitle  string
+	Duration      string
+	PublishDate   string
+	Views         string
+	LikeCount     string
+	CommentCount  string
+	AgeRestricted bool
+}
+
 type VideoLoader struct {
 	youtubeClient *youtubeAPI.Service
 }
