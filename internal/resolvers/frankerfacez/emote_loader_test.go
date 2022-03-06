@@ -1,6 +1,7 @@
 package frankerfacez
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,17 +10,13 @@ import (
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
-	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/go-chi/chi/v5"
 
 	qt "github.com/frankban/quicktest"
 )
 
-func init() {
-	resolver.SetLogger(logger.New())
-}
-
 func TestFoo(t *testing.T) {
+	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
 
 	r := chi.NewRouter()
@@ -42,9 +39,12 @@ func TestFoo(t *testing.T) {
 	})
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	emoteAPIURL = ts.URL + "/v1/emote/%s"
+	baseURL := ts.URL + "/v1/emote/%s"
+	loader := &EmoteLoader{
+		emoteAPIURL: baseURL,
+	}
 
-	response, _, err := load("testemote", nil)
+	response, _, err := loader.Load(ctx, "testemote", nil)
 
 	c.Assert(err, qt.IsNil)
 	c.Assert(response, qt.Not(qt.IsNil))

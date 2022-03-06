@@ -25,19 +25,23 @@ type Logger interface {
 	Sync() error
 }
 
-type ContextKeyType string
+type contextKeyType string
 
 var (
-	ContextKey = ContextKeyType("logger")
+	contextKey = contextKeyType("logger")
 )
 
 func FromContext(ctx context.Context) Logger {
-	if v := ctx.Value(ContextKey); v != nil {
+	if v := ctx.Value(contextKey); v != nil {
 		return v.(Logger)
 	}
 
 	log.Fatal("No logger found in context")
 	return nil
+}
+
+func OnContext(ctx context.Context, logger Logger) context.Context {
+	return context.WithValue(ctx, contextKey, logger)
 }
 
 func New(logLevel zap.AtomicLevel, logDevelopment bool) Logger {

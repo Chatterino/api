@@ -18,8 +18,6 @@ var (
 
 	errLocaleMatch = errors.New("could not find locale from URL")
 	errTitleMatch  = errors.New("could not find title from URL")
-
-	endpointURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {

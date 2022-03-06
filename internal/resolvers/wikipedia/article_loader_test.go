@@ -1,6 +1,7 @@
 package wikipedia
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
-	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
 	"github.com/go-chi/chi/v5"
@@ -46,16 +46,11 @@ func init() {
 		Thumbnail:   nil,
 		Description: nil,
 	}
-
-	log := logger.New()
-
-	resolver.SetLogger(log)
-	SetLogger(log)
 }
 
-func testLoadAndUnescape(c *qt.C, locale, page string) (cleanTooltip string) {
+func testLoadAndUnescape(ctx context.Context, loader *ArticleLoader, c *qt.C, locale, page string) (cleanTooltip string) {
 	urlString := fmt.Sprintf("https://%s.wikipedia.org/wiki/%s", locale, page)
-	response, _, err := load(urlString, nil)
+	response, _, err := loader.Load(ctx, urlString, nil)
 
 	c.Assert(err, qt.IsNil)
 	c.Assert(response, qt.Not(qt.IsNil))
@@ -67,6 +62,7 @@ func testLoadAndUnescape(c *qt.C, locale, page string) (cleanTooltip string) {
 }
 
 func TestLoad(t *testing.T) {
+	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
 	r := chi.NewRouter()
 	r.Get("/api/rest_v1/page/summary/{locale}/{page}", func(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +84,10 @@ func TestLoad(t *testing.T) {
 	})
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	endpointURL = ts.URL + "/api/rest_v1/page/summary/%s/%s"
+
+	loader := &ArticleLoader{
+		endpointURL: ts.URL + "/api/rest_v1/page/summary/%s/%s",
+	}
 
 	c.Run("Normal page", func(c *qt.C) {
 		const locale = "en"
@@ -96,7 +95,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>Test title&nbsp;•&nbsp;Test description</b><br>Test extract</div>`
 
-		cleanTooltip := testLoadAndUnescape(c, locale, page)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, locale, page)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -107,7 +106,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>&lt;b&gt;Test title&lt;/b&gt;&nbsp;•&nbsp;&lt;b&gt;Test description&lt;/b&gt;</b><br>&lt;b&gt;Test extract&lt;/b&gt;</div>`
 
-		cleanTooltip := testLoadAndUnescape(c, locale, page)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, locale, page)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -118,7 +117,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>Test title</b><br>Test extract</div>`
 
-		cleanTooltip := testLoadAndUnescape(c, locale, page)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, locale, page)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})

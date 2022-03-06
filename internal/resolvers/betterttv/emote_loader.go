@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -22,6 +23,7 @@ var (
 )
 
 // API structs
+
 type EmoteAPIUser struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
@@ -43,6 +45,7 @@ type EmoteAPIResponse struct {
 }
 
 // TODO: Should this live elsewhere?
+
 type TooltipData struct {
 	Code     string
 	Type     string
@@ -55,6 +58,10 @@ type EmoteLoader struct {
 
 func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Request) (*resolver.Response, time.Duration, error) {
 	// TODO: Build URL smarter
+	log := logger.FromContext(ctx)
+	log.Debugw("Load BetterTTV emote",
+		"emoteHash", emoteHash,
+	)
 	apiURL := fmt.Sprintf(l.emoteAPIURL, emoteHash)
 	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteHash)
 

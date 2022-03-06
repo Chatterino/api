@@ -1,22 +1,31 @@
 package imgur
 
 import (
+	"context"
 	"net/url"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/pkg/config"
+	"github.com/Chatterino/api/pkg/resolver"
 	qt "github.com/frankban/quicktest"
 )
 
-func testCheck(c *qt.C, urlString string) bool {
+func testCheck(ctx context.Context, resolver resolver.Resolver, c *qt.C, urlString string) bool {
 	u, err := url.Parse(urlString)
 	c.Assert(u, qt.Not(qt.IsNil))
 	c.Assert(err, qt.IsNil)
 
-	return check(u)
+	return resolver.Check(ctx, u)
 }
 
 func TestCheck(t *testing.T) {
+	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
+
+	resolver := NewResolver(ctx, config.APIConfig{
+		TwitterBearerToken: "fake",
+	})
 
 	shouldCheck := []string{
 		"https://imgur.com",
@@ -25,7 +34,7 @@ func TestCheck(t *testing.T) {
 	}
 
 	for _, u := range shouldCheck {
-		c.Assert(testCheck(c, u), qt.IsTrue)
+		c.Assert(testCheck(ctx, resolver, c, u), qt.IsTrue)
 	}
 
 	shouldNotCheck := []string{
@@ -37,6 +46,6 @@ func TestCheck(t *testing.T) {
 	}
 
 	for _, u := range shouldNotCheck {
-		c.Assert(testCheck(c, u), qt.IsFalse)
+		c.Assert(testCheck(ctx, resolver, c, u), qt.IsFalse)
 	}
 }

@@ -39,7 +39,11 @@ func (r *EmoteResolver) Run(ctx context.Context, url *url.URL, req *http.Request
 }
 
 func NewEmoteResolver(ctx context.Context, cfg config.APIConfig) *EmoteResolver {
-	emoteLoader := &EmoteLoader{}
+	const emoteAPIURL = "https://api.frankerfacez.com/v1/emote/%s"
+
+	emoteLoader := &EmoteLoader{
+		emoteAPIURL: emoteAPIURL,
+	}
 
 	r := &EmoteResolver{
 		emoteCache: cache.NewPostgreSQLCache(ctx, cfg, "frankerfacez:emote", resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),

@@ -23,8 +23,6 @@ const (
 )
 
 var (
-	seventvAPIURL = "https://api.7tv.app/v2/gql"
-
 	errInvalidSevenTVEmotePath = errors.New("invalid SevenTV emote path")
 
 	domains = map[string]struct{}{

@@ -15,7 +15,7 @@ import (
 )
 
 type ClipLoader struct {
-	helixAPI *helix.Client
+	helixAPI TwitchAPIClient
 }
 
 func (l *ClipLoader) Load(ctx context.Context, clipSlug string, r *http.Request) (*resolver.Response, time.Duration, error) {

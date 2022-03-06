@@ -81,7 +81,7 @@ func main() {
 	defer log.Sync()
 
 	// attach logger to context
-	ctx := context.WithValue(context.Background(), logger.ContextKey, log)
+	ctx := logger.OnContext(context.Background(), log)
 
 	resolver.InitializeStaticResponses(ctx, cfg)
 	thumbnail.InitializeConfig(cfg)

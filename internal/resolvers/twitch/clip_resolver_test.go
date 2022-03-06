@@ -1,9 +1,11 @@
 package twitch
 
 import (
+	"context"
 	"net/url"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
 	qt "github.com/frankban/quicktest"
 )
 
@@ -49,22 +51,25 @@ var invalidClips = []string{
 	"https://m.twitch.tv/username/notclip/slug",
 }
 
-func testCheck(c *qt.C, urlString string) bool {
+func testCheck(ctx context.Context, resolver *ClipResolver, c *qt.C, urlString string) bool {
 	u, err := url.Parse(urlString)
 	c.Assert(u, qt.IsNotNil)
 	c.Assert(err, qt.IsNil)
 
-	return check(u)
+	return resolver.Check(ctx, u)
 }
 
 func TestCheck(t *testing.T) {
+	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
 
+	resolver := &ClipResolver{}
+
 	for _, u := range validClips {
-		c.Assert(testCheck(c, u), qt.IsTrue, qt.Commentf("%v must be seen as a clip", u))
+		c.Assert(testCheck(ctx, resolver, c, u), qt.IsTrue, qt.Commentf("%v must be seen as a clip", u))
 	}
 
 	for _, u := range invalidClips {
-		c.Assert(testCheck(c, u), qt.IsFalse, qt.Commentf("%v must not be seen as a clip", u))
+		c.Assert(testCheck(ctx, resolver, c, u), qt.IsFalse, qt.Commentf("%v must not be seen as a clip", u))
 	}
 }

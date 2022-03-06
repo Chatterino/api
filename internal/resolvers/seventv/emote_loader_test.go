@@ -1,6 +1,7 @@
 package seventv
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/go-chi/chi/v5"
 
 	qt "github.com/frankban/quicktest"
@@ -48,6 +50,7 @@ func init() {
 }
 
 func TestFoo(t *testing.T) {
+	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
 
 	r := chi.NewRouter()
@@ -76,7 +79,10 @@ func TestFoo(t *testing.T) {
 	})
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	seventvAPIURL = ts.URL + "/v2/gql"
+	baseURL := ts.URL + "/v2/gql"
+	loader := &EmoteLoader{
+		baseURL: baseURL,
+	}
 
 	type tTest struct {
 		emoteHash       string
@@ -112,12 +118,12 @@ func TestFoo(t *testing.T) {
 	request, _ := http.NewRequest(http.MethodPost, "https://7tv.app/test", nil)
 
 	for _, test := range tests {
-		response, _, err := load(test.emoteHash, request)
+		response, _, err := loader.Load(ctx, test.emoteHash, request)
 
 		c.Assert(err, qt.IsNil)
 		c.Assert(response, qt.Not(qt.IsNil))
 
-		c.Assert(response.Status, qt.Equals, 200)
+		c.Assert(response.Status, qt.Equals, 200, qt.Commentf("For emote hash %s", test.emoteHash))
 
 		// TODO: check thumbnail
 		// c.Assert(response.Thumbnail, qt.Equals, fmt.Sprintf(thumbnailFormat, test.emoteHash))

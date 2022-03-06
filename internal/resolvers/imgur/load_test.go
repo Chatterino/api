@@ -1,20 +1,23 @@
 package imgur
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/mocks"
+	"github.com/Chatterino/api/pkg/config"
 	qt "github.com/frankban/quicktest"
 	"github.com/golang/mock/gomock"
 	"github.com/koffeinsource/go-imgur"
 )
 
-func testLoadAndUnescape(c *qt.C, urlString string) (cleanTooltip string) {
+func testLoadAndUnescape(ctx context.Context, loader *Loader, c *qt.C, urlString string) (cleanTooltip string) {
 	r, _ := http.NewRequest("GET", "https://i.imgur.com/kkona.png", nil)
-	response, _, err := load(urlString, r)
+	response, _, err := loader.Load(ctx, urlString, r)
 
 	c.Assert(err, qt.IsNil)
 	c.Assert(response, qt.Not(qt.IsNil))
@@ -26,11 +29,21 @@ func testLoadAndUnescape(c *qt.C, urlString string) (cleanTooltip string) {
 }
 
 func TestLoad(t *testing.T) {
+	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	datetime := time.Date(2019, time.November, 10, 23, 0, 0, 0, time.UTC).Unix()
 	c := qt.New(t)
 	mockCtrl := gomock.NewController(c)
 	m := mocks.NewMockImgurClient(mockCtrl)
-	apiClient = m
+
+	cfg := config.APIConfig{
+		ImgurClientID: "fake",
+		BaseURL:       "https://example.com/",
+	}
+
+	loader := &Loader{
+		baseURL:   cfg.BaseURL,
+		apiClient: m,
+	}
 
 	c.Run("Normal image", func(c *qt.C) {
 		const url = "image"
@@ -51,7 +64,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -76,7 +89,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li><li><b><span style="color: red;">NSFW</span></b></li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -100,7 +113,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -126,7 +139,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `Empty album`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -158,7 +171,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -190,7 +203,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -215,7 +228,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `Empty album`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -247,7 +260,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album Title</li><li><b>Description:</b> Album Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -279,7 +292,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> Album &lt;b&gt;Title&lt;/b&gt;</li><li><b>Description:</b> Album &lt;b&gt;Description&lt;/b&gt;</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -304,7 +317,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -329,7 +342,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My Cool Title</li><li><b>Description:</b> My Cool Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li><li><b><span style="color: red;">NSFW</span></b></li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -353,7 +366,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><li><b>Title:</b> My &lt;b&gt;Cool&lt;/b&gt; Title</li><li><b>Description:</b> My &lt;b&gt;Cool&lt;/b&gt; Description</li><li><b>Uploaded:</b> 10 Nov 2019 • 23:00 UTC</li></div>`
 
-		cleanTooltip := testLoadAndUnescape(c, url)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, url)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})

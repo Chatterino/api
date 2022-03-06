@@ -15,10 +15,11 @@ import (
 )
 
 type EmoteLoader struct {
+	emoteAPIURL string
 }
 
 func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request) (*resolver.Response, time.Duration, error) {
-	apiURL := fmt.Sprintf(emoteAPIURL, emoteID)
+	apiURL := fmt.Sprintf(l.emoteAPIURL, emoteID)
 	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteID)
 
 	// Create FrankerFaceZ API request

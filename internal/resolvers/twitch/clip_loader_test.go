@@ -1,23 +1,19 @@
 package twitch
 
 import (
+	"context"
 	"net/url"
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/mocks"
-	"github.com/Chatterino/api/pkg/resolver"
 	qt "github.com/frankban/quicktest"
 	"github.com/golang/mock/gomock"
 	"github.com/nicklaw5/helix"
 )
 
-func init() {
-	resolver.SetLogger(logger.New())
-}
-
-func testLoadAndUnescape(c *qt.C, clipSlug string) (cleanTooltip string) {
-	response, _, err := load(clipSlug, nil)
+func testLoadAndUnescape(ctx context.Context, loader *ClipLoader, c *qt.C, clipSlug string) (cleanTooltip string) {
+	response, _, err := loader.Load(ctx, clipSlug, nil)
 
 	c.Assert(err, qt.IsNil)
 	c.Assert(response, qt.Not(qt.IsNil))
@@ -29,10 +25,14 @@ func testLoadAndUnescape(c *qt.C, clipSlug string) (cleanTooltip string) {
 }
 
 func TestLoad(t *testing.T) {
+	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
 	mockCtrl := gomock.NewController(c)
 	m := mocks.NewMockTwitchAPIClient(mockCtrl)
-	helixAPI = m
+
+	loader := &ClipLoader{
+		helixAPI: m,
+	}
 
 	c.Run("Normal clip", func(c *qt.C) {
 		const slug = "KKona"
@@ -56,7 +56,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> supinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 69</div>`
 
-		cleanTooltip := testLoadAndUnescape(c, slug)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, slug)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -83,7 +83,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it LUL</b><hr><b>Clipped by:</b> suspinic<br><b>Channel:</b> pajlada<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 6,969</div>`
 
-		cleanTooltip := testLoadAndUnescape(c, slug)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, slug)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})
@@ -110,7 +110,7 @@ func TestLoad(t *testing.T) {
 
 		const expectedTooltip = `<div style="text-align: left;"><b>Clipped it &lt;b&gt;LUL&lt;/b&gt;</b><hr><b>Clipped by:</b> &lt;b&gt;supinic&lt;/b&gt;<br><b>Channel:</b> &lt;b&gt;pajlada&lt;/b&gt;<br><b>Duration:</b> 30s<br><b>Created:</b> 14 Nov 2019<br><b>Views:</b> 69</div>`
 
-		cleanTooltip := testLoadAndUnescape(c, slug)
+		cleanTooltip := testLoadAndUnescape(ctx, loader, c, slug)
 
 		c.Assert(cleanTooltip, qt.Equals, expectedTooltip)
 	})

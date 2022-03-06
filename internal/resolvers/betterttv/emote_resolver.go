@@ -39,6 +39,8 @@ func (r *EmoteResolver) Run(ctx context.Context, url *url.URL, req *http.Request
 }
 
 func NewEmoteResolver(ctx context.Context, cfg config.APIConfig) *EmoteResolver {
+	const emoteAPIURL = "https://api.betterttv.net/3/emotes/%s"
+
 	emoteLoader := &EmoteLoader{
 		emoteAPIURL: emoteAPIURL,
 	}

@@ -2,20 +2,7 @@ package main
 
 import (
 	"testing"
-
-	"github.com/Chatterino/api/internal/logger"
-	"github.com/Chatterino/api/pkg/cache"
-	"github.com/Chatterino/api/pkg/resolver"
 )
-
-var (
-	log = logger.New()
-)
-
-func init() {
-	resolver.SetLogger(log)
-	cache.SetLogger(log)
-}
 
 func TestResolveTwitchClip(t *testing.T) {
 	// router := chi.NewRouter()

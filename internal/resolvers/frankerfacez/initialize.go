@@ -20,8 +20,6 @@ const (
 )
 
 var (
-	emoteAPIURL = "https://api.frankerfacez.com/v1/emote/%s"
-
 	// FrankerFaceZ hosts we're doing our smart things on
 	domains = map[string]struct{}{
 		"frankerfacez.com":     {},

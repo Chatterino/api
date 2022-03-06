@@ -55,7 +55,7 @@ query fetchEmote($id: String!) {
 	}
 
 	// Execute SevenTV API request
-	resp, err := resolver.RequestPOST(seventvAPIURL, string(queryBytes))
+	resp, err := resolver.RequestPOST(l.baseURL, string(queryBytes))
 	if err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,

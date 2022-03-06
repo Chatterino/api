@@ -29,7 +29,10 @@ func (r *ArticleResolver) Run(ctx context.Context, url *url.URL, req *http.Reque
 }
 
 func NewArticleResolver(ctx context.Context, cfg config.APIConfig) *ArticleResolver {
-	articleLoader := &ArticleLoader{}
+	const endpointURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
+	articleLoader := &ArticleLoader{
+		endpointURL: endpointURL,
+	}
 
 	r := &ArticleResolver{
 		articleCache: cache.NewPostgreSQLCache(ctx, cfg, "wikipedia:article", resolver.NewResponseMarshaller(articleLoader), 1*time.Hour),
