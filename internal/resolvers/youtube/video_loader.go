@@ -10,45 +10,16 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
-	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/Chatterino/api/pkg/utils"
 	youtubeAPI "google.golang.org/api/youtube/v3"
 )
 
-type YouTubeVideoResolver struct {
+type VideoLoader struct {
 	youtubeClient *youtubeAPI.Service
-	videoCache    cache.Cache
 }
 
-func (r *YouTubeVideoResolver) Check(ctx context.Context, url *url.URL) bool {
-	return utils.IsSubdomainOf(url, "youtube.com")
-}
-
-func (r *YouTubeVideoResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
-	videoID := getYoutubeVideoIDFromURL(url)
-
-	if videoID == "" {
-		return resolver.NoLinkInfoFound, nil
-	}
-
-	return r.videoCache.Get(ctx, videoID, req)
-}
-
-func NewYouTubeVideoResolver(ctx context.Context, cfg config.APIConfig, youtubeClient *youtubeAPI.Service) *YouTubeVideoResolver {
-	r := &YouTubeVideoResolver{
-		youtubeClient: youtubeClient,
-	}
-
-	videoCache := cache.NewPostgreSQLCache(ctx, cfg, "youtube_videos", resolver.NewResponseMarshaller(r), 24*time.Hour)
-
-	r.videoCache = videoCache
-
-	return r
-}
-
-func (r *YouTubeVideoResolver) Load(ctx context.Context, videoID string, req *http.Request) (*resolver.Response, time.Duration, error) {
+func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Request) (*resolver.Response, time.Duration, error) {
 	youtubeVideoParts := []string{
 		"statistics",
 		"snippet",
@@ -111,4 +82,13 @@ func (r *YouTubeVideoResolver) Load(ctx context.Context, videoID string, req *ht
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: thumbnail,
 	}, cache.NoSpecialDur, nil
+
+}
+
+func NewVideoLoader(youtubeClient *youtubeAPI.Service) *VideoLoader {
+	loader := &VideoLoader{
+		youtubeClient: youtubeClient,
+	}
+
+	return loader
 }

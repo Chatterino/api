@@ -68,8 +68,8 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 
 	for _, m := range r.customResolvers {
 		if m.Check(ctx, requestUrl) {
-			// TODO: include custom resolver info
 			log.Debugw("Run url on custom resolver",
+				"name", m.Name(),
 				"url", requestUrl,
 			)
 			data, err := m.Run(ctx, requestUrl, req)
@@ -78,11 +78,11 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 				break
 			}
 
-			// TODO: Replace custom with the name of the resolver
-			resolverHits.WithLabelValues("custom").Inc()
+			resolverHits.WithLabelValues(m.Name()).Inc()
 
 			if err != nil {
 				log.Errorw("Error in custom resolver, falling back to default",
+					"name", m.Name(),
 					"url", requestUrl,
 					"error", err,
 				)
@@ -92,6 +92,7 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 			_, err = w.Write(data)
 			if err != nil {
 				log.Errorw("Error writing response",
+					"name", m.Name(),
 					"error", err,
 				)
 			}

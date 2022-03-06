@@ -38,6 +38,10 @@ func (r *EmoteResolver) Run(ctx context.Context, url *url.URL, req *http.Request
 	return r.emoteCache.Get(ctx, emoteHash, req)
 }
 
+func (r *EmoteResolver) Name() string {
+	return "frankerfacez:emote"
+}
+
 func NewEmoteResolver(ctx context.Context, cfg config.APIConfig) *EmoteResolver {
 	const emoteAPIURL = "https://api.frankerfacez.com/v1/emote/%s"
 

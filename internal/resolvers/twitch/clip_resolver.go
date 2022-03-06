@@ -66,6 +66,10 @@ func (r *ClipResolver) Run(ctx context.Context, url *url.URL, req *http.Request)
 	return r.clipCache.Get(ctx, clipSlug, req)
 }
 
+func (r *ClipResolver) Name() string {
+	return "twitch:clip"
+}
+
 func NewClipResolver(ctx context.Context, cfg config.APIConfig, helixAPI *helix.Client) *ClipResolver {
 	clipLoader := &ClipLoader{
 		helixAPI: helixAPI,

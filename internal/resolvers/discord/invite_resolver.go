@@ -32,6 +32,10 @@ func (r *InviteResolver) Run(ctx context.Context, url *url.URL, req *http.Reques
 	return r.inviteCache.Get(ctx, inviteCode, req)
 }
 
+func (r *InviteResolver) Name() string {
+	return "discord:invite"
+}
+
 func NewInviteResolver(ctx context.Context, cfg config.APIConfig) *InviteResolver {
 	inviteLoader := &InviteLoader{
 		token: cfg.DiscordToken,

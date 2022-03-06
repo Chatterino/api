@@ -28,6 +28,10 @@ func (r *ArticleResolver) Run(ctx context.Context, url *url.URL, req *http.Reque
 	return r.articleCache.Get(ctx, url.String(), req)
 }
 
+func (r *ArticleResolver) Name() string {
+	return "wikipedia:article"
+}
+
 func NewArticleResolver(ctx context.Context, cfg config.APIConfig) *ArticleResolver {
 	const endpointURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
 	articleLoader := &ArticleLoader{

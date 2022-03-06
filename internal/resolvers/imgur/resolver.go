@@ -33,6 +33,10 @@ func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]
 	return r.imgurCache.Get(ctx, url.String(), req)
 }
 
+func (r *Resolver) Name() string {
+	return "imgur"
+}
+
 func NewResolver(ctx context.Context, cfg config.APIConfig) *Resolver {
 	loader := &Loader{
 		baseURL: cfg.BaseURL,

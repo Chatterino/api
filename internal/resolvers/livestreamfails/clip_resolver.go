@@ -36,6 +36,10 @@ func (r *ClipResolver) Run(ctx context.Context, url *url.URL, req *http.Request)
 	return r.clipCache.Get(ctx, clipId, req)
 }
 
+func (r *ClipResolver) Name() string {
+	return "livestreamfails:clip"
+}
+
 func NewClipResolver(ctx context.Context, cfg config.APIConfig) *ClipResolver {
 	clipLoader := &ClipLoader{}
 

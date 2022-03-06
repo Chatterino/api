@@ -27,6 +27,10 @@ func (r *YouTubeVideoShortURLResolver) Run(ctx context.Context, url *url.URL, re
 	return r.videoCache.Get(ctx, videoID, req)
 }
 
+func (r *YouTubeVideoShortURLResolver) Name() string {
+	return "youtube:video:shorturl"
+}
+
 func NewYouTubeVideoShortURLResolver(videoCache cache.Cache) *YouTubeVideoShortURLResolver {
 	r := &YouTubeVideoShortURLResolver{
 		videoCache: videoCache,

@@ -27,6 +27,10 @@ func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]
 	return r.oEmbedCache.Get(ctx, url.String(), req)
 }
 
+func (r *Resolver) Name() string {
+	return "oembed"
+}
+
 func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) (*Resolver, error) {
 	var err error
 	var facebookAppAccessToken string

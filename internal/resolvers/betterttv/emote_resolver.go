@@ -41,6 +41,10 @@ func (r *EmoteResolver) Run(ctx context.Context, url *url.URL, req *http.Request
 	return r.emoteCache.Get(ctx, emoteHash, req)
 }
 
+func (r *EmoteResolver) Name() string {
+	return "betterttv:emote"
+}
+
 func NewEmoteResolver(ctx context.Context, cfg config.APIConfig) *EmoteResolver {
 	log := logger.FromContext(ctx)
 	const emoteAPIURL = "https://api.betterttv.net/3/emotes/"

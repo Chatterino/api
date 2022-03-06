@@ -39,6 +39,10 @@ func (r *TrackResolver) Run(ctx context.Context, url *url.URL, req *http.Request
 	return r.trackCache.Get(ctx, trackID, req)
 }
 
+func (r *TrackResolver) Name() string {
+	return "supinic:track"
+}
+
 func NewTrackResolver(ctx context.Context, cfg config.APIConfig) *TrackResolver {
 	trackLoader := &TrackLoader{}
 

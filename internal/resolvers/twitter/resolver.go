@@ -70,6 +70,10 @@ func (r *TwitterResolver) Run(ctx context.Context, url *url.URL, req *http.Reque
 	return resolver.NoLinkInfoFound, nil
 }
 
+func (r *TwitterResolver) Name() string {
+	return "twitter"
+}
+
 func NewTwitterResolver(ctx context.Context, cfg config.APIConfig) *TwitterResolver {
 	tweetLoader := &TweetLoader{
 		bearerKey: cfg.TwitterBearerToken,
