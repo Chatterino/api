@@ -3,7 +3,6 @@ package twitter
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"time"
@@ -13,51 +12,20 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-type TweetLoader struct {
-	bearerKey string
+type TwitterUserApiResponse struct {
+	Name            string `json:"name"`
+	Username        string `json:"screen_name"`
+	Description     string `json:"description"`
+	Followers       uint64 `json:"followers_count"`
+	ProfileImageUrl string `json:"profile_image_url_https"`
 }
 
-func (l *TweetLoader) Load(ctx context.Context, tweetID string, r *http.Request) (*resolver.Response, time.Duration, error) {
-	log := logger.FromContext(ctx)
-
-	log.Debugw("[Twitter] Get tweet",
-		"tweetID", tweetID,
-	)
-
-	tweetResp, err := getTweetByID(tweetID, l.bearerKey)
-	if err != nil {
-		if err.Error() == "404" {
-			var response resolver.Response
-			unmarshalErr := json.Unmarshal(resolver.NoLinkInfoFound, &response)
-			if unmarshalErr != nil {
-				log.Errorw("Error unmarshalling prebuilt response",
-					"error", unmarshalErr.Error(),
-				)
-			}
-
-			return &response, 1 * time.Hour, nil
-		}
-
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Error getting Tweet: " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
-	}
-
-	tweetData := buildTweetTooltip(tweetResp)
-	var tooltip bytes.Buffer
-	if err := tweetTooltipTemplate.Execute(&tooltip, tweetData); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Tweet template error: " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
-	}
-
-	return &resolver.Response{
-		Status:    http.StatusOK,
-		Tooltip:   url.PathEscape(tooltip.String()),
-		Thumbnail: tweetData.Thumbnail,
-	}, cache.NoSpecialDur, nil
+type twitterUserTooltipData struct {
+	Name        string
+	Username    string
+	Description string
+	Followers   string
+	Thumbnail   string
 }
 
 type UserLoader struct {

@@ -14,6 +14,15 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
+type twitchClipsTooltipData struct {
+	Title        string
+	AuthorName   string
+	ChannelName  string
+	Duration     string
+	CreationDate string
+	Views        string
+}
+
 type ClipLoader struct {
 	helixAPI TwitchAPIClient
 }
