@@ -27,7 +27,7 @@ func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]
 	return r.oEmbedCache.Get(ctx, url.String(), req)
 }
 
-func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) *Resolver {
+func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) (*Resolver, error) {
 	var err error
 	var facebookAppAccessToken string
 
@@ -40,7 +40,9 @@ func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) *Resolv
 	}
 
 	oEmbed := oembed.NewOembed()
-	oEmbed.ParseProviders(bytes.NewReader(data))
+	if err := oEmbed.ParseProviders(bytes.NewReader(data)); err != nil {
+		return nil, err
+	}
 
 	loader := &Loader{
 		oEmbed:                 oEmbed,
@@ -52,5 +54,5 @@ func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) *Resolv
 		oEmbed:      oEmbed,
 	}
 
-	return r
+	return r, nil
 }

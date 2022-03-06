@@ -12,13 +12,6 @@ import (
 const goodSlugV1 = "GoodSlugV1"
 const goodSlugV2 = "GoodSlugV2-HVUvT7bYQnMn6nwp"
 
-func goodSlugs(urlString string) []string {
-	return []string{
-		urlString + goodSlugV1,
-		urlString + goodSlugV2,
-	}
-}
-
 var validClips = []string{
 	"https://clips.twitch.tv/" + goodSlugV1,
 	"https://clips.twitch.tv/" + goodSlugV2,

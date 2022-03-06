@@ -33,5 +33,12 @@ func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver
 		return
 	}
 
-	*resolvers = append(*resolvers, NewResolver(ctx, cfg, data))
+	resolver, err := NewResolver(ctx, cfg, data)
+	if err != nil {
+		log.Warnw("[oEmbed] Error parsing providers.json file",
+			"error", err,
+		)
+	}
+
+	*resolvers = append(*resolvers, resolver)
 }
