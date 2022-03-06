@@ -2,7 +2,6 @@ package supinic
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -18,7 +17,6 @@ type TrackResolver struct {
 }
 
 func (r *TrackResolver) Check(ctx context.Context, url *url.URL) bool {
-	fmt.Println("Checking supinic", url)
 	if !utils.IsDomains(url, trackListDomains) {
 		return false
 	}
