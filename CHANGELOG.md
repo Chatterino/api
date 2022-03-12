@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.2
+
 - YouTube: Added comment count to rich video tooltips. (#252)
 - YouTube: Added a red `AGE RESTRICTED` label to the YouTube video tooltip. (#251)
 - YouTube: Removed dislike count from rich tooltips since YouTube removed it. (#243)
