@@ -34,7 +34,7 @@ jobs:
         working-directory: cmd/api
 
       - name: Test
-        run: go test -race -v -count=1 -coverprofile=coverage.out ./...
+        run: go test -v ./...
 
       - name: Generate code coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17'
@@ -51,12 +51,6 @@ jobs:
         with:
           name: chatterino-api-${{ matrix.go }}-${{ matrix.os }}
           path: build/chatterino-api
-
-      - name: Upload Test Coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.17'
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
 
   create-release:
     needs: build
