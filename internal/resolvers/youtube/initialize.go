@@ -3,7 +3,6 @@ package youtube
 import (
 	"context"
 	"html/template"
-	"regexp"
 	"time"
 
 	"github.com/Chatterino/api/internal/logger"
@@ -39,8 +38,6 @@ const (
 var (
 	youtubeVideoTooltipTemplate   = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
 	youtubeChannelTooltipTemplate = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
-
-	youtubeChannelRegex = regexp.MustCompile(`/(user|c(hannel)?)/[\w._\-']+`)
 )
 
 func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, youtubeClient *youtubeAPI.Service) (resolver.Resolver, resolver.Resolver) {

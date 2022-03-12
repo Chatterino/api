@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"log"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -27,21 +28,24 @@ type YouTubeChannelLoader struct {
 }
 
 func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string, req *http.Request) (*resolver.Response, time.Duration, error) {
+	log := logger.FromContext(ctx)
 	youtubeChannelParts := []string{
 		"statistics",
 		"snippet",
 	}
 
-	log.Println("[YouTube] GET channel", channelCacheKey)
+	log.Debugw("[YouTube] GET channel",
+		"cacheKey", channelCacheKey,
+	)
 	builtRequest := r.youtubeClient.Channels.List(youtubeChannelParts)
 
-	channelID := deconstructChannelIDFromCacheKey(channelCacheKey)
-	if channelID.chanType == CustomChannel {
+	channel := getChannelFromCacheKey(channelCacheKey)
+	if channel.Type == CustomChannel {
 		// Channels with custom URLs aren't searchable with the channel/list endpoint
 		// The only average way to do this at the moment is to do a YouTube search of that name
 		// and filter for channels. Not ideal...
 
-		searchRequest := r.youtubeClient.Search.List([]string{"snippet"}).Q(channelID.ID).Type("channel")
+		searchRequest := r.youtubeClient.Search.List([]string{"snippet"}).Q(channel.ID).Type("channel")
 		response, err := searchRequest.MaxResults(1).Do()
 
 		if err != nil {
@@ -55,20 +59,20 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 			return nil, cache.NoSpecialDur, errors.New("channel search response is not size 1")
 		}
 
-		channelID.ID = response.Items[0].Snippet.ChannelId
+		channel.ID = response.Items[0].Snippet.ChannelId
 	}
 
-	switch channelID.chanType {
+	switch channel.Type {
 	case UserChannel:
-		builtRequest = builtRequest.ForUsername(channelID.ID)
+		builtRequest = builtRequest.ForUsername(channel.ID)
 	case IdentifierChannel:
-		builtRequest = builtRequest.Id(channelID.ID)
+		builtRequest = builtRequest.Id(channel.ID)
 	case CustomChannel:
-		builtRequest = builtRequest.Id(channelID.ID)
+		builtRequest = builtRequest.Id(channel.ID)
 	case InvalidChannel:
 		return &resolver.Response{
 			Status:  500,
-			Message: "cached channel ID is invalid",
+			Message: fmt.Sprintf("cached channel ID is invalid %s", resolver.CleanResponse(channelCacheKey)),
 		}, 1 * time.Hour, nil
 	}
 
@@ -81,17 +85,27 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 		}, 1 * time.Hour, nil
 	}
 
-	if len(youtubeResponse.Items) != 1 {
-		return nil, cache.NoSpecialDur, errors.New("channel response is not size 1")
+	if len(youtubeResponse.Items) == 0 {
+		return &resolver.Response{
+			Status:  404,
+			Message: fmt.Sprintf("No YouTube channel with the ID %s found", resolver.CleanResponse(channel.ID)),
+		}, 24 * time.Hour, nil
 	}
 
-	channel := youtubeResponse.Items[0]
+	if len(youtubeResponse.Items) > 1 {
+		return &resolver.Response{
+			Status:  500,
+			Message: fmt.Sprintf("YouTube channel response contained %d items", len(youtubeResponse.Items)),
+		}, 24 * time.Hour, nil
+	}
+
+	youtubeChannel := youtubeResponse.Items[0]
 
 	data := youtubeChannelTooltipData{
-		Title:       channel.Snippet.Title,
-		JoinedDate:  humanize.CreationDateRFC3339(channel.Snippet.PublishedAt),
-		Subscribers: humanize.Number(channel.Statistics.SubscriberCount),
-		Views:       humanize.Number(channel.Statistics.ViewCount),
+		Title:       youtubeChannel.Snippet.Title,
+		JoinedDate:  humanize.CreationDateRFC3339(youtubeChannel.Snippet.PublishedAt),
+		Subscribers: humanize.Number(youtubeChannel.Statistics.SubscriberCount),
+		Views:       humanize.Number(youtubeChannel.Statistics.ViewCount),
 	}
 
 	var tooltip bytes.Buffer
@@ -102,9 +116,9 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 		}, cache.NoSpecialDur, nil
 	}
 
-	thumbnail := channel.Snippet.Thumbnails.Default.Url
-	if channel.Snippet.Thumbnails.Medium != nil {
-		thumbnail = channel.Snippet.Thumbnails.Medium.Url
+	thumbnail := youtubeChannel.Snippet.Thumbnails.Default.Url
+	if youtubeChannel.Snippet.Thumbnails.Medium != nil {
+		thumbnail = youtubeChannel.Snippet.Thumbnails.Medium.Url
 	}
 
 	return &resolver.Response{

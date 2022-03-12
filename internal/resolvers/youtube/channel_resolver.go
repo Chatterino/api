@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"regexp"
 	"time"
 
 	"github.com/Chatterino/api/pkg/cache"
@@ -11,6 +12,10 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	youtubeAPI "google.golang.org/api/youtube/v3"
+)
+
+var (
+	youtubeChannelRegex = regexp.MustCompile(`^/(c\/|channel\/|user\/)?([a-zA-Z0-9\-]{1,})$`)
 )
 
 type YouTubeChannelResolver struct {
@@ -23,14 +28,13 @@ func (r *YouTubeChannelResolver) Check(ctx context.Context, url *url.URL) bool {
 }
 
 func (r *YouTubeChannelResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
-	channelID := getYoutubeChannelIDFromURL(url)
+	channel := getChannelFromPath(url.Path)
 
-	if channelID.chanType == InvalidChannel {
+	if channel.Type == InvalidChannel {
 		return resolver.NoLinkInfoFound, nil
 	}
 
-	channelCacheKey := constructCacheKeyFromChannelID(channelID)
-	return r.channelCache.Get(ctx, channelCacheKey, req)
+	return r.channelCache.Get(ctx, channel.ToCacheKey(), req)
 }
 
 func (r *YouTubeChannelResolver) Name() string {
