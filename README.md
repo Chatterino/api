@@ -1,4 +1,5 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FChatterino%2Fapi%2Fbadge&style=flat)](https://actions-badge.atrox.dev/Chatterino/api/goto)
+[![codecov](https://codecov.io/gh/Chatterino/api/branch/master/graph/badge.svg?token=gz6EYE3bQQ)](https://codecov.io/gh/Chatterino/api)
 
 # API
 
