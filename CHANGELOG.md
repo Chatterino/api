@@ -11,6 +11,7 @@
 - Added a Chatterino API Privacy Policy and Terms of Service to `/legal/privacy-policy` and `/legal/terms-of-service`. (#253)
 - Dev: Disable CodeGQL. (#275)
 - Dev: Add CodeCov support. (#276)
+- Dev: Add CodeCov badge to readme. (#277)
 
 ## 1.2.1
 
