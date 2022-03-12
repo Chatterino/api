@@ -114,8 +114,10 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 	}, cache.NoSpecialDur, nil
 }
 
-func NewYouTubeChannelLoader() *YouTubeChannelLoader {
-	loader := &YouTubeChannelLoader{}
+func NewYouTubeChannelLoader(youtubeClient *youtubeAPI.Service) *YouTubeChannelLoader {
+	loader := &YouTubeChannelLoader{
+		youtubeClient: youtubeClient,
+	}
 
 	return loader
 }

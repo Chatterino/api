@@ -38,7 +38,7 @@ func (r *YouTubeChannelResolver) Name() string {
 }
 
 func NewYouTubeChannelResolver(ctx context.Context, cfg config.APIConfig, youtubeClient *youtubeAPI.Service) *YouTubeChannelResolver {
-	loader := NewYouTubeChannelLoader()
+	loader := NewYouTubeChannelLoader(youtubeClient)
 
 	r := &YouTubeChannelResolver{
 		channelCache: cache.NewPostgreSQLCache(ctx, cfg, "youtube_channels", resolver.NewResponseMarshaller(loader), 24*time.Hour),
