@@ -1,6 +1,10 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+
+	qt "github.com/frankban/quicktest"
+)
 
 func TestTruncateString(t *testing.T) {
 	type tType struct {
@@ -47,5 +51,35 @@ func TestTruncateString(t *testing.T) {
 		if output != test.expectedOutput {
 			t.Fatalf("got output '%s', expected '%s'", output, test.expectedOutput)
 		}
+	}
+}
+
+func TestStringPtr(t *testing.T) {
+	c := qt.New(t)
+	type tTest struct {
+		input string
+	}
+
+	tests := []tTest{
+		{
+			input: "s",
+		},
+		{
+			input: "",
+		},
+		{
+			input: " ",
+		},
+		{
+			input: "😂",
+		},
+	}
+
+	for _, test := range tests {
+		c.Run(test.input, func(c *qt.C) {
+			output := StringPtr(test.input)
+			c.Assert(output, qt.IsNotNil)
+			c.Assert(*output, qt.Equals, test.input)
+		})
 	}
 }
