@@ -9,6 +9,7 @@
 - Twitch: Handle Twitch clips from `m.twitch.tv` domain. (#239)
 - Updated Facebook & Instagram endpoints to oembed v10. (#201)
 - Added a Chatterino API Privacy Policy and Terms of Service to `/legal/privacy-policy` and `/legal/terms-of-service`. (#253)
+- Dev: Disable CodeGQL. (#275)
 
 ## 1.2.1
 
