@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -74,7 +75,7 @@ func (r *TwitterResolver) Name() string {
 	return "twitter"
 }
 
-func NewTwitterResolver(ctx context.Context, cfg config.APIConfig) *TwitterResolver {
+func NewTwitterResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *TwitterResolver {
 	tweetLoader := &TweetLoader{
 		bearerKey: cfg.TwitterBearerToken,
 	}
@@ -84,8 +85,8 @@ func NewTwitterResolver(ctx context.Context, cfg config.APIConfig) *TwitterResol
 	}
 
 	r := &TwitterResolver{
-		tweetCache: cache.NewPostgreSQLCache(ctx, cfg, "twitter:tweet", resolver.NewResponseMarshaller(tweetLoader), 24*time.Hour),
-		userCache:  cache.NewPostgreSQLCache(ctx, cfg, "twitter:user", resolver.NewResponseMarshaller(userLoader), 24*time.Hour),
+		tweetCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "twitter:tweet", resolver.NewResponseMarshaller(tweetLoader), 24*time.Hour),
+		userCache:  cache.NewPostgreSQLCache(ctx, cfg, pool, "twitter:user", resolver.NewResponseMarshaller(userLoader), 24*time.Hour),
 	}
 
 	return r

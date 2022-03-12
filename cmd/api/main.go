@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/internal/caches/twitchusernamecache"
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/Chatterino/api/internal/routes/twitchemotes"
@@ -67,7 +68,6 @@ func listen(ctx context.Context, bind string, router *chi.Mux, log logger.Logger
 }
 
 func main() {
-
 	cfg := config.New()
 
 	var atomicLogLevel zap.AtomicLevel
@@ -82,6 +82,15 @@ func main() {
 
 	// attach logger to context
 	ctx := logger.OnContext(context.Background(), log)
+
+	pool, err := db.NewPool(ctx, cfg.DSN)
+	if err != nil {
+		log.Fatalw("Error initializing DB pool",
+			"error", err,
+		)
+	}
+
+	go cache.StartCacheClearer(ctx, pool)
 
 	resolver.InitializeStaticResponses(ctx, cfg)
 	thumbnail.InitializeConfig(cfg)
@@ -99,7 +108,7 @@ func main() {
 			"error", err,
 		)
 	} else {
-		helixUsernameCache = twitchusernamecache.New(ctx, cfg, helixClient)
+		helixUsernameCache = twitchusernamecache.New(ctx, cfg, pool, helixClient)
 	}
 
 	if cfg.EnablePrometheus {
@@ -107,11 +116,11 @@ func main() {
 		listenPrometheus(cfg)
 	}
 
-	twitchemotes.Initialize(ctx, cfg, router, helixClient, helixUsernameCache)
+	twitchemotes.Initialize(ctx, cfg, pool, router, helixClient, helixUsernameCache)
 	handleRoot(router)
 	handleHealth(router)
 	handleLegal(router)
-	defaultresolver.Initialize(ctx, router, cfg, helixClient)
+	defaultresolver.Initialize(ctx, cfg, pool, router, helixClient)
 
 	listen(ctx, cfg.BindAddress, mountRouter(router, cfg, log), log)
 }

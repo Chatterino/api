@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
-	"github.com/Chatterino/api/internal/migration"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -47,39 +46,21 @@ type PostgreSQLCache struct {
 	cacheDuration time.Duration
 
 	prefix string
+
+	pool db.Pool
 }
 
 var (
-	// connection pool
-	pool *pgxpool.Pool
-
 	// TODO: Make the "internal error" tooltip an actual tooltip
 	tooltipInternalError = []byte("internal error")
 )
 
-func clearOldTooltips(ctx context.Context) (pgconn.CommandTag, error) {
+func clearOldTooltips(ctx context.Context, pool db.Pool) (pgconn.CommandTag, error) {
 	const query = "DELETE FROM cache WHERE now() > cached_until;"
 	return pool.Exec(ctx, query)
 }
 
-func startTooltipClearer(ctx context.Context) {
-	log := logger.FromContext(ctx)
-
-	ticker := time.NewTicker(1 * time.Minute)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-
-		case <-ticker.C:
-			if ct, err := clearOldTooltips(ctx); err != nil {
-				log.Errorw("Error clearing old tooltips")
-			} else {
-				clearedEntries.Add(float64(ct.RowsAffected()))
-				log.Debugw("Cleared old tooltips", "rowsAffected", ct.RowsAffected())
-			}
-		}
-	}
+func startTooltipClearer(ctx context.Context, pool db.Pool) {
 }
 
 func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request) ([]byte, error) {
@@ -97,7 +78,7 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 	}
 
 	cacheKey := c.prefix + ":" + key
-	if _, err := pool.Exec(ctx, "INSERT INTO cache (key, value, cached_until) VALUES ($1, $2, $3)", cacheKey, valueBytes, time.Now().Add(dur)); err != nil {
+	if _, err := c.pool.Exec(ctx, "INSERT INTO cache (key, value, cached_until) VALUES ($1, $2, $3)", cacheKey, valueBytes, time.Now().Add(dur)); err != nil {
 		log.Errorw("Error inserting tooltip into cache",
 			"prefix", c.prefix,
 			"key", key,
@@ -109,7 +90,7 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 
 func (c *PostgreSQLCache) loadFromDatabase(ctx context.Context, cacheKey string) ([]byte, error) {
 	var value []byte
-	err := pool.QueryRow(ctx, "SELECT value FROM cache WHERE key=$1", cacheKey).Scan(&value)
+	err := c.pool.QueryRow(ctx, "SELECT value FROM cache WHERE key=$1", cacheKey).Scan(&value)
 	if err == nil {
 		return value, nil
 	}
@@ -159,62 +140,32 @@ func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) []byte {
 	return nil
 }
 
-func initPool(ctx context.Context, dsn string) {
-	if pool != nil {
-		// connection pool already initialized
-		return
-	}
-
+func StartCacheClearer(ctx context.Context, pool db.Pool) {
 	log := logger.FromContext(ctx)
 
-	var err error
+	ticker := time.NewTicker(1 * time.Minute)
+	for {
+		select {
+		case <-ctx.Done():
+			return
 
-	log.Debugw("Initialize pool")
-	pool, err = pgxpool.Connect(ctx, dsn)
-
-	if err != nil {
-		log.Fatalw("Error connecting to pool", "dsn", dsn, "error", err)
-	}
-
-	if err := pool.Ping(ctx); err != nil {
-		log.Fatalw("Error pinging pool", "dsn", dsn, "error", err)
-	}
-
-	conn, err := pool.Acquire(ctx)
-	if err != nil {
-		log.Fatalw("Error acquiring connection from pool",
-			"dsn", dsn,
-			"error", err,
-		)
-	}
-	defer conn.Release()
-
-	if oldVersion, newVersion, err := migration.Run(ctx, conn.Conn()); err != nil {
-		log.Fatalw("Error running database migrations",
-			"dsn", dsn,
-			"error", err,
-		)
-	} else {
-		if newVersion != oldVersion {
-			log.Infow("Ran database migrations",
-				"oldVersion", oldVersion,
-				"newVersion", newVersion,
-			)
+		case <-ticker.C:
+			if ct, err := clearOldTooltips(ctx, pool); err != nil {
+				log.Errorw("Error clearing old tooltips")
+			} else {
+				clearedEntries.Add(float64(ct.RowsAffected()))
+				log.Debugw("Cleared old tooltips", "rowsAffected", ct.RowsAffected())
+			}
 		}
 	}
-
-	go startTooltipClearer(ctx)
-
-	// TODO: We currently don't close the connection pool
 }
 
-func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, prefix string, loader Loader, cacheDuration time.Duration) *PostgreSQLCache {
-	initPool(ctx, cfg.DSN)
-
+func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool, prefix string, loader Loader, cacheDuration time.Duration) *PostgreSQLCache {
 	// Create connection pool if it's not already initialized
 	return &PostgreSQLCache{
 		prefix:        prefix,
 		loader:        loader,
 		cacheDuration: cacheDuration,
+		pool:          pool,
 	}
 }

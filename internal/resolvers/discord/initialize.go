@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -40,12 +41,12 @@ var (
 	discordInviteTemplate = template.Must(template.New("discordInviteTooltip").Parse(discordInviteTooltip))
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
 	if cfg.DiscordToken == "" {
 		log.Warnw("[Config] discord-token is missing, won't do special responses for Discord invites")
 		return
 	}
 
-	*resolvers = append(*resolvers, NewInviteResolver(ctx, cfg))
+	*resolvers = append(*resolvers, NewInviteResolver(ctx, cfg, pool))
 }

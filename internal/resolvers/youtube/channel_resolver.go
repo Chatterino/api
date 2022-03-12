@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -41,11 +42,11 @@ func (r *YouTubeChannelResolver) Name() string {
 	return "youtube:channel"
 }
 
-func NewYouTubeChannelResolver(ctx context.Context, cfg config.APIConfig, youtubeClient *youtubeAPI.Service) *YouTubeChannelResolver {
+func NewYouTubeChannelResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, youtubeClient *youtubeAPI.Service) *YouTubeChannelResolver {
 	loader := NewYouTubeChannelLoader(youtubeClient)
 
 	r := &YouTubeChannelResolver{
-		channelCache: cache.NewPostgreSQLCache(ctx, cfg, "youtube_channels", resolver.NewResponseMarshaller(loader), 24*time.Hour),
+		channelCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "youtube_channels", resolver.NewResponseMarshaller(loader), 24*time.Hour),
 	}
 
 	return r

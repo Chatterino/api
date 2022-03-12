@@ -4,12 +4,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/nicklaw5/helix"
 )
 
-func New(ctx context.Context, cfg config.APIConfig, helixClient *helix.Client) cache.Cache {
+func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client) cache.Cache {
 	if helixClient == nil {
 		return nil
 	}
@@ -18,5 +19,5 @@ func New(ctx context.Context, cfg config.APIConfig, helixClient *helix.Client) c
 		helixClient: helixClient,
 	}
 
-	return cache.NewPostgreSQLCache(ctx, cfg, "twitch:username", usernameLoader, 1*time.Hour)
+	return cache.NewPostgreSQLCache(ctx, cfg, pool, "twitch:username", usernameLoader, 1*time.Hour)
 }

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"regexp"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
@@ -33,6 +34,6 @@ var (
 	errInvalidFrankerFaceZEmotePath = errors.New("invalid FrankerFaceZ emote path")
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {
-	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg))
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
+	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg, pool))
 }

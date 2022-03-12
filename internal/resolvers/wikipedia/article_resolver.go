@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -32,14 +33,14 @@ func (r *ArticleResolver) Name() string {
 	return "wikipedia:article"
 }
 
-func NewArticleResolver(ctx context.Context, cfg config.APIConfig) *ArticleResolver {
+func NewArticleResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *ArticleResolver {
 	const endpointURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
 	articleLoader := &ArticleLoader{
 		endpointURL: endpointURL,
 	}
 
 	r := &ArticleResolver{
-		articleCache: cache.NewPostgreSQLCache(ctx, cfg, "wikipedia:article", resolver.NewResponseMarshaller(articleLoader), 1*time.Hour),
+		articleCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "wikipedia:article", resolver.NewResponseMarshaller(articleLoader), 1*time.Hour),
 	}
 
 	return r

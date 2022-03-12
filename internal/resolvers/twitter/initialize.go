@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"text/template"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -59,12 +60,12 @@ var (
 	twitterUserTooltipTemplate = template.Must(template.New("twitterUserTooltip").Parse(twitterUserTooltip))
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
 	if cfg.TwitterBearerToken == "" {
 		log.Warnw("Twitter credentials missing, won't do special responses for Twitter")
 		return
 	}
 
-	*resolvers = append(*resolvers, NewTwitterResolver(ctx, cfg))
+	*resolvers = append(*resolvers, NewTwitterResolver(ctx, cfg, pool))
 }

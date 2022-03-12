@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"regexp"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
@@ -20,6 +21,6 @@ var (
 	errTitleMatch  = errors.New("could not find title from URL")
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {
-	*resolvers = append(*resolvers, NewArticleResolver(ctx, cfg))
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
+	*resolvers = append(*resolvers, NewArticleResolver(ctx, cfg, pool))
 }

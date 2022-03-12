@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"regexp"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 )
@@ -34,9 +35,9 @@ var (
 	tmpl = template.Must(template.New("betterttvEmoteTooltip").Parse(tooltipTemplate))
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
 	// Find links matching the BetterTTV direct emote link (e.g. https://betterttv.com/emotes/566ca06065dbbdab32ec054e)
-	emoteResolver := NewEmoteResolver(ctx, cfg)
+	emoteResolver := NewEmoteResolver(ctx, cfg, pool)
 
 	*resolvers = append(*resolvers, emoteResolver)
 }

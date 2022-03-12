@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/resolvers/betterttv"
 	"github.com/Chatterino/api/internal/resolvers/discord"
@@ -151,22 +152,22 @@ func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.R
 	}
 }
 
-func New(ctx context.Context, cfg config.APIConfig, helixClient *helix.Client) *LinkResolver {
+func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client) *LinkResolver {
 	customResolvers := []resolver.Resolver{}
 
 	// Register Link Resolvers from internal/resolvers/
-	betterttv.Initialize(ctx, cfg, &customResolvers)
-	discord.Initialize(ctx, cfg, &customResolvers)
-	frankerfacez.Initialize(ctx, cfg, &customResolvers)
-	imgur.Initialize(ctx, cfg, &customResolvers)
-	livestreamfails.Initialize(ctx, cfg, &customResolvers)
-	oembed.Initialize(ctx, cfg, &customResolvers)
-	supinic.Initialize(ctx, cfg, &customResolvers)
-	twitch.Initialize(ctx, cfg, helixClient, &customResolvers)
-	twitter.Initialize(ctx, cfg, &customResolvers)
-	wikipedia.Initialize(ctx, cfg, &customResolvers)
-	youtube.Initialize(ctx, cfg, &customResolvers)
-	seventv.Initialize(ctx, cfg, &customResolvers)
+	betterttv.Initialize(ctx, cfg, pool, &customResolvers)
+	discord.Initialize(ctx, cfg, pool, &customResolvers)
+	frankerfacez.Initialize(ctx, cfg, pool, &customResolvers)
+	imgur.Initialize(ctx, cfg, pool, &customResolvers)
+	livestreamfails.Initialize(ctx, cfg, pool, &customResolvers)
+	oembed.Initialize(ctx, cfg, pool, &customResolvers)
+	supinic.Initialize(ctx, cfg, pool, &customResolvers)
+	twitch.Initialize(ctx, cfg, pool, helixClient, &customResolvers)
+	twitter.Initialize(ctx, cfg, pool, &customResolvers)
+	wikipedia.Initialize(ctx, cfg, pool, &customResolvers)
+	youtube.Initialize(ctx, cfg, pool, &customResolvers)
+	seventv.Initialize(ctx, cfg, pool, &customResolvers)
 
 	linkLoader := &LinkLoader{
 		baseURL:          cfg.BaseURL,
@@ -182,8 +183,8 @@ func New(ctx context.Context, cfg config.APIConfig, helixClient *helix.Client) *
 	r := &LinkResolver{
 		customResolvers: customResolvers,
 
-		linkCache:      cache.NewPostgreSQLCache(ctx, cfg, "default:link", linkLoader, 10*time.Minute),
-		thumbnailCache: cache.NewPostgreSQLCache(ctx, cfg, "default:thumbnail", thumbnailLoader, 10*time.Minute),
+		linkCache:      cache.NewPostgreSQLCache(ctx, cfg, pool, "default:link", linkLoader, 10*time.Minute),
+		thumbnailCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "default:thumbnail", thumbnailLoader, 10*time.Minute),
 	}
 
 	return r

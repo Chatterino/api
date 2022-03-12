@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
@@ -40,9 +41,9 @@ var (
 	youtubeChannelTooltipTemplate = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
 )
 
-func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, youtubeClient *youtubeAPI.Service) (resolver.Resolver, resolver.Resolver) {
+func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, pool db.Pool, youtubeClient *youtubeAPI.Service) (resolver.Resolver, resolver.Resolver) {
 	videoLoader := NewVideoLoader(youtubeClient)
-	videoCache := cache.NewPostgreSQLCache(ctx, cfg, "youtube_videos", resolver.NewResponseMarshaller(videoLoader), 24*time.Hour)
+	videoCache := cache.NewPostgreSQLCache(ctx, cfg, pool, "youtube_videos", resolver.NewResponseMarshaller(videoLoader), 24*time.Hour)
 
 	videoResolver := NewYouTubeVideoResolver(videoCache)
 	videoShortURLResolver := NewYouTubeVideoShortURLResolver(videoCache)
@@ -50,7 +51,7 @@ func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, youtube
 	return videoResolver, videoShortURLResolver
 }
 
-func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver.Resolver) {
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
 	if cfg.YoutubeApiKey == "" {
 		log.Warnw("[Config] youtube-api-key is missing, won't do special responses for YouTube")
@@ -66,9 +67,9 @@ func Initialize(ctx context.Context, cfg config.APIConfig, resolvers *[]resolver
 	}
 
 	// Handle YouTube channels (youtube.com/c/chan, youtube.com/chan, youtube.com/user/chan)
-	*resolvers = append(*resolvers, NewYouTubeChannelResolver(ctx, cfg, youtubeClient))
+	*resolvers = append(*resolvers, NewYouTubeChannelResolver(ctx, cfg, pool, youtubeClient))
 
-	videoResolver, videoShortURLResolver := NewYouTubeVideoResolvers(ctx, cfg, youtubeClient)
+	videoResolver, videoShortURLResolver := NewYouTubeVideoResolvers(ctx, cfg, pool, youtubeClient)
 
 	// Handle YouTube video URLs
 	*resolvers = append(*resolvers, videoResolver)

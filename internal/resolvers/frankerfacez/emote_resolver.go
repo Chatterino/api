@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -42,7 +43,7 @@ func (r *EmoteResolver) Name() string {
 	return "frankerfacez:emote"
 }
 
-func NewEmoteResolver(ctx context.Context, cfg config.APIConfig) *EmoteResolver {
+func NewEmoteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *EmoteResolver {
 	const emoteAPIURL = "https://api.frankerfacez.com/v1/emote/%s"
 
 	emoteLoader := &EmoteLoader{
@@ -50,7 +51,7 @@ func NewEmoteResolver(ctx context.Context, cfg config.APIConfig) *EmoteResolver 
 	}
 
 	r := &EmoteResolver{
-		emoteCache: cache.NewPostgreSQLCache(ctx, cfg, "frankerfacez:emote", resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),
+		emoteCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "frankerfacez:emote", resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),
 	}
 
 	return r

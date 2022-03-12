@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -70,13 +71,13 @@ func (r *ClipResolver) Name() string {
 	return "twitch:clip"
 }
 
-func NewClipResolver(ctx context.Context, cfg config.APIConfig, helixAPI *helix.Client) *ClipResolver {
+func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixAPI *helix.Client) *ClipResolver {
 	clipLoader := &ClipLoader{
 		helixAPI: helixAPI,
 	}
 
 	r := &ClipResolver{
-		clipCache: cache.NewPostgreSQLCache(ctx, cfg, "twitch:clip", resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
+		clipCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "twitch:clip", resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
 	}
 
 	return r

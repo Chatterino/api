@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -40,11 +41,11 @@ func (r *ClipResolver) Name() string {
 	return "livestreamfails:clip"
 }
 
-func NewClipResolver(ctx context.Context, cfg config.APIConfig) *ClipResolver {
+func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *ClipResolver {
 	clipLoader := &ClipLoader{}
 
 	r := &ClipResolver{
-		clipCache: cache.NewPostgreSQLCache(ctx, cfg, "livestreamfails:clip", resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
+		clipCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "livestreamfails:clip", resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
 	}
 
 	return r

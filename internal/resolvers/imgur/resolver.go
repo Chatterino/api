@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -37,7 +38,7 @@ func (r *Resolver) Name() string {
 	return "imgur"
 }
 
-func NewResolver(ctx context.Context, cfg config.APIConfig) *Resolver {
+func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *Resolver {
 	loader := &Loader{
 		baseURL: cfg.BaseURL,
 		apiClient: &imgur.Client{
@@ -49,7 +50,7 @@ func NewResolver(ctx context.Context, cfg config.APIConfig) *Resolver {
 	}
 
 	r := &Resolver{
-		imgurCache: cache.NewPostgreSQLCache(ctx, cfg, "imgur", resolver.NewResponseMarshaller(loader), 1*time.Hour),
+		imgurCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "imgur", resolver.NewResponseMarshaller(loader), 1*time.Hour),
 	}
 
 	return r

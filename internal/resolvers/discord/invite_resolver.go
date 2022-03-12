@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -36,7 +37,7 @@ func (r *InviteResolver) Name() string {
 	return "discord:invite"
 }
 
-func NewInviteResolver(ctx context.Context, cfg config.APIConfig) *InviteResolver {
+func NewInviteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *InviteResolver {
 	inviteLoader := &InviteLoader{
 		token: cfg.DiscordToken,
 	}
@@ -44,7 +45,7 @@ func NewInviteResolver(ctx context.Context, cfg config.APIConfig) *InviteResolve
 	// We cache invites longer on purpose as the API is pretty strict with its rate limiting, and the information changes very seldomly anyway
 	// TODO: Log 429 errors from the loader
 	r := &InviteResolver{
-		inviteCache: cache.NewPostgreSQLCache(ctx, cfg, "discord:invite", resolver.NewResponseMarshaller(inviteLoader), 6*time.Hour),
+		inviteCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "discord:invite", resolver.NewResponseMarshaller(inviteLoader), 6*time.Hour),
 	}
 
 	return r

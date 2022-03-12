@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -31,7 +32,7 @@ func (r *Resolver) Name() string {
 	return "oembed"
 }
 
-func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) (*Resolver, error) {
+func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, data []byte) (*Resolver, error) {
 	var err error
 	var facebookAppAccessToken string
 
@@ -54,7 +55,7 @@ func NewResolver(ctx context.Context, cfg config.APIConfig, data []byte) (*Resol
 	}
 
 	r := &Resolver{
-		oEmbedCache: cache.NewPostgreSQLCache(ctx, cfg, "oembed", resolver.NewResponseMarshaller(loader), 1*time.Hour),
+		oEmbedCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "oembed", resolver.NewResponseMarshaller(loader), 1*time.Hour),
 		oEmbed:      oEmbed,
 	}
 

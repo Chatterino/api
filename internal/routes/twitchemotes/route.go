@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
@@ -142,10 +143,10 @@ func (l *TwitchemotesLoader) Load(ctx context.Context, setID string, r *http.Req
 // Initialize servers the /twitchemotes/set/{setID} route
 // In newer versions of Chatterino this data is fetched client-side instead.
 // To support older versions of Chattterino that relied on this API we will keep this API functional for some time longer.
-func Initialize(ctx context.Context, cfg config.APIConfig, router *chi.Mux, helixClient *helix.Client, helisUsernameCache cache.Cache) error {
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router *chi.Mux, helixClient *helix.Client, helisUsernameCache cache.Cache) error {
 	loader := &TwitchemotesLoader{}
 	helixAPI = helixClient
-	twitchemotesCache := cache.NewPostgreSQLCache(ctx, cfg, "twitchemotes", loader, time.Duration(30)*time.Minute)
+	twitchemotesCache := cache.NewPostgreSQLCache(ctx, cfg, pool, "twitchemotes", loader, time.Duration(30)*time.Minute)
 
 	router.Get("/twitchemotes/set/{setID}", func(w http.ResponseWriter, r *http.Request) {
 		setHandler(ctx, helixUsernameCache, twitchemotesCache, w, r)

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"html/template"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -41,12 +42,12 @@ var (
 	}
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, helixClient *helix.Client, resolvers *[]resolver.Resolver) {
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
 	if helixClient == nil {
 		log.Warnw("[Config] Twitch credentials missing, won't do special responses for Twitch")
 		return
 	}
 
-	*resolvers = append(*resolvers, NewClipResolver(ctx, cfg, helixClient))
+	*resolvers = append(*resolvers, NewClipResolver(ctx, cfg, pool, helixClient))
 }
