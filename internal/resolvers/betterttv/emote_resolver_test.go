@@ -189,7 +189,7 @@ func TestEmoteResolver(t *testing.T) {
 					inputURL:       utils.MustParseURL("https://betterttv.com/emotes/bad"),
 					inputEmoteHash: "bad",
 					inputReq:       nil,
-					expectedBytes:  []byte(`{"status":500,"message":"betterttv api unmarshal error: invalid character &#39;x&#39; looking for beginning of value"}`),
+					expectedBytes:  []byte(`{"status":500,"message":"betterttv api unmarshal error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
 					expectedError:  nil,
 				},
 			}
