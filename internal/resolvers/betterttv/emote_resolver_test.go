@@ -147,7 +147,7 @@ func TestEmoteResolver(t *testing.T) {
 				c.Run(test.label, func(c *qt.C) {
 					rows := pgxmock.NewRows([]string{"value"}).AddRow(test.expectedBytes)
 					pool.ExpectQuery("SELECT").
-						WithArgs("betterttv:emotes:" + test.inputEmoteHash).
+						WithArgs("betterttv:emote:" + test.inputEmoteHash).
 						WillReturnRows(rows)
 					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
 					c.Assert(outputError, qt.Equals, test.expectedError)
@@ -200,7 +200,7 @@ func TestEmoteResolver(t *testing.T) {
 				c.Run(test.label, func(c *qt.C) {
 					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
 					pool.ExpectExec("INSERT INTO cache").
-						WithArgs("betterttv:emotes:"+test.inputEmoteHash, test.expectedBytes, pgxmock.AnyArg()).
+						WithArgs("betterttv:emote:"+test.inputEmoteHash, test.expectedBytes, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
 					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
 					c.Assert(outputError, qt.Equals, test.expectedError)
