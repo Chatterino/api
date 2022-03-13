@@ -62,7 +62,7 @@ func testServer() *httptest.Server {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		if emote == "bad_json" {
+		if emote == "bad" {
 			w.Write([]byte("xD"))
 		} else if response, ok = data[emote]; !ok {
 			http.Error(w, http.StatusText(404), 404)
