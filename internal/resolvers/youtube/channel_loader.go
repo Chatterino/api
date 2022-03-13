@@ -3,7 +3,6 @@ package youtube
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -55,8 +54,15 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 			}, 1 * time.Hour, nil
 		}
 
-		if len(response.Items) != 1 {
-			return nil, cache.NoSpecialDur, errors.New("channel search response is not size 1")
+		if len(response.Items) == 0 {
+			return &resolver.Response{
+				Status:  404,
+				Message: fmt.Sprintf("No YouTube channel with the ID %s found", resolver.CleanResponse(channel.ID)),
+			}, 24 * time.Hour, nil
+		}
+
+		if len(response.Items) > 1 {
+			return resolver.Errorf("YouTube channel response contained %d items", len(response.Items))
 		}
 
 		channel.ID = response.Items[0].Snippet.ChannelId
