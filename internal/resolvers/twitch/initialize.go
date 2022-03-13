@@ -42,7 +42,7 @@ var (
 	}
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client, resolvers *[]resolver.Resolver) {
+func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient TwitchAPIClient, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
 	if helixClient == nil {
 		log.Warnw("[Config] Twitch credentials missing, won't do special responses for Twitch")

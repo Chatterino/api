@@ -2,67 +2,179 @@ package twitch
 
 import (
 	"context"
+	"errors"
+	"net/http"
 	"net/url"
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/internal/mocks"
+	"github.com/Chatterino/api/pkg/config"
+	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
+	"github.com/golang/mock/gomock"
+	"github.com/jackc/pgx/v4"
+	"github.com/nicklaw5/helix"
+	"github.com/pashagolub/pgxmock"
 )
 
-const goodSlugV1 = "GoodSlugV1"
-const goodSlugV2 = "GoodSlugV2-HVUvT7bYQnMn6nwp"
-
-var validClips = []string{
-	"https://clips.twitch.tv/" + goodSlugV1,
-	"https://clips.twitch.tv/" + goodSlugV2,
-	"https://twitch.tv/pajlada/clip/" + goodSlugV1,
-	"https://twitch.tv/pajlada/clip/" + goodSlugV2,
-	"https://twitch.tv/zneix/clip/" + goodSlugV1,
-	"https://twitch.tv/zneix/clip/" + goodSlugV2,
-	"https://m.twitch.tv/pajlada/clip/" + goodSlugV1,
-	"https://m.twitch.tv/pajlada/clip/" + goodSlugV2,
-	"https://m.twitch.tv/zneix/clip/" + goodSlugV1,
-	"https://m.twitch.tv/zneix/clip/" + goodSlugV2,
-	"https://m.twitch.tv/clip/" + goodSlugV1,
-	"https://m.twitch.tv/clip/" + goodSlugV2,
-	"https://m.twitch.tv/clip/clip/" + goodSlugV1,
-	"https://m.twitch.tv/clip/clip/" + goodSlugV2,
-}
-
-var invalidClips = []string{
-	"https://clips.twitch.tv/pajlada/clip/VastBitterVultureMau5",
-	"https://clips.twitch.tv/",
-	"https://twitch.tv/nam____________________________________________/clip/someSlugNam",
-	"https://twitch.tv/supinic/clip/",
-	"https://twitch.tv/pajlada/clips/VastBitterVultureMau5",
-	"https://twitch.tv/zneix/clip/ImpossibleOilyAlpacaTF2John-jIlgtnSAQ52BThHhifyouseethisvivon",
-	"https://twitch.tv/clip/slug",
-	"https://gql.twitch.tv/VastBitterVultureMau5",
-	"https://gql.twitch.tv/ThreeLetterAPI/clip/VastBitterVultureMau5",
-	"https://m.twitch.tv/VastBitterVultureMau5",
-	"https://m.twitch.tv/username/clip/clip/slug",
-	"https://m.twitch.tv/username/notclip/slug",
-}
-
-func testCheck(ctx context.Context, resolver *ClipResolver, c *qt.C, urlString string) bool {
-	u, err := url.Parse(urlString)
-	c.Assert(u, qt.IsNotNil)
-	c.Assert(err, qt.IsNil)
-
-	return resolver.Check(ctx, u)
-}
-
-func TestCheck(t *testing.T) {
+func TestClipResolver(t *testing.T) {
 	ctx := logger.OnContext(context.Background(), logger.NewTest())
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	c := qt.New(t)
 
-	resolver := &ClipResolver{}
+	pool, _ := pgxmock.NewPool()
+	cfg := config.APIConfig{}
+	helixClient := mocks.NewMockTwitchAPIClient(ctrl)
 
-	for _, u := range validClips {
-		c.Assert(testCheck(ctx, resolver, c, u), qt.IsTrue, qt.Commentf("%v must be seen as a clip", u))
-	}
+	resolver := NewClipResolver(ctx, cfg, pool, helixClient)
 
-	for _, u := range invalidClips {
-		c.Assert(testCheck(ctx, resolver, c, u), qt.IsFalse, qt.Commentf("%v must not be seen as a clip", u))
-	}
+	c.Assert(resolver, qt.IsNotNil)
+
+	c.Run("Name", func(c *qt.C) {
+		c.Assert(resolver.Name(), qt.Equals, "twitch:clip")
+	})
+
+	c.Run("Check", func(c *qt.C) {
+		type checkTest struct {
+			label    string
+			input    *url.URL
+			expected bool
+		}
+
+		tests := []checkTest{}
+
+		for _, b := range validClipBase {
+			tests = append(tests, checkTest{
+				label:    "valid",
+				input:    utils.MustParseURL(b + goodSlugV1),
+				expected: true,
+			})
+			tests = append(tests, checkTest{
+				label:    "valid",
+				input:    utils.MustParseURL(b + goodSlugV2),
+				expected: true,
+			})
+		}
+
+		for _, b := range invalidClips {
+			tests = append(tests, checkTest{
+				label:    "invalid",
+				input:    utils.MustParseURL(b),
+				expected: false,
+			})
+		}
+
+		for _, test := range tests {
+			c.Run(test.label, func(c *qt.C) {
+				output := resolver.Check(ctx, test.input)
+				c.Assert(output, qt.Equals, test.expected)
+			})
+		}
+	})
+
+	c.Run("Run", func(c *qt.C) {
+		c.Run("Error", func(c *qt.C) {
+			type runTest struct {
+				label          string
+				inputURL       *url.URL
+				inputEmoteHash string
+				inputReq       *http.Request
+				expectedError  error
+			}
+
+			tests := []runTest{
+				{
+					label:         "Non-matching link",
+					inputURL:      utils.MustParseURL("https://clips.twitch.tv/user/566ca04265dbbdab32ec054a"),
+					expectedError: errInvalidTwitchClip,
+				},
+			}
+
+			const q = `SELECT value FROM cache WHERE key=$1`
+
+			for _, test := range tests {
+				c.Run(test.label, func(c *qt.C) {
+					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
+					c.Assert(outputError, qt.Equals, test.expectedError)
+					c.Assert(outputBytes, qt.IsNil)
+				})
+			}
+		})
+
+		c.Run("Not cached", func(c *qt.C) {
+			type runTest struct {
+				label                string
+				inputURL             *url.URL
+				inputSlug            string
+				inputReq             *http.Request
+				expectedClipResponse *helix.ClipsResponse
+				expectedClipError    error
+				expectedBytes        []byte
+				expectedError        error
+				rowsReturned         int
+			}
+
+			tests := []runTest{
+				{
+					label:     "Emote",
+					inputURL:  utils.MustParseURL("https://clips.twitch.tv/GoodSlugV1"),
+					inputSlug: "GoodSlugV1",
+					inputReq:  nil,
+					expectedClipResponse: &helix.ClipsResponse{
+						Data: helix.ManyClips{
+							Clips: []helix.Clip{
+								{
+									Title:           "Title",
+									CreatorName:     "CreatorName",
+									BroadcasterName: "BroadcasterName",
+									Duration:        5,
+									CreatedAt:       "202", // will fail
+									ViewCount:       420,
+									ThumbnailURL:    "https://example.com/thumbnail.png",
+								},
+							},
+						},
+					},
+					expectedClipError: nil,
+					expectedBytes:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETitle%3C%2Fb%3E%3Chr%3E%3Cb%3EClipped%20by:%3C%2Fb%3E%20CreatorName%3Cbr%3E%3Cb%3EChannel:%3C%2Fb%3E%20BroadcasterName%3Cbr%3E%3Cb%3EDuration:%3C%2Fb%3E%205s%3Cbr%3E%3Cb%3ECreated:%3C%2Fb%3E%20%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%3C%2Fdiv%3E"}`),
+					expectedError:     nil,
+				},
+				{
+					label:                "GetClipsError",
+					inputURL:             utils.MustParseURL("https://clips.twitch.tv/GoodSlugV1GetClipsError"),
+					inputSlug:            "GoodSlugV1GetClipsError",
+					inputReq:             nil,
+					expectedClipResponse: nil,
+					expectedClipError:    errors.New("error"),
+					expectedBytes:        []byte(`{"status":500,"message":"Twitch clip load error: error"}`),
+					expectedError:        nil,
+				},
+				// {
+				// 	label:         "Bad JSON",
+				// 	inputURL:      utils.MustParseURL("https://betterttv.com/emotes/bad"),
+				// 	inputSlug:     "bad",
+				// 	inputReq:      nil,
+				// 	expectedBytes: []byte(`{"status":500,"message":"betterttv api unmarshal error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+				// 	expectedError: nil,
+				// },
+			}
+
+			const q = `SELECT value FROM cache WHERE key=$1`
+
+			for _, test := range tests {
+				c.Run(test.label, func(c *qt.C) {
+					helixClient.EXPECT().GetClips(&helix.ClipsParams{IDs: []string{test.inputSlug}}).Times(1).Return(test.expectedClipResponse, test.expectedClipError)
+					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
+					pool.ExpectExec("INSERT INTO cache").
+						WithArgs("twitch:clip:"+test.inputSlug, test.expectedBytes, pgxmock.AnyArg()).
+						WillReturnResult(pgxmock.NewResult("INSERT", 1))
+					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
+					c.Assert(outputError, qt.Equals, test.expectedError)
+					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
+				})
+			}
+		})
+	})
 }
