@@ -9,6 +9,7 @@ import (
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 const (
@@ -36,5 +37,7 @@ var (
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
-	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg, pool))
+	apiURL := utils.MustParseURL("https://7v.app/v2/gql")
+
+	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg, pool, apiURL))
 }

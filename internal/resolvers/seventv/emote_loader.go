@@ -13,11 +13,13 @@ import (
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 )
 
 type EmoteLoader struct {
+	apiURL  string
 	baseURL string
 }
 
@@ -48,29 +50,20 @@ query fetchEmote($id: String!) {
 
 	queryBytes, err := json.Marshal(queryMap)
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "SevenTV API request error" + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("SevenTV API request marshal error: %s", err)
 	}
 
 	// Execute SevenTV API request
-	resp, err := resolver.RequestPOST(l.baseURL, string(queryBytes))
+	resp, err := resolver.RequestPOST(l.apiURL, string(queryBytes))
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "SevenTV API request error" + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("SevenTV API request error: %s", err)
 	}
 	defer resp.Body.Close()
 
 	// Read response into a string
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "SevenTV API http body read error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("SevenTV HTTP body read error: %s", err)
 	}
 
 	// Error out if the emote wasn't found or something else went wrong with the request
@@ -80,10 +73,7 @@ query fetchEmote($id: String!) {
 
 	var jsonResponse EmoteAPIResponse
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "SevenTV API unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("SevenTV API response unmarshal error: %s", err)
 	}
 
 	// API returns Data.Emote as null if the emote wasn't found
@@ -119,10 +109,7 @@ query fetchEmote($id: String!) {
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
 	if err := seventvEmoteTemplate.Execute(&tooltip, data); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "SevenTV emote template error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("SevenTV emote template error: %s", err)
 	}
 
 	// Success
@@ -139,5 +126,11 @@ query fetchEmote($id: String!) {
 	}
 
 	return successTooltip, cache.NoSpecialDur, nil
+}
 
+func NewEmoteLoader(cfg config.APIConfig, apiURL *url.URL) *EmoteLoader {
+	return &EmoteLoader{
+		apiURL:  apiURL.String(),
+		baseURL: cfg.BaseURL,
+	}
 }

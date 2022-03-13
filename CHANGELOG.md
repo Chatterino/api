@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Breaking: Resolver caches are now stored in PostgreSQL. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#271)
+- Fix: SevenTV emotes now resolve correctly.
 
 ## 1.2.3
 
