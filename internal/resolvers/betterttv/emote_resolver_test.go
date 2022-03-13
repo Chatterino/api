@@ -2,9 +2,7 @@ package betterttv
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"testing"
 
@@ -12,7 +10,6 @@ import (
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
-	"github.com/go-chi/chi/v5"
 	"github.com/golang/mock/gomock"
 	"github.com/jackc/pgx/v4"
 	"github.com/pashagolub/pgxmock"
@@ -28,30 +25,7 @@ func TestEmoteResolver(t *testing.T) {
 	pool, _ := pgxmock.NewPool()
 
 	cfg := config.APIConfig{}
-	r := chi.NewRouter()
-	r.Get("/3/emotes/{emote}", func(w http.ResponseWriter, r *http.Request) {
-		emote := chi.URLParam(r, "emote")
-
-		var response *EmoteAPIResponse
-		var ok bool
-
-		w.Header().Set("Content-Type", "application/json")
-
-		if emote == "500" {
-			// response = &resolver.Response{
-			// 	Status: http.StatusInternalServerError,
-			// 	Message: "betterttv http request error "
-			// }
-		} else if response, ok = data[emote]; !ok {
-			http.Error(w, http.StatusText(404), 404)
-			return
-		}
-
-		b, _ := json.Marshal(&response)
-
-		w.Write(b)
-	})
-	ts := httptest.NewServer(r)
+	ts := testServer()
 	defer ts.Close()
 	emoteAPIURL := utils.MustParseURL(ts.URL + "/3/emotes/")
 
@@ -195,7 +169,7 @@ func TestEmoteResolver(t *testing.T) {
 
 			tests := []runTest{
 				{
-					label:          "Matching link - not cached",
+					label:          "Emote",
 					inputURL:       utils.MustParseURL("https://betterttv.com/emotes/566ca04265dbbdab32ec054b"),
 					inputEmoteHash: "566ca04265dbbdab32ec054b",
 					inputReq:       nil,
@@ -203,11 +177,19 @@ func TestEmoteResolver(t *testing.T) {
 					expectedError:  nil,
 				},
 				{
-					label:          "Matching link - 404",
+					label:          "404",
 					inputURL:       utils.MustParseURL("https://betterttv.com/emotes/404"),
 					inputEmoteHash: "404",
 					inputReq:       nil,
 					expectedBytes:  []byte(`{"status":404,"message":"No BetterTTV emote with this hash found"}`),
+					expectedError:  nil,
+				},
+				{
+					label:          "Bad JSON",
+					inputURL:       utils.MustParseURL("https://betterttv.com/emotes/bad"),
+					inputEmoteHash: "bad",
+					inputReq:       nil,
+					expectedBytes:  []byte(`{"status":500,"message":"betterttv api unmarshal error: invalid character &#39;x&#39; looking for beginning of value"}`),
 					expectedError:  nil,
 				},
 			}
