@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.3
+
 - Dev: Automatically publish docker image to the GitHub Container Registry. (#279)
 
 ## 1.2.2
