@@ -1,6 +1,6 @@
 FROM golang:1.16 AS build
 ADD . /src
-RUN cd /src/cmd/api && GOOS=linux GOARCH=amd64 go build -ldflags '-extldflags "-static"'
+RUN cd /src/cmd/api && GOOS=linux GOARCH=amd64 go build -tags netgo -ldflags '-extldflags "-static"'
 
 FROM alpine:latest
 WORKDIR /app
