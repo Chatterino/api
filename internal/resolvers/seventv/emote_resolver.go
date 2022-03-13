@@ -39,13 +39,11 @@ func (r *EmoteResolver) Name() string {
 	return "seventv:emote"
 }
 
-func NewEmoteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *EmoteResolver {
-	emoteLoader := &EmoteLoader{
-		baseURL: cfg.BaseURL,
-	}
+func NewEmoteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, apiURL *url.URL) *EmoteResolver {
+	emoteLoader := NewEmoteLoader(cfg, apiURL)
 
 	r := &EmoteResolver{
-		emoteCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "seventv:emotes", resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),
+		emoteCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "seventv:emote", resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),
 	}
 
 	return r
