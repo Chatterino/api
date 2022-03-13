@@ -76,10 +76,7 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 	// Create and execute BetterTTV API request
 	resp, err := resolver.RequestGET(ctx, emoteURL)
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "betterttv http request error " + resolver.CleanResponse(err.Error()),
-		}, resolver.NoSpecialDur, nil
+		return resolver.Errorf("betterttv http request error: %s", err)
 	}
 	defer resp.Body.Close()
 
@@ -91,19 +88,13 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 	// Read response into a string
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "betterttv http body read error " + resolver.CleanResponse(err.Error()),
-		}, resolver.NoSpecialDur, nil
+		return resolver.Errorf("betterttv http body read error: %s", err)
 	}
 
 	// Parse response into a predefined JSON blob (see EmoteAPIResponse struct in model.go)
 	var jsonResponse EmoteAPIResponse
 	if err := json.Unmarshal(body, &jsonResponse); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "betterttv api unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, resolver.NoSpecialDur, nil
+		return resolver.Errorf("betterttv api unmarshal error: %s", err)
 	}
 
 	// Build tooltip data from the API response
@@ -120,10 +111,7 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
 	if err := tmpl.Execute(&tooltip, data); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "youtube template error " + resolver.CleanResponse(err.Error()),
-		}, resolver.NoSpecialDur, nil
+		return resolver.Errorf("betterttv template error: %s", err)
 	}
 
 	return &resolver.Response{
@@ -134,15 +122,10 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 
 }
 
-func NewEmoteLoader(baseURLString string) (*EmoteLoader, error) {
-	baseURL, err := url.Parse(baseURLString)
-	if err != nil {
-		return nil, err
-	}
-
+func NewEmoteLoader(emoteAPIURL *url.URL) *EmoteLoader {
 	l := &EmoteLoader{
-		baseURL: baseURL,
+		baseURL: emoteAPIURL,
 	}
 
-	return l, nil
+	return l
 }

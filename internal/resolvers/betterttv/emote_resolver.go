@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/internal/db"
-	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -46,15 +45,8 @@ func (r *EmoteResolver) Name() string {
 	return "betterttv:emote"
 }
 
-func NewEmoteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *EmoteResolver {
-	log := logger.FromContext(ctx)
-	const emoteAPIURL = "https://api.betterttv.net/3/emotes/"
-	emoteLoader, err := NewEmoteLoader(emoteAPIURL)
-	if err != nil {
-		log.Fatalw("Error creating BetterTTV Emote Loader",
-			"error", err,
-		)
-	}
+func NewEmoteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, emoteAPIURL *url.URL) *EmoteResolver {
+	emoteLoader := NewEmoteLoader(emoteAPIURL)
 
 	r := &EmoteResolver{
 		emoteCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "betterttv:emotes", resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),

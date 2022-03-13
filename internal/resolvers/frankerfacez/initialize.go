@@ -9,6 +9,7 @@ import (
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 const (
@@ -35,5 +36,6 @@ var (
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
-	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg, pool))
+	emoteAPIURL := utils.MustParseURL("https://api.frankerfacez.com/v1/emote/")
+	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg, pool, emoteAPIURL))
 }

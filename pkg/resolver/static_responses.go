@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
@@ -53,4 +54,13 @@ func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
 			"error", err,
 		)
 	}
+}
+
+func Errorf(format string, a ...interface{}) (*Response, time.Duration, error) {
+	r := &Response{
+		Status:  http.StatusInternalServerError,
+		Message: CleanResponse(fmt.Sprintf(format, a...)),
+	}
+
+	return r, NoSpecialDur, nil
 }

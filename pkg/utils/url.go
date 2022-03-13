@@ -64,3 +64,11 @@ func IsDomain(url *url.URL, domain string) bool {
 	host := strings.ToLower(url.Hostname())
 	return host == domain
 }
+
+func MustParseURL(urlString string) *url.URL {
+	u, err := url.Parse(urlString)
+	if err != nil {
+		panic(err)
+	}
+	return u
+}

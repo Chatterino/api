@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 )
@@ -52,24 +53,24 @@ var (
 }
 */
 
-type FrankerFaceZUser struct {
+type EmoteAPIUser struct {
 	DisplayName string `json:"display_name"`
 	ID          int    `json:"_id"`
 	Name        string `json:"name"`
 }
 
-type FrankerFaceZEmoteAPIResponse struct {
-	Height    int16            `json:"height"`
-	Modifier  bool             `json:"modifier"`
-	Status    int              `json:"status"`
-	Width     int16            `json:"width"`
-	Hidden    bool             `json:"hidden"`
-	CreatedAt time.Time        `json:"created_at"`
-	UpdatedAt time.Time        `json:"last_updated"`
-	ID        int              `json:"id"`
-	Name      string           `json:"name"`
-	Public    bool             `json:"public"`
-	Owner     FrankerFaceZUser `json:"owner"`
+type EmoteAPIResponse struct {
+	Height    int16        `json:"height"`
+	Modifier  bool         `json:"modifier"`
+	Status    int          `json:"status"`
+	Width     int16        `json:"width"`
+	Hidden    bool         `json:"hidden"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"last_updated"`
+	ID        int          `json:"id"`
+	Name      string       `json:"name"`
+	Public    bool         `json:"public"`
+	Owner     EmoteAPIUser `json:"owner"`
 
 	URLs struct {
 		Size1 string `json:"1"`
@@ -84,20 +85,30 @@ type TooltipData struct {
 }
 
 type EmoteLoader struct {
-	emoteAPIURL string
+	emoteAPIURL *url.URL
+}
+
+func (l *EmoteLoader) buildURL(emoteID string) string {
+	relativeURL := &url.URL{
+		Path: emoteID,
+	}
+	finalURL := l.emoteAPIURL.ResolveReference(relativeURL)
+
+	return finalURL.String()
 }
 
 func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request) (*resolver.Response, time.Duration, error) {
-	apiURL := fmt.Sprintf(l.emoteAPIURL, emoteID)
+	log := logger.FromContext(ctx)
+	log.Debugw("Load FrankerFaceZ emote",
+		"emoteID", emoteID,
+	)
+	apiURL := l.buildURL(emoteID)
 	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteID)
 
 	// Create FrankerFaceZ API request
 	resp, err := resolver.RequestGET(ctx, apiURL)
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ffz http request error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("FrankerFaceZ HTTP request error: %s", err)
 	}
 	defer resp.Body.Close()
 
@@ -109,22 +120,16 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request)
 	// Read response into a string
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ffz http body read error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("FrankerFaceZ HTTP body read error: %s", err)
 	}
 
-	// Parse response into a predefined JSON blob (see FrankerFaceZEmoteAPIResponse struct above)
+	// Parse response into a predefined JSON blob (see EmoteAPIResponse struct above)
 	var temp struct {
-		Emote FrankerFaceZEmoteAPIResponse `json:"emote"`
+		Emote EmoteAPIResponse `json:"emote"`
 	}
 
 	if err := json.Unmarshal(body, &temp); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ffz api unmarshal error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("FrankerFaceZ API unmarshal error: %s", err)
 	}
 	jsonResponse := temp.Emote
 
@@ -137,10 +142,7 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request)
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
 	if err := tmpl.Execute(&tooltip, data); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ffz template error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("FrankerFaceZ template error: %s", err)
 	}
 
 	return &resolver.Response{
@@ -148,5 +150,10 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request)
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: thumbnailURL,
 	}, cache.NoSpecialDur, nil
+}
 
+func NewEmoteLoader(emoteAPIURL *url.URL) *EmoteLoader {
+	return &EmoteLoader{
+		emoteAPIURL: emoteAPIURL,
+	}
 }

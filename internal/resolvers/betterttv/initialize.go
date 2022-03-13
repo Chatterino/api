@@ -9,6 +9,7 @@ import (
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 const (
@@ -36,8 +37,9 @@ var (
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
+	emoteAPIURL := utils.MustParseURL("https://api.betterttv.net/3/emotes/")
 	// Find links matching the BetterTTV direct emote link (e.g. https://betterttv.com/emotes/566ca06065dbbdab32ec054e)
-	emoteResolver := NewEmoteResolver(ctx, cfg, pool)
+	emoteResolver := NewEmoteResolver(ctx, cfg, pool, emoteAPIURL)
 
 	*resolvers = append(*resolvers, emoteResolver)
 }
