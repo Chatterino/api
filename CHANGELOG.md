@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dev: Automatically publish docker image to the GitHub Container Registry. (#279)
+
 ## 1.2.2
 
 - YouTube: Added comment count to rich video tooltips. (#252)
