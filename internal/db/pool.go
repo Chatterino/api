@@ -32,26 +32,5 @@ func NewPool(ctx context.Context, dsn string) (Pool, error) {
 		return nil, fmt.Errorf("error pinging to pool: %w", err)
 	}
 
-	// conn, err := pool.Acquire(ctx)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error acquiring connection from pool: %w", err)
-	// }
-	// defer conn.Release()
-
-	// if oldVersion, newVersion, err := migration.Run(ctx, conn.Conn()); err != nil {
-	// 	return nil, fmt.Errorf("error running database migrations: %w", err)
-	// 	log.Fatalw("Error running database migrations",
-	// 		"dsn", dsn,
-	// 		"error", err,
-	// 	)
-	// } else {
-	// 	if newVersion != oldVersion {
-	// 		log.Infow("Ran database migrations",
-	// 			"oldVersion", oldVersion,
-	// 			"newVersion", newVersion,
-	// 		)
-	// 	}
-	// }
-
 	return pool, nil
 }
