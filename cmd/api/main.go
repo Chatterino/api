@@ -11,6 +11,7 @@ import (
 	"github.com/Chatterino/api/internal/caches/twitchusernamecache"
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/internal/migration"
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
 	"github.com/Chatterino/api/internal/routes/twitchemotes"
 	"github.com/Chatterino/api/internal/twitchapiclient"
@@ -67,6 +68,30 @@ func listen(ctx context.Context, bind string, router *chi.Mux, log logger.Logger
 	log.Fatal(srv.ListenAndServe())
 }
 
+func runMigrations(ctx context.Context, pool db.Pool) {
+	log := logger.FromContext(ctx)
+	conn, err := pool.Acquire(ctx)
+	if err != nil {
+		log.Fatalw("Error acquiring connection from pool",
+			"error", err,
+		)
+	}
+	defer conn.Release()
+
+	if oldVersion, newVersion, err := migration.Run(ctx, conn.Conn()); err != nil {
+		log.Fatalw("Error running database migrations",
+			"error", err,
+		)
+	} else {
+		if newVersion != oldVersion {
+			log.Infow("Ran database migrations",
+				"oldVersion", oldVersion,
+				"newVersion", newVersion,
+			)
+		}
+	}
+}
+
 func main() {
 	cfg := config.New()
 
@@ -89,6 +114,8 @@ func main() {
 			"error", err,
 		)
 	}
+
+	runMigrations(ctx, pool)
 
 	go cache.StartCacheClearer(ctx, pool)
 
