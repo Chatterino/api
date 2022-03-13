@@ -3,7 +3,6 @@ package youtube
 import (
 	"net/url"
 	"path"
-	"regexp"
 	"strings"
 )
 
@@ -30,18 +29,4 @@ func getYoutubeVideoIDFromURL(url *url.URL) string {
 
 func getYoutubeVideoIDFromURL2(url *url.URL) string {
 	return path.Base(url.Path)
-}
-
-func getYoutubeChannelIDFromURL(url *url.URL) channelID {
-	pattern, err := regexp.Compile(`(user|c(?:hannel)?)/([\w-]+)`)
-	if err != nil {
-		return channelID{ID: "", chanType: InvalidChannel}
-	}
-
-	match := pattern.FindStringSubmatch(url.Path)
-	if match == nil || len(match) < 3 {
-		return channelID{ID: "", chanType: InvalidChannel}
-	}
-
-	return channelID{ID: match[2], chanType: getChannelTypeFromString(match[1])}
 }

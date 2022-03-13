@@ -8,14 +8,10 @@ import (
 	"net/url"
 )
 
-var (
-	facebookAppAccessToken string
-)
-
-func initFacebookAppAccessToken(appID string, appSecret string) error {
+func getFacebookAppAccessToken(appID string, appSecret string) (string, error) {
 	u, err := url.Parse("https://graph.facebook.com/oauth/access_token")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	queryVariables := url.Values{}
@@ -27,12 +23,12 @@ func initFacebookAppAccessToken(appID string, appSecret string) error {
 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	defer resp.Body.Close()
@@ -42,15 +38,13 @@ func initFacebookAppAccessToken(appID string, appSecret string) error {
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("[oEmbed] error loading app access token", err)
-		return err
+		return "", err
 	}
 
 	err = json.Unmarshal(bytes, &d)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	facebookAppAccessToken = d.AccessToken
-
-	return nil
+	return d.AccessToken, nil
 }

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Breaking: Resolver caches are now stored in PostgreSQL. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#271)
+
 ## 1.2.3
 
 - Dev: Automatically publish docker image to the GitHub Container Registry. (#279)

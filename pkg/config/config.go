@@ -2,7 +2,7 @@ package config
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -50,7 +50,7 @@ func readFromPath(path string) (values map[string]interface{}, err error) {
 func mergeConfig(v *viper.Viper, configPaths []string) {
 	for _, configPath := range configPaths {
 		if configMap, err := readFromPath(configPath); err != nil {
-			fmt.Printf("Error reading config file from %s.yaml: %s\n", filepath.Join(configPath, configName), err)
+			log.Fatalf("Error reading config file at %s: %s\n", filepath.Join(configPath, configName), err)
 			return
 		} else {
 			v.MergeConfigMap(configMap)
@@ -65,6 +65,8 @@ func init() {
 	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size in bytes - requests with body bigger than this value will be skipped")
 	pflag.Bool("enable-lilliput", true, "When enabled, will attempt to use lilliput library for building animated thumbnails. Can increase memory usage by a lot")
 	pflag.Uint("max-thumbnail-size", 300, "Maximum width/height pixel size count of the thumbnails sent to the clients.")
+	pflag.String("log-level", "info", "Log level")
+	pflag.Bool("log-development", false, "Enable development logging for warnings and above, this includes stack traces")
 	pflag.String("discord-token", "", "Discord token")
 	pflag.String("twitch-client-id", "", "Twitch client ID")
 	pflag.String("twitch-client-secret", "", "Twitch client secret")
@@ -74,6 +76,9 @@ func init() {
 	pflag.String("oembed-facebook-app-id", "", "oEmbed Facebook app ID")
 	pflag.String("oembed-facebook-app-secret", "", "oEmbed Facebook app secret")
 	pflag.String("oembed-providers-path", "./data/oembed/providers.json", "Path to a json file containing supported oEmbed resolvers")
+	pflag.String("dsn", "", "Connection string for the PostgreSQL cache")
+	pflag.Bool("enable-prometheus", true, "When enabled, will host a Prometheus metrics HTTP server on the prometheus-bind-address")
+	pflag.String("prometheus-bind-address", "127.0.0.1:9382", "Address to which the API will host its Prometheus metrics")
 	pflag.Parse()
 }
 

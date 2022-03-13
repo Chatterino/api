@@ -1,82 +1,93 @@
 package twitter
 
 import (
-	"log"
-	"regexp"
-	"text/template"
+	"context"
+	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-const (
-	tweetTooltip = `<div style="text-align: left;">
-<b>{{.Name}} (@{{.Username}})</b>
-<span style="white-space: pre-wrap; word-wrap: break-word;">
-{{.Text}}
-</span>
-<span style="color: #808892;">{{.Likes}} likes&nbsp;•&nbsp;{{.Retweets}} retweets&nbsp;•&nbsp;{{.Timestamp}}</span>
-</div>
-`
+type TwitterResolver struct {
+	tweetCache cache.Cache
+	userCache  cache.Cache
+}
 
-	twitterUserTooltip = `<div style="text-align: left;">
-<b>{{.Name}} (@{{.Username}})</b>
-<span style="white-space: pre-wrap; word-wrap: break-word;">
-{{.Description}}
-</span>
-<span style="color: #808892;">{{.Followers}} followers</span>
-</div>
-`
-)
-
-var (
-	tweetRegexp       = regexp.MustCompile(`(?i)\/.*\/status(?:es)?\/([^\/\?]+)`)
-	twitterUserRegexp = regexp.MustCompile(`(?i)twitter\.com\/([^\/\?\s]+)(\/?$|(\?).*)`)
-
-	/* These routes refer to non-user pages. If the capture group in twitterUserRegexp
-	   matches any of these names, we must not resolve it as a Twitter user link.
-
-	   The pages are listed alphabetically. They were sourced by simply looking around the
-	   Twitter web page. AFAIK, there is no resource describing these "special" routes.
-	*/
-	nonUserPages = utils.SetFromSlice([]interface{}{
-		"compose",
-		"explore",
-		"home",
-		"logout",
-		"messages",
-		"notifications",
-		"search",
-		"settings",
-		"tos",
-		"privacy",
-	})
-
-	tweetTooltipTemplate = template.Must(template.New("tweetTooltip").Parse(tweetTooltip))
-
-	twitterUserTooltipTemplate = template.Must(template.New("twitterUserTooltip").Parse(twitterUserTooltip))
-
-	bearerKey string
-
-	tweetCache       = cache.New("tweets", loadTweet, 24*time.Hour)
-	twitterUserCache = cache.New("twitterUsers", loadTwitterUser, 24*time.Hour)
-)
-
-func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
-	if cfg.TwitterBearerToken == "" {
-		log.Println("[Config] twitter-bearer-token is missing, won't do special responses for twitter")
-		return
+func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) bool {
+	if !utils.IsSubdomainOf(url, "twitter.com") {
+		return false
 	}
-	bearerKey = cfg.TwitterBearerToken
 
-	resolvers = append(resolvers, resolver.CustomURLManager{
-		Check: check,
+	isTweet := tweetRegexp.MatchString(url.String())
+	if isTweet {
+		return true
+	}
 
-		Run: run,
-	})
+	/* Simply matching the regex isn't enough for user pages. Pages like
+	   twitter.com/explore and twitter.com/settings match the expression but do not refer
+	   to a valid user page. We therefore need to check the captured name against a list
+	   of known non-user pages.
+	*/
+	m := twitterUserRegexp.FindAllStringSubmatch(url.String(), -1)
+	if len(m) == 0 || len(m[0]) == 0 {
+		return false
+	}
+	userName := m[0][1]
 
-	return
+	_, notAUser := nonUserPages[userName]
+	isTwitterUser := !notAUser
+
+	return isTwitterUser
+}
+
+func (r *TwitterResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+	if tweetRegexp.MatchString(url.String()) {
+		tweetID := getTweetIDFromURL(url)
+		if tweetID == "" {
+			return resolver.NoLinkInfoFound, nil
+		}
+
+		return r.tweetCache.Get(ctx, tweetID, req)
+	}
+
+	if twitterUserRegexp.MatchString(url.String()) {
+		// We always use the lowercase representation in order
+		// to avoid making redundant requests.
+		userName := strings.ToLower(getUserNameFromUrl(url))
+		if userName == "" {
+			return resolver.NoLinkInfoFound, nil
+		}
+
+		return r.userCache.Get(ctx, userName, req)
+	}
+
+	// TODO: Return "do not handle" here?
+	return resolver.NoLinkInfoFound, nil
+}
+
+func (r *TwitterResolver) Name() string {
+	return "twitter"
+}
+
+func NewTwitterResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *TwitterResolver {
+	tweetLoader := &TweetLoader{
+		bearerKey: cfg.TwitterBearerToken,
+	}
+
+	userLoader := &UserLoader{
+		bearerKey: cfg.TwitterBearerToken,
+	}
+
+	r := &TwitterResolver{
+		tweetCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "twitter:tweet", resolver.NewResponseMarshaller(tweetLoader), 24*time.Hour),
+		userCache:  cache.NewPostgreSQLCache(ctx, cfg, pool, "twitter:user", resolver.NewResponseMarshaller(userLoader), 24*time.Hour),
+	}
+
+	return r
 }

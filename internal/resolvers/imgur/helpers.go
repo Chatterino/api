@@ -1,12 +1,18 @@
 package imgur
 
 import (
+	"bytes"
+	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
+	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/koffeinsource/go-imgur"
 )
 
@@ -87,4 +93,25 @@ func finalizeMiniImage(mini *miniImage) {
 		// Hide thumbnails for NSFW images
 		mini.Link = ""
 	}
+}
+
+func internalServerError(message string) (*resolver.Response, time.Duration, error) {
+	return &resolver.Response{
+		Status:  http.StatusInternalServerError,
+		Message: "imgur resolver error: " + resolver.CleanResponse(message),
+	}, cache.NoSpecialDur, nil
+}
+
+func buildTooltip(miniData miniImage) (*resolver.Response, time.Duration, error) {
+	var tooltip bytes.Buffer
+
+	if err := imageTooltipTemplate.Execute(&tooltip, &miniData); err != nil {
+		return internalServerError(fmt.Sprintf("Error building template: %s", err.Error()))
+	}
+
+	return &resolver.Response{
+		Status:    http.StatusOK,
+		Tooltip:   url.PathEscape(tooltip.String()),
+		Thumbnail: miniData.Link,
+	}, cache.NoSpecialDur, nil
 }

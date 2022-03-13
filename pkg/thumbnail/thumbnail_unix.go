@@ -19,7 +19,7 @@ var (
 	}
 )
 
-func buildThumbnailByteArray(inputBuf []byte, resp *http.Response) ([]byte, error) {
+func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) {
 	// decoder wants []byte, so read the whole file into a buffer
 	decoder, err := lilliput.NewDecoder(inputBuf)
 	// this error reflects very basic checks,

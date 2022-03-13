@@ -9,6 +9,14 @@ type APIConfig struct {
 	EnableLilliput   bool   `mapstructure:"enable-lilliput" json:"enable-lilliput"`
 	MaxThumbnailSize uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
 
+	LogLevel       string `mapstructure:"log-level" json:"log-level"`
+	LogDevelopment bool   `mapstructure:"log-development" json:"log-development"`
+
+	DSN string `mapstructure:"dsn" json:"dsn"`
+
+	EnablePrometheus      bool   `mapstructure:"enable-prometheus" json:"enable-prometheus"`
+	PrometheusBindAddress string `mapstructure:"prometheus-bind-address" json:"prometheus-bind-address"`
+
 	// Secrets
 
 	DiscordToken            string `mapstructure:"discord-token" json:"discord-token"`

@@ -5,14 +5,16 @@
 package imgur
 
 import (
-	"html/template"
+	"context"
+	"net/http"
+	"net/url"
 	"time"
 
-	"log"
-
+	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 	"github.com/koffeinsource/go-imgur"
 )
 
@@ -20,39 +22,36 @@ type ImgurClient interface {
 	GetInfoFromURL(urlString string) (*imgur.GenericInfo, int, error)
 }
 
-var (
-	// max size of an image before we use a small thumbnail of it
-	maxRawImageSize = 50 * 1024
+type Resolver struct {
+	imgurCache cache.Cache
+}
 
-	imageTooltipTemplate = template.Must(template.New("imageTooltipTemplate").Parse(imageTooltip))
+func (r *Resolver) Check(ctx context.Context, url *url.URL) bool {
+	return utils.IsSubdomainOf(url, "imgur.com")
+}
 
-	imgurCache = cache.New("imgur", load, 1*time.Hour)
+func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+	return r.imgurCache.Get(ctx, url.String(), req)
+}
 
-	apiClient ImgurClient
+func (r *Resolver) Name() string {
+	return "imgur"
+}
 
-	baseURL string
-)
-
-func New(cfg config.APIConfig) (resolvers []resolver.CustomURLManager) {
-	if cfg.ImgurClientID == "" {
-		log.Println("[Config] imgur-client-id is missing, won't do special responses for imgur")
-		return
+func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *Resolver {
+	loader := &Loader{
+		baseURL: cfg.BaseURL,
+		apiClient: &imgur.Client{
+			HTTPClient:    resolver.HTTPClient(),
+			Log:           &NullLogger{},
+			ImgurClientID: cfg.ImgurClientID,
+			RapidAPIKEY:   "",
+		},
 	}
 
-	baseURL = cfg.BaseURL
-
-	apiClient = &imgur.Client{
-		HTTPClient:    resolver.HTTPClient(),
-		Log:           &NullLogger{},
-		ImgurClientID: cfg.ImgurClientID,
-		RapidAPIKEY:   "",
+	r := &Resolver{
+		imgurCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "imgur", resolver.NewResponseMarshaller(loader), 1*time.Hour),
 	}
 
-	resolvers = append(resolvers, resolver.CustomURLManager{
-		Check: check,
-
-		Run: run,
-	})
-
-	return
+	return r
 }

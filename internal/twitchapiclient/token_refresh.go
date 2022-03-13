@@ -1,22 +1,30 @@
 package twitchapiclient
 
 import (
-	"log"
+	"context"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/nicklaw5/helix"
 )
 
 // initAppAccessToken requests and sets app access token to the provided helix.Client
 // and initializes a ticker running every 24 Hours which re-requests and sets app access token
-func initAppAccessToken(helixAPI *helix.Client, tokenFetched chan struct{}) {
+func initAppAccessToken(ctx context.Context, helixAPI *helix.Client, tokenFetched chan struct{}) {
+	log := logger.FromContext(ctx)
+
 	response, err := helixAPI.RequestAppAccessToken([]string{})
 
 	if err != nil {
-		log.Fatalf("[Helix] Error requesting app access token: %s", err)
+		log.Fatalw("[Helix] Error requesting app access token:",
+			"error", err,
+		)
 	}
 
-	log.Printf("[Helix] Requested access token, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
+	log.Debugw("[Helix] Requested access token",
+		"status", response.StatusCode,
+		"expiresIn", response.Data.ExpiresIn,
+	)
 	helixAPI.SetAppAccessToken(response.Data.AccessToken)
 	close(tokenFetched)
 
@@ -26,10 +34,15 @@ func initAppAccessToken(helixAPI *helix.Client, tokenFetched chan struct{}) {
 	for range ticker.C {
 		response, err := helixAPI.RequestAppAccessToken([]string{})
 		if err != nil {
-			log.Printf("[Helix] Failed to re-request app access token from ticker: %s", err)
+			log.Errorw("[Helix] Failed to re-request app access token from ticker",
+				"error", err,
+			)
 			continue
 		}
-		log.Printf("[Helix] Re-requested access token from ticker, status: %d, expires in: %d", response.StatusCode, response.Data.ExpiresIn)
+		log.Debugw("[Helix] Re-requested access token from ticker",
+			"status", response.StatusCode,
+			"expiresIn", response.Data.ExpiresIn,
+		)
 
 		helixAPI.SetAppAccessToken(response.Data.AccessToken)
 	}

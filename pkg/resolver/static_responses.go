@@ -1,12 +1,13 @@
 package resolver
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
+	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 )
 
@@ -16,7 +17,9 @@ var (
 	ResponseTooLarge []byte
 )
 
-func InitializeStaticResponses(cfg config.APIConfig) {
+func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
+	log := logger.FromContext(ctx)
+
 	var err error
 	r := &Response{
 		Status:  404,
@@ -25,8 +28,9 @@ func InitializeStaticResponses(cfg config.APIConfig) {
 
 	NoLinkInfoFound, err = json.Marshal(r)
 	if err != nil {
-		log.Println("Error marshalling prebuilt response:", err)
-		os.Exit(1)
+		log.Fatalw("Error marshalling prebuilt response",
+			"error", err,
+		)
 	}
 
 	r = &Response{
@@ -35,8 +39,9 @@ func InitializeStaticResponses(cfg config.APIConfig) {
 	}
 	InvalidURL, err = json.Marshal(r)
 	if err != nil {
-		log.Println("Error marshalling prebuilt response:", err)
-		os.Exit(1)
+		log.Fatalw("Error marshalling prebuilt response",
+			"error", err,
+		)
 	}
 
 	r = &Response{
@@ -45,7 +50,17 @@ func InitializeStaticResponses(cfg config.APIConfig) {
 	}
 	ResponseTooLarge, err = json.Marshal(r)
 	if err != nil {
-		log.Println("Error marshalling prebuilt response:", err)
-		os.Exit(1)
+		log.Fatalw("Error marshalling prebuilt response",
+			"error", err,
+		)
 	}
+}
+
+func Errorf(format string, a ...interface{}) (*Response, time.Duration, error) {
+	r := &Response{
+		Status:  http.StatusInternalServerError,
+		Message: CleanResponse(fmt.Sprintf(format, a...)),
+	}
+
+	return r, NoSpecialDur, nil
 }
