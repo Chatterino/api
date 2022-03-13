@@ -2,16 +2,12 @@ package betterttv
 
 import (
 	"context"
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
-	"github.com/go-chi/chi/v5"
 )
 
 func TestBuildURL(t *testing.T) {
@@ -55,27 +51,7 @@ func TestBuildURL(t *testing.T) {
 func TestLoad(t *testing.T) {
 	ctx := logger.OnContext(context.Background(), logger.NewTest())
 	c := qt.New(t)
-	r := chi.NewRouter()
-	r.Get("/3/emotes/{emote}", func(w http.ResponseWriter, r *http.Request) {
-		emote := chi.URLParam(r, "emote")
-
-		var response *EmoteAPIResponse
-		var ok bool
-
-		w.Header().Set("Content-Type", "application/json")
-
-		if emote == "bad_json" {
-			w.Write([]byte("xD"))
-		} else if response, ok = data[emote]; !ok {
-			http.Error(w, http.StatusText(404), 404)
-			return
-		}
-
-		b, _ := json.Marshal(&response)
-
-		w.Write(b)
-	})
-	ts := httptest.NewServer(r)
+	ts := testServer()
 	defer ts.Close()
 	loader := NewEmoteLoader(utils.MustParseURL(ts.URL + "/3/emotes/"))
 
