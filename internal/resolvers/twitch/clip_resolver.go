@@ -11,7 +11,6 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/nicklaw5/helix"
 )
 
 var (
@@ -71,7 +70,7 @@ func (r *ClipResolver) Name() string {
 	return "twitch:clip"
 }
 
-func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixAPI *helix.Client) *ClipResolver {
+func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixAPI TwitchAPIClient) *ClipResolver {
 	clipLoader := &ClipLoader{
 		helixAPI: helixAPI,
 	}

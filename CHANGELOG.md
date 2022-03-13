@@ -6,6 +6,7 @@
 - Fix: SevenTV emotes now resolve correctly. (#281)
 - Dev: Improve BetterTTV emote tests. (#282)
 - Minor: BetterTTV cache key changed from plural to singular form. (#282)
+- Dev: Improve Twitch.tv clip tests. (#283)
 
 ## 1.2.3
 

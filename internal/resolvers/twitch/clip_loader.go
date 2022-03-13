@@ -41,10 +41,7 @@ func (l *ClipLoader) Load(ctx context.Context, clipSlug string, r *http.Request)
 			"error", err,
 		)
 
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "An internal error occured while fetching the Twitch clip",
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("Twitch clip load error: %s", err)
 	}
 
 	if len(response.Data.Clips) != 1 {
@@ -64,10 +61,7 @@ func (l *ClipLoader) Load(ctx context.Context, clipSlug string, r *http.Request)
 
 	var tooltip bytes.Buffer
 	if err := twitchClipsTooltip.Execute(&tooltip, data); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "twitch clip template error " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("Twitch clip template error: %s", err)
 	}
 
 	return &resolver.Response{
