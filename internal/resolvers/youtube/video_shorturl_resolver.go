@@ -6,7 +6,6 @@ import (
 	"net/url"
 
 	"github.com/Chatterino/api/pkg/cache"
-	"github.com/Chatterino/api/pkg/resolver"
 )
 
 type YouTubeVideoShortURLResolver struct {
@@ -14,14 +13,20 @@ type YouTubeVideoShortURLResolver struct {
 }
 
 func (r *YouTubeVideoShortURLResolver) Check(ctx context.Context, url *url.URL) bool {
-	return url.Host == "youtu.be"
+	if url.Host != "youtu.be" {
+		return false
+	}
+
+	videoID := getYoutubeVideoIDFromURL2(url)
+
+	return videoID != "" && videoID != "."
 }
 
 func (r *YouTubeVideoShortURLResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
 	videoID := getYoutubeVideoIDFromURL2(url)
 
-	if videoID == "" {
-		return resolver.NoLinkInfoFound, nil
+	if videoID == "" || videoID == "." {
+		return nil, errInvalidVideoLink
 	}
 
 	return r.videoCache.Get(ctx, videoID, req)
