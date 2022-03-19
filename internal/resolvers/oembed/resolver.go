@@ -20,8 +20,8 @@ type Resolver struct {
 	oEmbed      *oembed.Oembed
 }
 
-func (r *Resolver) Check(ctx context.Context, url *url.URL) bool {
-	return r.oEmbed.FindItem(url.String()) != nil
+func (r *Resolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
+	return ctx, r.oEmbed.FindItem(url.String()) != nil
 }
 
 func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

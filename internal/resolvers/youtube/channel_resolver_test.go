@@ -148,7 +148,7 @@ func TestChannelResolver(t *testing.T) {
 
 		for _, test := range tests {
 			c.Run(test.label, func(c *qt.C) {
-				output := resolver.Check(ctx, test.input)
+				_, output := resolver.Check(ctx, test.input)
 				c.Assert(output, qt.Equals, test.expected, qt.Commentf("%s must %v", test.input, test.expected))
 			})
 		}

@@ -16,12 +16,12 @@ type EmoteResolver struct {
 	emoteCache cache.Cache
 }
 
-func (r *EmoteResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *EmoteResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if match, _ := resolver.MatchesHosts(url, domains); !match {
-		return false
+		return ctx, false
 	}
 
-	return emotePathRegex.MatchString(url.Path)
+	return ctx, emotePathRegex.MatchString(url.Path)
 }
 
 func (r *EmoteResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

@@ -6,10 +6,12 @@ import (
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
+	qt "github.com/frankban/quicktest"
 )
 
 func TestShouldMatch(t *testing.T) {
 	ctx := logger.OnContext(context.Background(), logger.NewTest())
+	c := qt.New(t)
 
 	tests := []string{
 		"https://twitter.com/pajlada",
@@ -24,14 +26,14 @@ func TestShouldMatch(t *testing.T) {
 			t.Fatalf("invalid url %s", test)
 		}
 
-		if !resolver.Check(ctx, u) {
-			t.Fatalf("url %s didn't match twitter check while it should have", test)
-		}
+		_, result := resolver.Check(ctx, u)
+		c.Assert(result, qt.IsTrue, qt.Commentf("url %s didn't match twitter check while it should have", test))
 	}
 }
 
 func TestShouldNotMatch(t *testing.T) {
 	ctx := logger.OnContext(context.Background(), logger.NewTest())
+	c := qt.New(t)
 
 	tests := []string{
 		"https://google.com",
@@ -49,8 +51,7 @@ func TestShouldNotMatch(t *testing.T) {
 			t.Fatalf("invalid url %s", test)
 		}
 
-		if resolver.Check(ctx, u) {
-			t.Fatalf("url %s matched twitter check while it shouldn't have", test)
-		}
+		_, result := resolver.Check(ctx, u)
+		c.Assert(result, qt.IsFalse, qt.Commentf("url %s matched twitter check while it shouldn't have", test))
 	}
 }

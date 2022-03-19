@@ -19,14 +19,14 @@ type TwitterResolver struct {
 	userCache  cache.Cache
 }
 
-func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsSubdomainOf(url, "twitter.com") {
-		return false
+		return ctx, false
 	}
 
 	isTweet := tweetRegexp.MatchString(url.String())
 	if isTweet {
-		return true
+		return ctx, true
 	}
 
 	/* Simply matching the regex isn't enough for user pages. Pages like
@@ -36,14 +36,14 @@ func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) bool {
 	*/
 	m := twitterUserRegexp.FindAllStringSubmatch(url.String(), -1)
 	if len(m) == 0 || len(m[0]) == 0 {
-		return false
+		return ctx, false
 	}
 	userName := m[0][1]
 
 	_, notAUser := nonUserPages[userName]
 	isTwitterUser := !notAUser
 
-	return isTwitterUser
+	return ctx, isTwitterUser
 }
 
 func (r *TwitterResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

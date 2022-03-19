@@ -63,7 +63,7 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 	// default tooltip.
 	if requestUrl.String() != resp.Request.URL.String() {
 		for _, m := range l.customResolvers {
-			if m.Check(ctx, resp.Request.URL) {
+			if ctx, result := m.Check(ctx, resp.Request.URL); result {
 				data, err := m.Run(ctx, resp.Request.URL, r)
 
 				if errors.Is(err, resolver.ErrDontHandle) {

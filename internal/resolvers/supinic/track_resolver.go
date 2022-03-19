@@ -17,16 +17,16 @@ type TrackResolver struct {
 	trackCache cache.Cache
 }
 
-func (r *TrackResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *TrackResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsDomains(url, trackListDomains) {
-		return false
+		return ctx, false
 	}
 
 	if !trackPathRegex.MatchString(url.Path) {
-		return false
+		return ctx, false
 	}
 
-	return true
+	return ctx, true
 }
 
 func (r *TrackResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

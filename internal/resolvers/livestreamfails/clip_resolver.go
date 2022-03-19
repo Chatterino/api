@@ -18,16 +18,16 @@ type ClipResolver struct {
 	clipCache cache.Cache
 }
 
-func (r *ClipResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *ClipResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsSubdomainOf(url, "livestreamfails.com") {
-		return false
+		return ctx, false
 	}
 
 	if !pathRegex.MatchString(url.Path) {
-		return false
+		return ctx, false
 	}
 
-	return true
+	return ctx, true
 }
 
 func (r *ClipResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
