@@ -30,7 +30,7 @@ func TestLoad(t *testing.T) {
 	defer ts.Close()
 
 	loader := &ArticleLoader{
-		endpointURL: ts.URL + "/api/rest_v1/page/summary/%s/%s",
+		apiURL: ts.URL + "/api/rest_v1/page/summary/%s/%s",
 	}
 
 	c.Run("Normal page", func(c *qt.C) {

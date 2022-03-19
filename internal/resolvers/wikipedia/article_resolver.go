@@ -33,10 +33,9 @@ func (r *ArticleResolver) Name() string {
 	return "wikipedia:article"
 }
 
-func NewArticleResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *ArticleResolver {
-	const endpointURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
+func NewArticleResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, apiURL string) *ArticleResolver {
 	articleLoader := &ArticleLoader{
-		endpointURL: endpointURL,
+		apiURL: apiURL,
 	}
 
 	r := &ArticleResolver{

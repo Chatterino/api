@@ -22,5 +22,7 @@ var (
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
-	*resolvers = append(*resolvers, NewArticleResolver(ctx, cfg, pool))
+	const apiURL = "https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=false"
+
+	*resolvers = append(*resolvers, NewArticleResolver(ctx, cfg, pool, apiURL))
 }
