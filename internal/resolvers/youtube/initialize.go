@@ -53,14 +53,10 @@ func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, pool db
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
-	if cfg.YoutubeApiKey == "" {
-		log.Warnw("[Config] youtube-api-key is missing, won't do special responses for YouTube")
-		return
-	}
 
 	youtubeClient, err := youtubeAPI.NewService(ctx, option.WithAPIKey(cfg.YoutubeApiKey))
 	if err != nil {
-		log.Warnw("Error initialization YouTube api client",
+		log.Warnw("[Config] youtube-api-key missing or otherwise misconfigured, won't do special responses for YouTube",
 			"error", err,
 		)
 		return
