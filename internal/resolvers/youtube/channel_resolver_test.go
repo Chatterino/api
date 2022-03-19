@@ -3,7 +3,6 @@ package youtube
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -33,7 +32,6 @@ func TestChannelResolver(t *testing.T) {
 	r := chi.NewRouter()
 	r.Get("/youtube/v3/search", func(w http.ResponseWriter, r *http.Request) {
 		channelID := r.URL.Query().Get("q")
-		fmt.Println("Search query with channel ID", channelID)
 		w.Header().Set("Content-Type", "application/json")
 		if channelID == "badresp" {
 			w.Write([]byte("xd"))
@@ -45,7 +43,6 @@ func TestChannelResolver(t *testing.T) {
 				http.Error(w, "unable to marshal request: "+err.Error(), http.StatusBadRequest)
 				return
 			}
-			fmt.Println(string(b))
 			w.Write(b)
 
 			return
@@ -54,8 +51,6 @@ func TestChannelResolver(t *testing.T) {
 		http.Error(w, http.StatusText(404), 404)
 	})
 	r.Get("/youtube/v3/channels", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r)
-		fmt.Println(r.URL.Query())
 		channelID := r.URL.Query().Get("id")
 		channelUsername := r.URL.Query().Get("forUsername")
 		w.Header().Set("Content-Type", "application/json")
@@ -286,7 +281,6 @@ func TestChannelResolver(t *testing.T) {
 						WithArgs("youtube:channel:"+test.inputVideoID, test.expectedBytes, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
 					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
-					fmt.Println(string(outputBytes))
 					c.Assert(outputError, qt.Equals, test.expectedError)
 					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
 				})
