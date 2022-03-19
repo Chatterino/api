@@ -9,6 +9,7 @@
 - Minor: BetterTTV cache key changed from plural to singular form. (#282)
 - Dev: Improve Twitch.tv clip tests. (#283)
 - Dev: Improve YouTube tests. (#284)
+- Dev: Resolver Check now returns a context. (#287)
 
 ## 1.2.3
 

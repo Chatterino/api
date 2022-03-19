@@ -18,8 +18,8 @@ type InviteResolver struct {
 	inviteCache cache.Cache
 }
 
-func (r *InviteResolver) Check(ctx context.Context, url *url.URL) bool {
-	return discordInviteURLRegex.MatchString(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
+func (r *InviteResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
+	return ctx, discordInviteURLRegex.MatchString(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
 }
 
 func (r *InviteResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

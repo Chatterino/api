@@ -14,12 +14,12 @@ type YouTubeVideoResolver struct {
 	videoCache cache.Cache
 }
 
-func (r *YouTubeVideoResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *YouTubeVideoResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsSubdomainOf(url, "youtube.com") {
-		return false
+		return ctx, false
 	}
 
-	return getYoutubeVideoIDFromURL(url) != ""
+	return ctx, getYoutubeVideoIDFromURL(url) != ""
 }
 
 var (

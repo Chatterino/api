@@ -68,7 +68,7 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, m := range r.customResolvers {
-		if m.Check(ctx, requestUrl) {
+		if ctx, result := m.Check(ctx, requestUrl); result {
 			log.Debugw("Run url on custom resolver",
 				"name", m.Name(),
 				"url", requestUrl,

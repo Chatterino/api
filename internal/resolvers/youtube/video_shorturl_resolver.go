@@ -12,14 +12,14 @@ type YouTubeVideoShortURLResolver struct {
 	videoCache cache.Cache
 }
 
-func (r *YouTubeVideoShortURLResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *YouTubeVideoShortURLResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if url.Host != "youtu.be" {
-		return false
+		return ctx, false
 	}
 
 	videoID := getYoutubeVideoIDFromURL2(url)
 
-	return videoID != "" && videoID != "."
+	return ctx, videoID != "" && videoID != "."
 }
 
 func (r *YouTubeVideoShortURLResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

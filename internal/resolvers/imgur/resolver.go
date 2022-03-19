@@ -26,8 +26,8 @@ type Resolver struct {
 	imgurCache cache.Cache
 }
 
-func (r *Resolver) Check(ctx context.Context, url *url.URL) bool {
-	return utils.IsSubdomainOf(url, "imgur.com")
+func (r *Resolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
+	return ctx, utils.IsSubdomainOf(url, "imgur.com")
 }
 
 func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

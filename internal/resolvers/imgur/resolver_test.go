@@ -15,7 +15,9 @@ func testCheck(ctx context.Context, resolver resolver.Resolver, c *qt.C, urlStri
 	c.Assert(u, qt.Not(qt.IsNil))
 	c.Assert(err, qt.IsNil)
 
-	return resolver.Check(ctx, u)
+	_, result := resolver.Check(ctx, u)
+
+	return result
 }
 
 func TestCheck(t *testing.T) {

@@ -24,19 +24,19 @@ type YouTubeChannelResolver struct {
 	channelCache cache.Cache
 }
 
-func (r *YouTubeChannelResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *YouTubeChannelResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsSubdomainOf(url, "youtube.com") {
-		return false
+		return ctx, false
 	}
 
 	q := url.Query()
 	// TODO(go1.18): Replace with q.Has("v") once we've transitioned to at least go 1.17 as least supported version
 	if q.Get("v") != "" {
-		return false
+		return ctx, false
 	}
 
 	matches := youtubeChannelRegex.MatchString(url.Path)
-	return matches
+	return ctx, matches
 }
 
 func (r *YouTubeChannelResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {

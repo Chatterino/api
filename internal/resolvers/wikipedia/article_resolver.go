@@ -18,11 +18,11 @@ type ArticleResolver struct {
 	articleCache cache.Cache
 }
 
-func (r *ArticleResolver) Check(ctx context.Context, url *url.URL) bool {
+func (r *ArticleResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	isWikipedia := utils.IsSubdomainOf(url, "wikipedia.org")
 	isWikiArticle := strings.HasPrefix(url.Path, "/wiki/")
 
-	return isWikipedia && isWikiArticle
+	return ctx, isWikipedia && isWikiArticle
 }
 
 func (r *ArticleResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
