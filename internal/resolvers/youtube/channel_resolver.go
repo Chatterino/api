@@ -30,7 +30,8 @@ func (r *YouTubeChannelResolver) Check(ctx context.Context, url *url.URL) bool {
 	}
 
 	q := url.Query()
-	if q.Has("v") {
+	// TODO(go1.18): Replace with q.Has("v") once we've transitioned to at least go 1.17 as least supported version
+	if q.Get("v") != "" {
 		return false
 	}
 
