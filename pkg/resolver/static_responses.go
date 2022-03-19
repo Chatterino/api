@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	NoLinkInfoFound  []byte
+	NoLinkInfoFound  = []byte(`{"status":404,"message":"Could not fetch link info: No link info found"}`)
 	InvalidURL       []byte
 	ResponseTooLarge []byte
 )
@@ -21,17 +21,7 @@ func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
 	log := logger.FromContext(ctx)
 
 	var err error
-	r := &Response{
-		Status:  404,
-		Message: "Could not fetch link info: No link info found",
-	}
-
-	NoLinkInfoFound, err = json.Marshal(r)
-	if err != nil {
-		log.Fatalw("Error marshalling prebuilt response",
-			"error", err,
-		)
-	}
+	var r *Response
 
 	r = &Response{
 		Status:  500,
