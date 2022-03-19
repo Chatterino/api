@@ -2,11 +2,11 @@ package youtube
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 
 	"github.com/Chatterino/api/pkg/cache"
-	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 )
 
@@ -15,14 +15,22 @@ type YouTubeVideoResolver struct {
 }
 
 func (r *YouTubeVideoResolver) Check(ctx context.Context, url *url.URL) bool {
-	return utils.IsSubdomainOf(url, "youtube.com")
+	if !utils.IsSubdomainOf(url, "youtube.com") {
+		return false
+	}
+
+	return getYoutubeVideoIDFromURL(url) != ""
 }
+
+var (
+	errInvalidVideoLink = errors.New("invalid video link")
+)
 
 func (r *YouTubeVideoResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
 	videoID := getYoutubeVideoIDFromURL(url)
 
 	if videoID == "" {
-		return resolver.NoLinkInfoFound, nil
+		return nil, errInvalidVideoLink
 	}
 
 	return r.videoCache.Get(ctx, videoID, req)

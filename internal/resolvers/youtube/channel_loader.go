@@ -48,10 +48,7 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 		response, err := searchRequest.MaxResults(1).Do()
 
 		if err != nil {
-			return &resolver.Response{
-				Status:  500,
-				Message: "youtube search api error " + resolver.CleanResponse(err.Error()),
-			}, 1 * time.Hour, nil
+			return resolver.Errorf("YouTube search API error: %s", err)
 		}
 
 		if len(response.Items) == 0 {
@@ -62,7 +59,7 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 		}
 
 		if len(response.Items) > 1 {
-			return resolver.Errorf("YouTube channel response contained %d items", len(response.Items))
+			return resolver.Errorf("YouTube search response contained %d items", len(response.Items))
 		}
 
 		channel.ID = response.Items[0].Snippet.ChannelId
@@ -76,19 +73,13 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 	case CustomChannel:
 		builtRequest = builtRequest.Id(channel.ID)
 	case InvalidChannel:
-		return &resolver.Response{
-			Status:  500,
-			Message: fmt.Sprintf("cached channel ID is invalid %s", resolver.CleanResponse(channelCacheKey)),
-		}, 1 * time.Hour, nil
+		return resolver.Errorf("YouTube API channel type is invalid for key: %s", channelCacheKey)
 	}
 
 	youtubeResponse, err := builtRequest.Do()
 
 	if err != nil {
-		return &resolver.Response{
-			Status:  500,
-			Message: "youtube api error " + resolver.CleanResponse(err.Error()),
-		}, 1 * time.Hour, nil
+		return resolver.Errorf("YouTube API error: %s", err)
 	}
 
 	if len(youtubeResponse.Items) == 0 {
@@ -99,10 +90,7 @@ func (r *YouTubeChannelLoader) Load(ctx context.Context, channelCacheKey string,
 	}
 
 	if len(youtubeResponse.Items) > 1 {
-		return &resolver.Response{
-			Status:  500,
-			Message: fmt.Sprintf("YouTube channel response contained %d items", len(youtubeResponse.Items)),
-		}, 24 * time.Hour, nil
+		return resolver.Errorf("YouTube channel response contained %d items", len(youtubeResponse.Items))
 	}
 
 	youtubeChannel := youtubeResponse.Items[0]
