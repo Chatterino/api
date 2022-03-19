@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/internal/db"
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -24,14 +25,28 @@ type YouTubeChannelResolver struct {
 }
 
 func (r *YouTubeChannelResolver) Check(ctx context.Context, url *url.URL) bool {
+	if !utils.IsSubdomainOf(url, "youtube.com") {
+		return false
+	}
+
+	q := url.Query()
+	// TODO(go1.18): Replace with q.Has("v") once we've transitioned to at least go 1.17 as least supported version
+	if q.Get("v") != "" {
+		return false
+	}
+
 	matches := youtubeChannelRegex.MatchString(url.Path)
-	return utils.IsSubdomainOf(url, "youtube.com") && matches
+	return matches
 }
 
 func (r *YouTubeChannelResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+	log := logger.FromContext(ctx)
 	channel := getChannelFromPath(url.Path)
 
 	if channel.Type == InvalidChannel {
+		log.Warnw("[YouTube] URL was incorrectly treated as a channel",
+			"url", url,
+		)
 		return resolver.NoLinkInfoFound, nil
 	}
 
@@ -46,7 +61,7 @@ func NewYouTubeChannelResolver(ctx context.Context, cfg config.APIConfig, pool d
 	loader := NewYouTubeChannelLoader(youtubeClient)
 
 	r := &YouTubeChannelResolver{
-		channelCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "youtube_channels", resolver.NewResponseMarshaller(loader), 24*time.Hour),
+		channelCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "youtube:channel", resolver.NewResponseMarshaller(loader), 24*time.Hour),
 	}
 
 	return r
