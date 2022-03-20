@@ -5,57 +5,54 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/Chatterino/api/internal/logger"
-	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
 type ArticleLoader struct {
-	endpointURL string
+	// the apiURL format must consist of 2 %s, first being region second being article
+	apiURL string
 }
 
-func (l *ArticleLoader) getPageInfo(ctx context.Context, urlString string) (*wikipediaTooltipData, error) {
-	u, err := url.Parse(urlString)
-	if err != nil {
-		return nil, err
-	}
+func (l *ArticleLoader) Load(ctx context.Context, unused string, r *http.Request) (*resolver.Response, time.Duration, error) {
+	log := logger.FromContext(ctx)
 
 	// Since the Wikipedia API is locale-dependant, we need the locale code.
 	// For example, if you want to resolve a de.wikipedia.org link, you need
 	// to ping the DE API endpoint.
-	localeMatch := localeRegexp.FindStringSubmatch(u.Hostname())
-	if len(localeMatch) != 2 {
-		return nil, errLocaleMatch
+	// If no locale is specified in the given URL, we will assume it's the english wiki article
+	localeCode, articleID, err := articleValuesFromContext(ctx)
+	if err != nil {
+		return nil, resolver.NoSpecialDur, err
 	}
 
-	localeCode := localeMatch[1]
+	log.Debugw("[Wikipedia] GET",
+		"localeCode", localeCode,
+		"articleID", articleID,
+	)
 
-	titleMatch := titleRegexp.FindStringSubmatch(u.Path)
-	if len(titleMatch) != 2 {
-		return nil, errTitleMatch
-	}
-
-	canonicalName := titleMatch[1]
-
-	requestURL := fmt.Sprintf(l.endpointURL, localeCode, canonicalName)
+	requestURL := fmt.Sprintf(l.apiURL, localeCode, articleID)
 
 	resp, err := resolver.RequestGET(ctx, requestURL)
 	if err != nil {
-		return nil, err
+		return nil, resolver.NoSpecialDur, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("bad status: %d", resp.StatusCode)
+		return &resolver.Response{
+			Status:  http.StatusNotFound,
+			Message: "No Wikipedia article found",
+		}, resolver.NoSpecialDur, nil
+		// return nil, fmt.Errorf("bad status: %d", resp.StatusCode)
 	}
 
 	var pageInfo *wikipediaAPIResponse
 	if err = json.NewDecoder(resp.Body).Decode(&pageInfo); err != nil {
-		return nil, err
+		return resolver.Errorf("Wikipedia API unmarshal JSON error: %s", err)
 	}
 
 	// Transform API response into our tooltip model for Wikipedia links
@@ -74,27 +71,6 @@ func (l *ArticleLoader) getPageInfo(ctx context.Context, urlString string) (*wik
 
 	if pageInfo.Thumbnail != nil {
 		tooltipData.ThumbnailURL = pageInfo.Thumbnail.URL
-	}
-
-	return tooltipData, nil
-}
-
-func (l *ArticleLoader) Load(ctx context.Context, urlString string, r *http.Request) (*resolver.Response, time.Duration, error) {
-	log := logger.FromContext(ctx)
-
-	log.Debugw("[Wikipedia] GET",
-		"url", urlString,
-	)
-
-	tooltipData, err := l.getPageInfo(ctx, urlString)
-
-	if err != nil {
-		log.Debugw("[Wikipedia] Unable to get page info",
-			"url", urlString,
-			"error", err,
-		)
-
-		return nil, cache.NoSpecialDur, resolver.ErrDontHandle
 	}
 
 	return buildTooltip(tooltipData)
