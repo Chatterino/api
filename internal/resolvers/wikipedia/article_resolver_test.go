@@ -75,7 +75,7 @@ func TestArticleResolver(t *testing.T) {
 
 		for _, test := range tests {
 			c.Run(test.label, func(c *qt.C) {
-				output := r.Check(ctx, test.input)
+				_, output := r.Check(ctx, test.input)
 				c.Assert(output, qt.Equals, test.expected)
 			})
 		}
@@ -117,6 +117,8 @@ func TestArticleResolver(t *testing.T) {
 			for _, test := range tests {
 				c.Run(test.label, func(c *qt.C) {
 					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
+					ctx, checkResult := r.Check(ctx, test.inputURL)
+					c.Assert(checkResult, qt.IsTrue)
 					outputBytes, outputError := r.Run(ctx, test.inputURL, nil)
 					c.Assert(outputError, qt.Equals, test.expectedError)
 					c.Assert(outputBytes, qt.IsNil)
@@ -148,6 +150,20 @@ func TestArticleResolver(t *testing.T) {
 					expectedBytes: []byte(`{"status":404,"message":"No Wikipedia article found"}`),
 					expectedError: nil,
 				},
+				{
+					label:         "Normal page (HTML)",
+					inputURL:      utils.MustParseURL("https://wikipedia.org/wiki/test_html"),
+					inputReq:      nil,
+					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3E\u0026lt%3Bb\u0026gt%3BTest%20title\u0026lt%3B%2Fb\u0026gt%3B\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B\u0026lt%3Bb\u0026gt%3BTest%20description\u0026lt%3B%2Fb\u0026gt%3B%3C%2Fb%3E%3Cbr%3E\u0026lt%3Bb\u0026gt%3BTest%20extract\u0026lt%3B%2Fb\u0026gt%3B%3C%2Fdiv%3E"}`),
+					expectedError: nil,
+				},
+				{
+					label:         "Normal page (No description)",
+					inputURL:      utils.MustParseURL("https://wikipedia.org/wiki/test_no_description"),
+					inputReq:      nil,
+					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETest%20title%3C%2Fb%3E%3Cbr%3ETest%20extract%3C%2Fdiv%3E"}`),
+					expectedError: nil,
+				},
 				// {
 				// 	label:          "Bad JSON",
 				// 	inputURL:       utils.MustParseURL("https://betterttv.com/emotes/bad"),
@@ -165,6 +181,8 @@ func TestArticleResolver(t *testing.T) {
 					pool.ExpectExec("INSERT INTO cache").
 						WithArgs(pgxmock.AnyArg(), test.expectedBytes, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
+					ctx, checkResult := r.Check(ctx, test.inputURL)
+					c.Assert(checkResult, qt.IsTrue)
 					outputBytes, outputError := r.Run(ctx, test.inputURL, test.inputReq)
 					c.Assert(outputError, qt.Equals, test.expectedError)
 					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)

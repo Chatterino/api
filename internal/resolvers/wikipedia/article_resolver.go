@@ -18,11 +18,47 @@ type ArticleResolver struct {
 	articleCache cache.Cache
 }
 
-func (r *ArticleResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
-	isWikipedia := utils.IsSubdomainOf(url, "wikipedia.org")
-	isWikiArticle := strings.HasPrefix(url.Path, "/wiki/")
+// getLocaleCode returns the locale code figured out from the url hostname, or "en" if none is found
+func (r *ArticleResolver) getLocaleCode(u *url.URL) string {
+	localeMatch := localeRegexp.FindStringSubmatch(u.Hostname())
+	if len(localeMatch) != 2 {
+		return "en"
+	}
 
-	return ctx, isWikipedia && isWikiArticle
+	return localeMatch[1]
+}
+
+// getArticleID returns the locale code figured out from the url hostname, or "en" if none is found
+func (r *ArticleResolver) getArticleID(u *url.URL) (string, error) {
+	titleMatch := titleRegexp.FindStringSubmatch(u.Path)
+	if len(titleMatch) != 2 {
+		return "", errTitleMatch
+	}
+
+	return titleMatch[1], nil
+}
+
+func (r *ArticleResolver) Check(ctx context.Context, u *url.URL) (context.Context, bool) {
+	if !utils.IsSubdomainOf(u, "wikipedia.org") {
+		return ctx, false
+	}
+
+	if !strings.HasPrefix(u.Path, "/wiki/") {
+		return ctx, false
+	}
+
+	// Load locale code & article ID
+	localeCode := r.getLocaleCode(u)
+	articleID, err := r.getArticleID(u)
+	if err != nil {
+		return ctx, false
+	}
+
+	ctx = contextWithArticleValues(ctx, localeCode, articleID)
+
+	// Attach locale code & article ID to context
+
+	return ctx, true
 }
 
 func (r *ArticleResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
