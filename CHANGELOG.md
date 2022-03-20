@@ -13,6 +13,7 @@
 - Dev: Resolver Check now returns a context. (#287)
 - Dev: Improve Wikipedia tests. (#286)
 - Dev: Improve Imgur tests. (#289)
+- Dev: Improve migration tests. (#290)
 
 ## 1.2.3
 
