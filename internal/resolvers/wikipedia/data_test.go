@@ -40,6 +40,17 @@ func init() {
 		Thumbnail:   nil,
 		Description: nil,
 	}
+
+	wikiData["en_thumbnail"] = &wikipediaAPIResponse{
+		Titles: wikipediaAPITitles{
+			Normalized: "Test title",
+		},
+		Extract: "Test extract",
+		Thumbnail: &wikipediaAPIThumbnail{
+			URL: "https://example.com/thumbnail.png",
+		},
+		Description: nil,
+	}
 }
 
 func testServer() *httptest.Server {
@@ -51,6 +62,13 @@ func testServer() *httptest.Server {
 		var response *wikipediaAPIResponse
 		var ok bool
 
+		w.Header().Set("Content-Type", "application/json")
+
+		if page == "badjson" {
+			w.Write([]byte(`xD`))
+			return
+		}
+
 		if response, ok = wikiData[locale+"_"+page]; !ok {
 			http.Error(w, http.StatusText(404), 404)
 			return
@@ -58,7 +76,6 @@ func testServer() *httptest.Server {
 
 		b, _ := json.Marshal(&response)
 
-		w.Header().Set("Content-Type", "application/json")
 		w.Write(b)
 	})
 	return httptest.NewServer(r)

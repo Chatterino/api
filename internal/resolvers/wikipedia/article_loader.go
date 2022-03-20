@@ -52,7 +52,7 @@ func (l *ArticleLoader) Load(ctx context.Context, unused string, r *http.Request
 
 	var pageInfo *wikipediaAPIResponse
 	if err = json.NewDecoder(resp.Body).Decode(&pageInfo); err != nil {
-		return nil, resolver.NoSpecialDur, err
+		return resolver.Errorf("Wikipedia API unmarshal JSON error: %s", err)
 	}
 
 	// Transform API response into our tooltip model for Wikipedia links

@@ -14,10 +14,7 @@ func buildTooltip(pageInfo *wikipediaTooltipData) (*resolver.Response, time.Dura
 	var tooltip bytes.Buffer
 
 	if err := wikipediaTooltipTemplate.Execute(&tooltip, pageInfo); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Wikipedia template error: " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("Wikipedia template error: %s", err.Error())
 	}
 
 	return &resolver.Response{
