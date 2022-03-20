@@ -38,15 +38,10 @@ func (r *Resolver) Name() string {
 	return "imgur"
 }
 
-func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *Resolver {
+func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, imgurClient ImgurClient) *Resolver {
 	loader := &Loader{
-		baseURL: cfg.BaseURL,
-		apiClient: &imgur.Client{
-			HTTPClient:    resolver.HTTPClient(),
-			Log:           &NullLogger{},
-			ImgurClientID: cfg.ImgurClientID,
-			RapidAPIKEY:   "",
-		},
+		baseURL:   cfg.BaseURL,
+		apiClient: imgurClient,
 	}
 
 	r := &Resolver{
