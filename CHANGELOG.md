@@ -11,6 +11,7 @@
 - Dev: Improve YouTube tests. (#284)
 - Dev: Resolver Check now returns a context. (#287)
 - Dev: Improve Wikipedia tests. (#286)
+- Dev: Improve Imgur tests. (#289)
 
 ## 1.2.3
 
