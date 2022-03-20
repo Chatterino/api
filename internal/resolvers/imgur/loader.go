@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
@@ -16,12 +17,23 @@ type Loader struct {
 }
 
 func (l *Loader) Load(ctx context.Context, urlString string, r *http.Request) (*resolver.Response, time.Duration, error) {
+	log := logger.FromContext(ctx)
+
 	genericInfo, _, err := l.apiClient.GetInfoFromURL(urlString)
 	if err != nil {
-		return &resolver.Response{
-			Status:  http.StatusOK,
-			Tooltip: "Error getting imgur API information for URL",
-		}, cache.NoSpecialDur, resolver.ErrDontHandle
+		log.Warnw("Error getting imgur info from URL",
+			"url", urlString,
+			"error", err,
+		)
+		return nil, cache.NoSpecialDur, resolver.ErrDontHandle
+	}
+
+	if genericInfo == nil {
+		log.Warnw("Missing imgur info",
+			"url", urlString,
+			"error", err,
+		)
+		return nil, cache.NoSpecialDur, resolver.ErrDontHandle
 	}
 
 	var miniData miniImage
@@ -59,14 +71,17 @@ func (l *Loader) Load(ctx context.Context, urlString string, r *http.Request) (*
 		miniData.Title = ptr.Title
 		miniData.Description = ptr.Description
 	} else {
-		return &resolver.Response{
-			Status:  http.StatusOK,
-			Tooltip: "Error getting imgur API information for URL",
-		}, cache.NoSpecialDur, nil
+		log.Warnw("Missing relevant imgur response",
+			"url", urlString,
+		)
+
+		return nil, resolver.NoSpecialDur, resolver.ErrDontHandle
 	}
 
 	// Proxy imgur thumbnails
-	miniData.Link = utils.FormatThumbnailURL(l.baseURL, r, miniData.Link)
+	if miniData.Link != "" {
+		miniData.Link = utils.FormatThumbnailURL(l.baseURL, r, miniData.Link)
+	}
 
 	return buildTooltip(miniData)
 }

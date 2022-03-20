@@ -2,7 +2,6 @@ package imgur
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -85,6 +84,7 @@ func finalizeMiniImage(mini *miniImage) {
 				mini.Link = linkURL.String()
 			} else {
 				log.Println("[IMGUR] Error making smaller thumbnail for image:", err, mini)
+				mini.Link = ""
 			}
 		}
 	}
@@ -95,18 +95,11 @@ func finalizeMiniImage(mini *miniImage) {
 	}
 }
 
-func internalServerError(message string) (*resolver.Response, time.Duration, error) {
-	return &resolver.Response{
-		Status:  http.StatusInternalServerError,
-		Message: "imgur resolver error: " + resolver.CleanResponse(message),
-	}, cache.NoSpecialDur, nil
-}
-
 func buildTooltip(miniData miniImage) (*resolver.Response, time.Duration, error) {
 	var tooltip bytes.Buffer
 
 	if err := imageTooltipTemplate.Execute(&tooltip, &miniData); err != nil {
-		return internalServerError(fmt.Sprintf("Error building template: %s", err.Error()))
+		return resolver.Errorf("Imgur template error: %s", err)
 	}
 
 	return &resolver.Response{

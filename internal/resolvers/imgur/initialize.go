@@ -8,6 +8,7 @@ import (
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/koffeinsource/go-imgur"
 )
 
 var (
@@ -24,5 +25,12 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolve
 		return
 	}
 
-	*resolvers = append(*resolvers, NewResolver(ctx, cfg, pool))
+	imgurClient := &imgur.Client{
+		HTTPClient:    resolver.HTTPClient(),
+		Log:           &NullLogger{},
+		ImgurClientID: cfg.ImgurClientID,
+		RapidAPIKEY:   "",
+	}
+
+	*resolvers = append(*resolvers, NewResolver(ctx, cfg, pool, imgurClient))
 }
