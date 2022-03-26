@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Chatterino/api/internal/db"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -15,8 +16,8 @@ type Migration struct {
 	Down    MigrationFunction
 }
 
-func (m *Migration) MigrateTo(ctx context.Context, conn *pgx.Conn) error {
-	tx, err := conn.Begin(ctx)
+func (m *Migration) MigrateTo(ctx context.Context, pool db.Pool) error {
+	tx, err := pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
@@ -34,27 +35,27 @@ func (m *Migration) MigrateTo(ctx context.Context, conn *pgx.Conn) error {
 	return tx.Commit(ctx)
 }
 
-func createMigrationsTableIfItDoesNotAlreadyExist(ctx context.Context, conn *pgx.Conn) error {
+func createMigrationsTableIfItDoesNotAlreadyExist(ctx context.Context, pool db.Pool) error {
 	const createTableQuery = `CREATE TABLE IF NOT EXISTS migrations(version BIGINT);`
-	_, err := conn.Exec(ctx, createTableQuery)
+	_, err := pool.Exec(ctx, createTableQuery)
 	return err
 }
 
-func insertVersionRow(ctx context.Context, conn *pgx.Conn) error {
+func insertVersionRow(ctx context.Context, pool db.Pool) error {
 	const query = `INSERT INTO migrations (version) VALUES (0)`
-	_, err := conn.Exec(ctx, query)
+	_, err := pool.Exec(ctx, query)
 	return err
 }
 
 // getCurrentVersion returns the current version from the database. if no version row is there, it will insert a new row with the default value 0
-func getCurrentVersion(ctx context.Context, conn *pgx.Conn) (int64, error) {
+func getCurrentVersion(ctx context.Context, pool db.Pool) (int64, error) {
 	const query = `SELECT version FROM migrations;`
-	row := conn.QueryRow(ctx, query)
+	row := pool.QueryRow(ctx, query)
 	var currentVersion int64
 
 	if err := row.Scan(&currentVersion); err != nil {
 		if err == pgx.ErrNoRows {
-			err = insertVersionRow(ctx, conn)
+			err = insertVersionRow(ctx, pool)
 		}
 		return 0, err
 	}
@@ -62,12 +63,12 @@ func getCurrentVersion(ctx context.Context, conn *pgx.Conn) (int64, error) {
 	return currentVersion, nil
 }
 
-func Run(ctx context.Context, conn *pgx.Conn) (int64, int64, error) {
-	if err := createMigrationsTableIfItDoesNotAlreadyExist(ctx, conn); err != nil {
+func Run(ctx context.Context, pool db.Pool) (int64, int64, error) {
+	if err := createMigrationsTableIfItDoesNotAlreadyExist(ctx, pool); err != nil {
 		return 0, 0, fmt.Errorf("error creating migrations table: %w", err)
 	}
 
-	oldVersion, err := getCurrentVersion(ctx, conn)
+	oldVersion, err := getCurrentVersion(ctx, pool)
 	if err != nil {
 		return 0, 0, fmt.Errorf("error getting current version: %w", err)
 	}
@@ -77,8 +78,7 @@ func Run(ctx context.Context, conn *pgx.Conn) (int64, int64, error) {
 	relevantMigrations := getMigrations(migrations, oldVersion)
 
 	for _, migration := range relevantMigrations {
-		fmt.Println("MIGRATE", migration.Version)
-		if err := migration.MigrateTo(ctx, conn); err != nil {
+		if err := migration.MigrateTo(ctx, pool); err != nil {
 			return 0, 0, err
 		}
 

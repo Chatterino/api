@@ -16,6 +16,7 @@ type Pool interface {
 	Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error)
 	Ping(ctx context.Context) error
 	Acquire(ctx context.Context) (*pgxpool.Conn, error)
+	Begin(context.Context) (pgx.Tx, error)
 }
 
 func NewPool(ctx context.Context, dsn string) (Pool, error) {

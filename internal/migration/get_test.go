@@ -1,3 +1,5 @@
+//go:build !migrationtest
+
 package migration
 
 import (

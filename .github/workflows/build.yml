@@ -34,11 +34,14 @@ jobs:
         working-directory: cmd/api
 
       - name: Test
-        run: go test -v ./...
+        run: go test -v -tags test ./...
+
+      - name: Migration test
+        run: go test -v -tags migrationtest ./...
 
       - name: Generate code coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.18'
-        run: go test -race -v -count=1 -coverprofile=coverage.out ./...
+        run: go test -race -v -count=1 -coverprofile=coverage.out -tags test ./...
 
       - name: Upload Test Coverage
         if: matrix.os == 'ubuntu-latest' && matrix.go == '1.18'
