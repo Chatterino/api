@@ -24,8 +24,8 @@ func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Cont
 		return ctx, false
 	}
 
-	isTweet := tweetRegexp.MatchString(url.String())
-	if isTweet {
+	tweetMatch := tweetRegexp.FindStringSubmatch(url.Path)
+	if len(tweetMatch) == 2 && len(tweetMatch[1]) > 0 {
 		return ctx, true
 	}
 
@@ -34,11 +34,11 @@ func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Cont
 	   to a valid user page. We therefore need to check the captured name against a list
 	   of known non-user pages.
 	*/
-	m := twitterUserRegexp.FindAllStringSubmatch(url.String(), -1)
-	if len(m) == 0 || len(m[0]) == 0 {
+	m := twitterUserRegexp.FindStringSubmatch(url.Path)
+	if len(m) == 0 || len(m[1]) == 0 {
 		return ctx, false
 	}
-	userName := m[0][1]
+	userName := strings.ToLower(m[1])
 
 	_, notAUser := nonUserPages[userName]
 	isTwitterUser := !notAUser
@@ -47,41 +47,38 @@ func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Cont
 }
 
 func (r *TwitterResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
-	if tweetRegexp.MatchString(url.String()) {
-		tweetID := getTweetIDFromURL(url)
-		if tweetID == "" {
-			return resolver.NoLinkInfoFound, nil
-		}
+	tweetMatch := tweetRegexp.FindStringSubmatch(url.Path)
+	if len(tweetMatch) == 2 && len(tweetMatch[1]) > 0 {
+		tweetID := tweetMatch[1]
 
 		return r.tweetCache.Get(ctx, tweetID, req)
 	}
 
-	if twitterUserRegexp.MatchString(url.String()) {
+	userMatch := twitterUserRegexp.FindStringSubmatch(url.Path)
+	if len(userMatch) == 2 && len(userMatch[1]) > 0 {
 		// We always use the lowercase representation in order
 		// to avoid making redundant requests.
-		userName := strings.ToLower(getUserNameFromUrl(url))
-		if userName == "" {
-			return resolver.NoLinkInfoFound, nil
-		}
+		userName := strings.ToLower(userMatch[1])
 
 		return r.userCache.Get(ctx, userName, req)
 	}
 
-	// TODO: Return "do not handle" here?
-	return resolver.NoLinkInfoFound, nil
+	return nil, resolver.ErrDontHandle
 }
 
 func (r *TwitterResolver) Name() string {
 	return "twitter"
 }
 
-func NewTwitterResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *TwitterResolver {
+func NewTwitterResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, userEndpointURLFormat, tweetEndpointURLFormat string) *TwitterResolver {
 	tweetLoader := &TweetLoader{
-		bearerKey: cfg.TwitterBearerToken,
+		bearerKey:         cfg.TwitterBearerToken,
+		endpointURLFormat: tweetEndpointURLFormat,
 	}
 
 	userLoader := &UserLoader{
-		bearerKey: cfg.TwitterBearerToken,
+		bearerKey:         cfg.TwitterBearerToken,
+		endpointURLFormat: userEndpointURLFormat,
 	}
 
 	r := &TwitterResolver{

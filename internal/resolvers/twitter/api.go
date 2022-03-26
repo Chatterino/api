@@ -1,26 +1,10 @@
 package twitter
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"log"
-	"net/http"
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/Chatterino/api/pkg/humanize"
-	"github.com/Chatterino/api/pkg/resolver"
 )
-
-func getTweetIDFromURL(url *url.URL) string {
-	match := tweetRegexp.FindAllStringSubmatch(url.Path, -1)
-	if len(match) > 0 && len(match[0]) == 2 {
-		return match[0][1]
-	}
-	return ""
-}
 
 func buildTweetTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 	data := &tweetTooltipData{}
@@ -32,10 +16,10 @@ func buildTweetTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 
 	// TODO: what time format is this exactly? can we move to humanize a la CreationDteRFC3339?
 	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Timestamp)
-	data.Timestamp = humanize.CreationDateTime(timestamp)
 	if err != nil {
-		log.Println(err.Error())
 		data.Timestamp = ""
+	} else {
+		data.Timestamp = humanize.CreationDateTime(timestamp)
 	}
 
 	if len(tweet.Entities.Media) > 0 {
@@ -44,14 +28,6 @@ func buildTweetTooltip(tweet *TweetApiResponse) *tweetTooltipData {
 	}
 
 	return data
-}
-
-func getUserNameFromUrl(url *url.URL) string {
-	match := twitterUserRegexp.FindAllStringSubmatch(url.String(), -1)
-	if len(match) > 0 && len(match[0]) > 0 {
-		return match[0][1]
-	}
-	return ""
 }
 
 func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipData {
@@ -63,60 +39,4 @@ func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipDa
 	data.Thumbnail = user.ProfileImageUrl
 
 	return data
-}
-
-func getTweetByID(id, bearer string) (*TweetApiResponse, error) {
-	endpointUrl := fmt.Sprintf("https://api.twitter.com/1.1/statuses/show.json?id=%s&tweet_mode=extended", id)
-	extraHeaders := map[string]string{
-		"Authorization": fmt.Sprintf("Bearer %s", bearer),
-	}
-	resp, err := resolver.RequestGETWithHeaders(endpointUrl, extraHeaders)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return nil, fmt.Errorf("%d", resp.StatusCode)
-	}
-
-	var tweet *TweetApiResponse
-	err = json.NewDecoder(resp.Body).Decode(&tweet)
-	if err != nil {
-		return nil, errors.New("unable to process response")
-	}
-
-	return tweet, nil
-}
-
-func getUserByName(userName, bearer string) (*TwitterUserApiResponse, error) {
-	endpointUrl := fmt.Sprintf("https://api.twitter.com/1.1/users/show.json?screen_name=%s", userName)
-	extraHeaders := map[string]string{
-		"Authorization": fmt.Sprintf("Bearer %s", bearer),
-	}
-	resp, err := resolver.RequestGETWithHeaders(endpointUrl, extraHeaders)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return nil, fmt.Errorf("%d", resp.StatusCode)
-	}
-
-	var user *TwitterUserApiResponse
-	err = json.NewDecoder(resp.Body).Decode(&user)
-	if err != nil {
-		return nil, errors.New("unable to process response")
-	}
-
-	/* By default, Twitter returns a low resolution image.
-	 * This modification removes "_normal" to get the original sized image, based on Twitter's API documentation:
-	 * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/user-profile-images-and-banners
-	 */
-	user.ProfileImageUrl = strings.Replace(user.ProfileImageUrl, "_normal", "", 1)
-
-	return user, nil
 }
