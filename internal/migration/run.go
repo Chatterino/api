@@ -78,7 +78,6 @@ func Run(ctx context.Context, pool db.Pool) (int64, int64, error) {
 	relevantMigrations := getMigrations(migrations, oldVersion)
 
 	for _, migration := range relevantMigrations {
-		fmt.Println("MIGRATE", migration.Version)
 		if err := migration.MigrateTo(ctx, pool); err != nil {
 			return 0, 0, err
 		}
