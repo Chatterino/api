@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -117,18 +116,12 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request)
 		return emoteNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
-	// Read response into a string
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return resolver.Errorf("FrankerFaceZ HTTP body read error: %s", err)
-	}
-
 	// Parse response into a predefined JSON blob (see EmoteAPIResponse struct above)
 	var temp struct {
 		Emote EmoteAPIResponse `json:"emote"`
 	}
 
-	if err := json.Unmarshal(body, &temp); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&temp); err != nil {
 		return resolver.Errorf("FrankerFaceZ API unmarshal error: %s", err)
 	}
 	jsonResponse := temp.Emote
