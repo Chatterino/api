@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -60,20 +59,14 @@ query fetchEmote($id: String!) {
 	}
 	defer resp.Body.Close()
 
-	// Read response into a string
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return resolver.Errorf("SevenTV HTTP body read error: %s", err)
-	}
-
 	// Error out if the emote wasn't found or something else went wrong with the request
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		return emoteNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
 	var jsonResponse EmoteAPIResponse
-	if err := json.Unmarshal(body, &jsonResponse); err != nil {
-		return resolver.Errorf("SevenTV API response unmarshal error: %s", err)
+	if err := json.NewDecoder(resp.Body).Decode(&jsonResponse); err != nil {
+		return resolver.Errorf("SevenTV API response decode error: %s", err)
 	}
 
 	// API returns Data.Emote as null if the emote wasn't found

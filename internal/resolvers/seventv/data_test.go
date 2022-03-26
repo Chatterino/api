@@ -73,6 +73,13 @@ func init() {
 			},
 		},
 	}
+
+	// No emote
+	emotes["f0f0f0"] = EmoteAPIResponse{
+		Data: EmoteAPIResponseData{
+			Emote: nil,
+		},
+	}
 }
 
 func testServer() *httptest.Server {
@@ -90,7 +97,14 @@ func testServer() *httptest.Server {
 		if err != nil {
 			panic(err)
 		}
-		if response, ok := emotes[q.Variables["id"]]; ok {
+
+		emoteID := q.Variables["id"]
+
+		if emoteID == "bad" {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("xd"))
+			return
+		} else if response, ok := emotes[emoteID]; ok {
 			b, _ := json.Marshal(&response)
 
 			w.Header().Set("Content-Type", "application/json")

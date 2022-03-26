@@ -201,6 +201,22 @@ func TestEmoteResolver(t *testing.T) {
 					expectedBytes:  []byte(`{"status":404,"message":"No SevenTV emote with this id found"}`),
 					expectedError:  nil,
 				},
+				{
+					label:          "Matching link - noemote",
+					inputURL:       utils.MustParseURL("https://7tv.app/emotes/f0f0f0"),
+					inputEmoteHash: "f0f0f0",
+					inputReq:       nil,
+					expectedBytes:  []byte(`{"status":404,"message":"No SevenTV emote with this id found"}`),
+					expectedError:  nil,
+				},
+				{
+					label:          "Matching link - bad response",
+					inputURL:       utils.MustParseURL("https://7tv.app/emotes/bad"),
+					inputEmoteHash: "bad",
+					inputReq:       nil,
+					expectedBytes:  []byte(`{"status":500,"message":"SevenTV API response decode error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+					expectedError:  nil,
+				},
 			}
 
 			const q = `SELECT value FROM cache WHERE key=$1`
