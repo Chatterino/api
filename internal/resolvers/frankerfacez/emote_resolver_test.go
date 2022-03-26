@@ -179,6 +179,14 @@ func TestEmoteResolver(t *testing.T) {
 					expectedBytes:  []byte(`{"status":404,"message":"No FrankerFaceZ emote with this id found"}`),
 					expectedError:  nil,
 				},
+				{
+					label:          "Matching link - bad json",
+					inputURL:       utils.MustParseURL("https://frankerfacez.com/emoticon/696969-badjson"),
+					inputEmoteHash: "696969",
+					inputReq:       nil,
+					expectedBytes:  []byte(`{"status":500,"message":"FrankerFaceZ API response decode error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+					expectedError:  nil,
+				},
 			}
 
 			const q = `SELECT value FROM cache WHERE key=$1`

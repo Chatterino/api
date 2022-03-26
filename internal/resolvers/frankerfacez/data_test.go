@@ -78,7 +78,7 @@ func testServer() *httptest.Server {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		if emote == "bad_json" {
+		if emote == "696969" {
 			w.Write([]byte("xD"))
 		} else if e, ok := data[emote]; ok {
 			response.Emote = *e

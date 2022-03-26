@@ -122,7 +122,7 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request)
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&temp); err != nil {
-		return resolver.Errorf("FrankerFaceZ API unmarshal error: %s", err)
+		return resolver.Errorf("FrankerFaceZ API response decode error: %s", err)
 	}
 	jsonResponse := temp.Emote
 
