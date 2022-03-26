@@ -70,15 +70,8 @@ func listen(ctx context.Context, bind string, router *chi.Mux, log logger.Logger
 
 func runMigrations(ctx context.Context, pool db.Pool) {
 	log := logger.FromContext(ctx)
-	conn, err := pool.Acquire(ctx)
-	if err != nil {
-		log.Fatalw("Error acquiring connection from pool",
-			"error", err,
-		)
-	}
-	defer conn.Release()
 
-	if oldVersion, newVersion, err := migration.Run(ctx, conn.Conn()); err != nil {
+	if oldVersion, newVersion, err := migration.Run(ctx, pool); err != nil {
 		log.Fatalw("Error running database migrations",
 			"error", err,
 		)
