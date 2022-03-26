@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -13,18 +15,20 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
+type APIUser struct {
+	Name            string `json:"name"`
+	Username        string `json:"screen_name"`
+	ProfileImageUrl string `json:"profile_image_url_https"`
+}
+
 type TweetApiResponse struct {
-	ID        string `json:"id_str"`
-	Text      string `json:"full_text"`
-	Timestamp string `json:"created_at"`
-	Likes     uint64 `json:"favorite_count"`
-	Retweets  uint64 `json:"retweet_count"`
-	User      struct {
-		Name            string `json:"name"`
-		Username        string `json:"screen_name"`
-		ProfileImageUrl string `json:"profile_image_url_https"`
-	} `json:"user"`
-	Entities struct {
+	ID        string  `json:"id_str"`
+	Text      string  `json:"full_text"`
+	Timestamp string  `json:"created_at"`
+	Likes     uint64  `json:"favorite_count"`
+	Retweets  uint64  `json:"retweet_count"`
+	User      APIUser `json:"user"`
+	Entities  struct {
 		Media []struct {
 			Url string `json:"media_url_https"`
 		} `json:"media"`
@@ -42,7 +46,41 @@ type tweetTooltipData struct {
 }
 
 type TweetLoader struct {
-	bearerKey string
+	bearerKey         string
+	endpointURLFormat string
+}
+
+var (
+	errTweetNotFound = errors.New("tweet not found")
+)
+
+func (l *TweetLoader) getTweetByID(id string) (*TweetApiResponse, error) {
+	endpointUrl := fmt.Sprintf(l.endpointURLFormat, id)
+	extraHeaders := map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s", l.bearerKey),
+	}
+	resp, err := resolver.RequestGETWithHeaders(endpointUrl, extraHeaders)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, errTweetNotFound
+	}
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("unhandled status code: %d", resp.StatusCode)
+	}
+
+	var tweet *TweetApiResponse
+	err = json.NewDecoder(resp.Body).Decode(&tweet)
+	if err != nil {
+		return nil, errors.New("unable to unmarshal response")
+	}
+
+	return tweet, nil
 }
 
 func (l *TweetLoader) Load(ctx context.Context, tweetID string, r *http.Request) (*resolver.Response, time.Duration, error) {
@@ -52,33 +90,22 @@ func (l *TweetLoader) Load(ctx context.Context, tweetID string, r *http.Request)
 		"tweetID", tweetID,
 	)
 
-	tweetResp, err := getTweetByID(tweetID, l.bearerKey)
+	tweetResp, err := l.getTweetByID(tweetID)
 	if err != nil {
-		if err.Error() == "404" {
-			var response resolver.Response
-			unmarshalErr := json.Unmarshal(resolver.NoLinkInfoFound, &response)
-			if unmarshalErr != nil {
-				log.Errorw("Error unmarshalling prebuilt response",
-					"error", unmarshalErr.Error(),
-				)
-			}
-
-			return &response, 1 * time.Hour, nil
+		if err == errTweetNotFound {
+			return &resolver.Response{
+				Status:  http.StatusNotFound,
+				Message: fmt.Sprintf("Twitter tweet not found: %s", resolver.CleanResponse(tweetID)),
+			}, cache.NoSpecialDur, nil
 		}
 
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Error getting Tweet: " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("Twitter tweet API error: %s", err)
 	}
 
 	tweetData := buildTweetTooltip(tweetResp)
 	var tooltip bytes.Buffer
 	if err := tweetTooltipTemplate.Execute(&tooltip, tweetData); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Tweet template error: " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("Twitter tweet template error: %s", err)
 	}
 
 	return &resolver.Response{

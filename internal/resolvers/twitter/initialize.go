@@ -33,8 +33,8 @@ const (
 )
 
 var (
-	tweetRegexp       = regexp.MustCompile(`(?i)\/.*\/status(?:es)?\/([^\/\?]+)`)
-	twitterUserRegexp = regexp.MustCompile(`(?i)twitter\.com\/([^\/\?\s]+)(\/?$|(\?).*)`)
+	tweetRegexp       = regexp.MustCompile(`^/.*\/status(?:es)?\/([^\/\?]+)`)
+	twitterUserRegexp = regexp.MustCompile(`^/([^\/\?\s]+)(?:\/?$|\?.*)$`)
 
 	/* These routes refer to non-user pages. If the capture group in twitterUserRegexp
 	   matches any of these names, we must not resolve it as a Twitter user link.
@@ -67,5 +67,8 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolve
 		return
 	}
 
-	*resolvers = append(*resolvers, NewTwitterResolver(ctx, cfg, pool))
+	const userEndpointURLFormat = "https://api.twitter.com/1.1/users/show.json?screen_name=%s"
+	const tweetEndpointURLFormat = "https://api.twitter.com/1.1/statuses/show.json?id=%s&tweet_mode=extended"
+
+	*resolvers = append(*resolvers, NewTwitterResolver(ctx, cfg, pool, userEndpointURLFormat, tweetEndpointURLFormat))
 }

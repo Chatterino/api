@@ -3,8 +3,12 @@ package twitter
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Chatterino/api/internal/logger"
@@ -29,7 +33,47 @@ type twitterUserTooltipData struct {
 }
 
 type UserLoader struct {
-	bearerKey string
+	bearerKey         string
+	endpointURLFormat string
+}
+
+var (
+	errUserNotFound = errors.New("user not found")
+)
+
+func (l *UserLoader) getUserByName(userName string) (*TwitterUserApiResponse, error) {
+	endpointUrl := fmt.Sprintf(l.endpointURLFormat, userName)
+	extraHeaders := map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s", l.bearerKey),
+	}
+	resp, err := resolver.RequestGETWithHeaders(endpointUrl, extraHeaders)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, errUserNotFound
+	}
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("unhandled status code: %d", resp.StatusCode)
+	}
+
+	var user *TwitterUserApiResponse
+	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return nil, errors.New("unable to unmarshal response")
+	}
+
+	/* By default, Twitter returns a low resolution image.
+	 * This modification removes "_normal" to get the original sized image, based on Twitter's API documentation:
+	 * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/user-profile-images-and-banners
+	 */
+	user.ProfileImageUrl = strings.Replace(user.ProfileImageUrl, "_normal", "", 1)
+
+	return user, nil
 }
 
 func (l *UserLoader) Load(ctx context.Context, userName string, r *http.Request) (*resolver.Response, time.Duration, error) {
@@ -39,30 +83,22 @@ func (l *UserLoader) Load(ctx context.Context, userName string, r *http.Request)
 		"userName", userName,
 	)
 
-	userResp, err := getUserByName(userName, l.bearerKey)
+	userResp, err := l.getUserByName(userName)
 	if err != nil {
-		// Error code for "User not found.", as described here:
-		// https://developer.twitter.com/en/support/twitter-api/error-troubleshooting#error-codes
-		if err.Error() == "50" {
+		if err == errUserNotFound {
 			return &resolver.Response{
 				Status:  http.StatusNotFound,
-				Message: "Error: Twitter user not found.",
+				Message: fmt.Sprintf("Twitter user not found: %s", resolver.CleanResponse(userName)),
 			}, cache.NoSpecialDur, nil
 		}
 
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Error getting Twitter user: " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("Twitter user API error: %s", err)
 	}
 
 	userData := buildTwitterUserTooltip(userResp)
 	var tooltip bytes.Buffer
 	if err := twitterUserTooltipTemplate.Execute(&tooltip, userData); err != nil {
-		return &resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "Twitter user template error: " + resolver.CleanResponse(err.Error()),
-		}, cache.NoSpecialDur, nil
+		return resolver.Errorf("Twitter user template error: %s", err)
 	}
 
 	return &resolver.Response{
