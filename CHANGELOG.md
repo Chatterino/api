@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Go version 1.17 is now the minimum required version to build this. (#292)
 - Breaking: Resolver caches are now stored in PostgreSQL. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#271)
 - Fix: SevenTV emotes now resolve correctly. (#281, #288)
 - Fix: YouTube videos are no longer resolved as channels. (#284)
