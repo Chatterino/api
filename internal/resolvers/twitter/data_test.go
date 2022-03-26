@@ -34,8 +34,36 @@ func init() {
 		Timestamp: "Sat Mar 26 17:15:50 +0200 2022",
 	}
 
-	// TODO: Tweet with entities
-	// TODO: Tweet with poorly formatted timestamp
+	// Tweet with entities
+	tweets["1506968434134953986"] = &TweetApiResponse{
+		Text: "",
+		User: APIUser{
+			Name:     "PAJLADA",
+			Username: "pajlada",
+		},
+		Likes:     69,
+		Retweets:  420,
+		Timestamp: "Sat Mar 26 17:15:50 +0200 2022",
+		Entities: APIEntities{
+			Media: []APIEntitiesMedia{
+				{
+					Url: "https://pbs.twimg.com/media/FOnTzeQWUAMU6L1?format=jpg&name=medium",
+				},
+			},
+		},
+	}
+
+	// Tweet with poorly formatted timestamp
+	tweets["1505121705290874881"] = &TweetApiResponse{
+		Text: "Bad timestamp",
+		User: APIUser{
+			Name:     "PAJLADA",
+			Username: "pajlada",
+		},
+		Likes:     420,
+		Retweets:  69,
+		Timestamp: "asdasd",
+	}
 }
 
 func testServer() *httptest.Server {

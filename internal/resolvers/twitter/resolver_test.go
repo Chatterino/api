@@ -158,6 +158,20 @@ func TestResolver(t *testing.T) {
 					expectedError: nil,
 				},
 				{
+					label:         "with entities",
+					inputURL:      utils.MustParseURL("https://twitter.com/pajlada/status/1506968434134953986"),
+					inputTweet:    "1506968434134953986",
+					expectedBytes: []byte(`{"status":200,"thumbnail":"https://pbs.twimg.com/media/FOnTzeQWUAMU6L1?format=jpg\u0026name=medium","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EPAJLADA%20%28@pajlada%29%3C%2Fb%3E%0A%3Cspan%20style=%22white-space:%20pre-wrap%3B%20word-wrap:%20break-word%3B%22%3E%0A%0A%3C%2Fspan%3E%0A%3Cspan%20style=%22color:%20%23808892%3B%22%3E69%20likes\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B420%20retweets\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B26%20Mar%202022%20%E2%80%A2%2017:15%20UTC%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A"}`),
+					expectedError: nil,
+				},
+				{
+					label:         "Poorly formatted timestamp",
+					inputURL:      utils.MustParseURL("https://twitter.com/pajlada/status/1505121705290874881"),
+					inputTweet:    "1505121705290874881",
+					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EPAJLADA%20%28@pajlada%29%3C%2Fb%3E%0A%3Cspan%20style=%22white-space:%20pre-wrap%3B%20word-wrap:%20break-word%3B%22%3E%0ABad%20timestamp%0A%3C%2Fspan%3E%0A%3Cspan%20style=%22color:%20%23808892%3B%22%3E420%20likes\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B69%20retweets\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A"}`),
+					expectedError: nil,
+				},
+				{
 					label:         "404",
 					inputURL:      utils.MustParseURL("https://twitter.com/pajlada/status/404"),
 					inputTweet:    "404",
@@ -240,30 +254,6 @@ func TestResolver(t *testing.T) {
 					expectedBytes: []byte(`{"status":500,"message":"Twitter user API error: unable to unmarshal response"}`),
 					expectedError: nil,
 				},
-				// {
-				// 	label:         "Link too big",
-				// 	inputURL:      utils.MustParseURL("https://imgur.com/toobig"),
-				// 	expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Ftoobigl.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
-				// 	expectedError: nil,
-				// },
-				// {
-				// 	label:         "Link too big, malformed url",
-				// 	inputURL:      utils.MustParseURL("https://imgur.com/toobigbadurl"),
-				// 	expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
-				// 	expectedError: nil,
-				// },
-				// {
-				// 	label:         "Animated non-gif",
-				// 	inputURL:      utils.MustParseURL("https://imgur.com/b"),
-				// 	expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Fb.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EANIMATED%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%3C%2Fdiv%3E"}`),
-				// 	expectedError: nil,
-				// },
-				// {
-				// 	label:         "Animated malformed link",
-				// 	inputURL:      utils.MustParseURL("https://imgur.com/c"),
-				// 	expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EANIMATED%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%3C%2Fdiv%3E"}`),
-				// 	expectedError: nil,
-				// },
 			}
 
 			for _, test := range tests {

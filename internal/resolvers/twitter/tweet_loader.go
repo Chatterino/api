@@ -21,18 +21,22 @@ type APIUser struct {
 	ProfileImageUrl string `json:"profile_image_url_https"`
 }
 
+type APIEntitiesMedia struct {
+	Url string `json:"media_url_https"`
+}
+
+type APIEntities struct {
+	Media []APIEntitiesMedia `json:"media"`
+}
+
 type TweetApiResponse struct {
-	ID        string  `json:"id_str"`
-	Text      string  `json:"full_text"`
-	Timestamp string  `json:"created_at"`
-	Likes     uint64  `json:"favorite_count"`
-	Retweets  uint64  `json:"retweet_count"`
-	User      APIUser `json:"user"`
-	Entities  struct {
-		Media []struct {
-			Url string `json:"media_url_https"`
-		} `json:"media"`
-	} `json:"entities"`
+	ID        string      `json:"id_str"`
+	Text      string      `json:"full_text"`
+	Timestamp string      `json:"created_at"`
+	Likes     uint64      `json:"favorite_count"`
+	Retweets  uint64      `json:"retweet_count"`
+	User      APIUser     `json:"user"`
+	Entities  APIEntities `json:"entities"`
 }
 
 type tweetTooltipData struct {
