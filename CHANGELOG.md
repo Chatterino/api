@@ -15,6 +15,7 @@
 - Dev: Improve Imgur tests. (#289)
 - Dev: Improve migration tests. (#290)
 - Dev: Improve Twitter tests. (#293)
+- Dev: Improve SevenTV tests. (#294)
 
 ## 1.2.3
 
