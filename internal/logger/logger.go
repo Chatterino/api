@@ -1,9 +1,6 @@
 package logger
 
 import (
-	"context"
-	"log"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -23,25 +20,6 @@ type Logger interface {
 	Fatalw(msg string, keysAndValues ...interface{})
 
 	Sync() error
-}
-
-type contextKeyType string
-
-var (
-	contextKey = contextKeyType("logger")
-)
-
-func FromContext(ctx context.Context) Logger {
-	if v := ctx.Value(contextKey); v != nil {
-		return v.(Logger)
-	}
-
-	log.Fatal("No logger found in context")
-	return nil
-}
-
-func OnContext(ctx context.Context, logger Logger) context.Context {
-	return context.WithValue(ctx, contextKey, logger)
 }
 
 func New(logLevel zap.AtomicLevel, logDevelopment bool) Logger {

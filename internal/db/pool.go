@@ -20,9 +20,6 @@ type Pool interface {
 }
 
 func NewPool(ctx context.Context, dsn string) (Pool, error) {
-
-	var err error
-
 	pool, err := pgxpool.Connect(ctx, dsn)
 
 	if err != nil {

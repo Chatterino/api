@@ -17,8 +17,6 @@ type Loader interface {
 	Load(ctx context.Context, key string, r *http.Request) ([]byte, time.Duration, error)
 }
 
-// type Loader func(ctx context.Context, key string, r *http.Request) ([]byte, time.Duration, error)
-
 var NoSpecialDur time.Duration
 
 var NewDefaultCache = NewPostgreSQLCache
