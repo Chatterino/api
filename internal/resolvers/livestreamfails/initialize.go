@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	livestreamfailsAPIURL = "https://api.livestreamfails.com/clip/%s"
-
 	thumbnailFormat = "https://livestreamfails-image-prod.b-cdn.net/image/%s"
 
 	livestreamfailsTooltipString = `<div style="text-align: left;">
@@ -29,9 +27,10 @@ const (
 var (
 	livestreamfailsClipsTemplate = template.Must(template.New("livestreamfailsclipsTooltip").Parse(livestreamfailsTooltipString))
 
-	pathRegex = regexp.MustCompile(`/clip|post/[0-9]+`)
+	pathRegex = regexp.MustCompile(`^/(?:clip|post)/([0-9]+)`)
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
-	*resolvers = append(*resolvers, NewClipResolver(ctx, cfg, pool))
+	const clipAPIURLFormat = "https://api.livestreamfails.com/clip/%s"
+	*resolvers = append(*resolvers, NewClipResolver(ctx, cfg, pool, clipAPIURLFormat))
 }

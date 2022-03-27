@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/Chatterino/api/internal/db"
@@ -23,26 +22,33 @@ func (r *ClipResolver) Check(ctx context.Context, url *url.URL) (context.Context
 		return ctx, false
 	}
 
-	if !pathRegex.MatchString(url.Path) {
+	match := pathRegex.FindStringSubmatch(url.Path)
+	if len(match) != 2 {
 		return ctx, false
 	}
+
+	ctx = contextWithClipID(ctx, match[1])
 
 	return ctx, true
 }
 
 func (r *ClipResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
-	pathParts := strings.Split(strings.TrimPrefix(url.Path, "/"), "/")
-	clipId := pathParts[1]
+	clipID, err := clipIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	return r.clipCache.Get(ctx, clipId, req)
+	return r.clipCache.Get(ctx, clipID, req)
 }
 
 func (r *ClipResolver) Name() string {
 	return "livestreamfails:clip"
 }
 
-func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *ClipResolver {
-	clipLoader := &ClipLoader{}
+func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, apiURLFormat string) *ClipResolver {
+	clipLoader := &ClipLoader{
+		apiURLFormat: apiURLFormat,
+	}
 
 	r := &ClipResolver{
 		clipCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "livestreamfails:clip", resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),

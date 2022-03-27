@@ -17,6 +17,7 @@
 - Dev: Improve Twitter tests. (#293)
 - Dev: Improve SevenTV tests. (#294)
 - Dev: Improve FrankerFaceZ tests. (#295)
+- Dev: Improve Livestreamfails tests. (#297)
 
 ## 1.2.3
 
