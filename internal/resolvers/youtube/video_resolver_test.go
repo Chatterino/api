@@ -85,6 +85,11 @@ func TestVideoResolver(t *testing.T) {
 				expected: true,
 			},
 			{
+				label:    "Correct domain, shorts path",
+				input:    utils.MustParseURL("https://youtube.com/shorts/foobar"),
+				expected: true,
+			},
+			{
 				label:    "Correct (sub)domain, correct path",
 				input:    utils.MustParseURL("https://www.youtube.com/watch?v=foobar"),
 				expected: true,
