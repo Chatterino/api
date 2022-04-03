@@ -120,14 +120,14 @@ func TestClipResolver(t *testing.T) {
 					label:         "normal",
 					inputURL:      utils.MustParseURL("https://livestreamfails.com/clip/123"),
 					inputClipID:   "123",
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://livestreamfails-image-prod.b-cdn.net/image/asd","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2027%20Mar%202022%0A%3C%2Fdiv%3E"}`),
+					expectedBytes: []byte(`{"status":200,"thumbnail":"https://livestreamfails-image-prod.b-cdn.net/image/asd","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2010%20Nov%202019%0A%3C%2Fdiv%3E"}`),
 					expectedError: nil,
 				},
 				{
 					label:         "normal NSFW",
 					inputURL:      utils.MustParseURL("https://livestreamfails.com/clip/905"),
 					inputClipID:   "905",
-					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%22%3ENSFW%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2027%20Mar%202022%0A%3C%2Fdiv%3E"}`),
+					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%22%3ENSFW%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2010%20Nov%202019%0A%3C%2Fdiv%3E"}`),
 					expectedError: nil,
 				},
 				{
