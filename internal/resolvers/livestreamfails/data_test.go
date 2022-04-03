@@ -14,12 +14,13 @@ var (
 )
 
 func init() {
+	testTime := time.Date(2019, time.November, 10, 23, 0, 0, 0, time.UTC)
 	// Normal clip
 	data["123"] = &ClipAPIResponse{
 		Category: ClipAPICategory{
 			Label: "Category Label",
 		},
-		CreatedAt:      time.Now(),
+		CreatedAt:      testTime,
 		ImageID:        "asd",
 		IsNSFW:         false,
 		Label:          "Clip Label",
@@ -35,7 +36,7 @@ func init() {
 		Category: ClipAPICategory{
 			Label: "Category Label",
 		},
-		CreatedAt:      time.Now(),
+		CreatedAt:      testTime,
 		ImageID:        "asd",
 		IsNSFW:         true,
 		Label:          "Clip Label",
