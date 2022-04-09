@@ -65,17 +65,17 @@ jobs:
         with:
           path: 'project-git-repo'
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: chatterino-api-1.18-ubuntu-latest
           path: bins/ubuntu/
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: chatterino-api-1.18-macos-latest
           path: bins/macos/
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: chatterino-api-1.18-windows-latest
           path: bins/windows/
