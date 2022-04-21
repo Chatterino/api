@@ -5,7 +5,7 @@
 - Breaking: Go version 1.17 is now the minimum required version to build this. (#292)
 - Breaking: Resolver caches are now stored in PostgreSQL. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#271)
 - YouTube: Added support for 'YouTube shorts' URLs. (#299)
-- Fix: SevenTV emotes now resolve correctly. (#281, #288)
+- Fix: SevenTV emotes now resolve correctly. (#281, #288, #307)
 - Fix: YouTube videos are no longer resolved as channels. (#284)
 - Dev: Improve BetterTTV emote tests. (#282)
 - Minor: BetterTTV cache key changed from plural to singular form. (#282)
