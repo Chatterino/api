@@ -37,7 +37,7 @@ var (
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
-	apiURL := utils.MustParseURL("https://7tv.app/v2/gql")
+	apiURL := utils.MustParseURL("https://api.7tv.app/v2/gql")
 
 	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg, pool, apiURL))
 }
