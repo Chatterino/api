@@ -7,6 +7,7 @@
 - YouTube: Added support for 'YouTube shorts' URLs. (#299)
 - Fix: SevenTV emotes now resolve correctly. (#281, #288, #307)
 - Fix: YouTube videos are no longer resolved as channels. (#284)
+- Fix: Default resolver no longer crashes when provided url is broken. (#310)
 - Dev: Improve BetterTTV emote tests. (#282)
 - Minor: BetterTTV cache key changed from plural to singular form. (#282)
 - Dev: Improve Twitch.tv clip tests. (#283)
