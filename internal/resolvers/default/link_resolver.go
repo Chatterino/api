@@ -65,6 +65,7 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 				"error", err,
 			)
 		}
+		return
 	}
 
 	for _, m := range r.customResolvers {

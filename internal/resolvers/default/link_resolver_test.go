@@ -125,4 +125,49 @@ func TestLinkResolver(t *testing.T) {
 			})
 		}
 	})
+
+	c.Run("Request with early error", func(c *qt.C) {
+		tests := []struct {
+			inputReq     *http.Request
+			inputLinkKey string
+			expected     resolver.Response
+		}{
+			{
+				inputReq:     newLinkResolverRequest(t, ctx, "GET", " :", nil),
+				inputLinkKey: ts.URL,
+				expected: resolver.Response{
+					Status:  500,
+					Link:    "",
+					Message: `Could not fetch link info: Invalid URL`,
+				},
+			},
+		}
+
+		for _, test := range tests {
+			c.Run("", func(c *qt.C) {
+				respRec := httptest.NewRecorder()
+
+				router.ServeHTTP(respRec, test.inputReq)
+				resp := respRec.Result()
+				response := resolver.Response{}
+				err := json.NewDecoder(resp.Body).Decode(&response)
+				c.Assert(err, qt.IsNil)
+
+				c.Assert(response.Status, qt.Equals, test.expected.Status)
+				c.Assert(response.Link, qt.Equals, test.expected.Link)
+
+				unescapedTooltip, err := url.QueryUnescape(response.Tooltip)
+				c.Assert(err, qt.IsNil)
+
+				if test.expected.Tooltip != "" {
+					c.Assert(unescapedTooltip, MatchesRegexp, regexp.MustCompile(test.expected.Tooltip), qt.Commentf("%s does not match %s", unescapedTooltip, test.expected.Tooltip))
+				}
+				if test.expected.Message != "" {
+					c.Assert(response.Message, qt.Matches, test.expected.Message, qt.Commentf("%s does not match %s", response.Message, test.expected.Message))
+				}
+
+				c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
+			})
+		}
+	})
 }
