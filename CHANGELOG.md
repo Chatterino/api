@@ -19,6 +19,7 @@
 - Dev: Improve SevenTV tests. (#294)
 - Dev: Improve FrankerFaceZ tests. (#295)
 - Dev: Improve Livestreamfails tests. (#297, #301)
+- Dev: Improve default resolver tests. (#300)
 
 ## 1.2.3
 
