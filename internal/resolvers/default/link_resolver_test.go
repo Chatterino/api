@@ -81,9 +81,14 @@ func TestLinkResolver(t *testing.T) {
 				inputReq:     newLinkResolverRequest(t, ctx, "GET", ts.URL, nil),
 				inputLinkKey: ts.URL,
 				expected: resolver.Response{
-					Status:  200,
-					Link:    ts.URL,
-					Tooltip: `.*`,
+					Status: 200,
+					Link:   ts.URL,
+					Tooltip: `<div style="text-align: left;">
+
+<b>/ title</b><hr>
+
+
+<b>URL:</b> http://127\.0\.0\.1:[\d]{2,7}</div>`,
 				},
 			},
 		}
@@ -109,9 +114,12 @@ func TestLinkResolver(t *testing.T) {
 				unescapedTooltip, err := url.QueryUnescape(response.Tooltip)
 				c.Assert(err, qt.IsNil)
 
-				fmt.Println(unescapedTooltip)
-				fmt.Println(test.expected.Tooltip)
-				c.Assert("asd\nasd", qt.Matches, regexp.MustCompile(`.*`))
+				if test.expected.Tooltip != "" {
+					c.Assert(unescapedTooltip, MatchesRegexp, regexp.MustCompile(test.expected.Tooltip), qt.Commentf("%s does not match %s", unescapedTooltip, test.expected.Tooltip))
+				}
+				if test.expected.Message != "" {
+					c.Assert(response.Message, qt.Matches, test.expected.Message, qt.Commentf("%s does not match %s", response.Message, test.expected.Message))
+				}
 
 				c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
 			})
