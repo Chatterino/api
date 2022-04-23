@@ -22,7 +22,7 @@ func TestTruncateString(t *testing.T) {
 		{
 			input:          "foobar",
 			maxLength:      6,
-			expectedOutput: "fooba…",
+			expectedOutput: "foobar",
 		},
 		{
 			input:          "foobar",
