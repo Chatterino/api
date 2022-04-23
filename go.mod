@@ -11,7 +11,7 @@ require (
 	github.com/go-chi/stampede v0.5.1
 	github.com/golang/mock v1.6.0
 	github.com/jackc/pgconn v1.12.0
-	github.com/jackc/pgx/v4 v4.15.0
+	github.com/jackc/pgx/v4 v4.16.0
 	github.com/koffeinsource/go-imgur v0.3.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/nicklaw5/helix v1.25.0
@@ -45,7 +45,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
-	github.com/jackc/pgtype v1.10.0 // indirect
+	github.com/jackc/pgtype v1.11.0 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/koffeinsource/go-klogger v0.1.1 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
