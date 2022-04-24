@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. Resolved links are stored in PostgreSQL, so you must have PostgreSQL installed and accessible for the user running the API. For Ubuntu, you would install it with `sudo apt install postgresql`, create a DB user for your system user (`sudo -upostgres createuser pajlada`), then create a db for the api (`sudo -upostgres createdb chatterino-api --owner pajlada`).
+1. Resolved links are stored in PostgreSQL, so you must have PostgreSQL installed and accessible for the user running the API. For Ubuntu, you would install it with `sudo apt install postgresql`, create a DB user for your system user (`sudo -upostgres createuser pajlada`), then create a db for the api (`sudo -upostgres createdb chatterino-api --owner pajlada`). Make sure to edit `dsn` in your [configuration](./config.md). Example, using the details above, `dsn:"host=/var/run/postgresql user=pajlada database=chatterino-api"`.
 
 ## Build
 
