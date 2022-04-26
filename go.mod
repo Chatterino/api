@@ -21,7 +21,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.11.0
 	go.uber.org/zap v1.21.0
-	google.golang.org/api v0.75.0
+	google.golang.org/api v0.76.0
 	honnef.co/go/tools v0.3.0-0.dev.0.20220306074811-23e1086441d2
 )
 
