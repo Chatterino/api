@@ -21,12 +21,12 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.11.0
 	go.uber.org/zap v1.21.0
-	google.golang.org/api v0.77.0
+	google.golang.org/api v0.78.0
 	honnef.co/go/tools v0.3.0-0.dev.0.20220306074811-23e1086441d2
 )
 
 require (
-	cloud.google.com/go/compute v1.6.0 // indirect
+	cloud.google.com/go/compute v1.6.1 // indirect
 	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/Jeffail/gabs v1.4.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
@@ -36,7 +36,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.7 // indirect
+	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/googleapis/gax-go/v2 v2.3.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.5-0.20200511160909-eb529947af53 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -69,15 +69,15 @@ require (
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
+	golang.org/x/sys v0.0.0-20220502124256-b6088ccd6cba // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.8 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220414192740-2d67ff6cf2b4 // indirect
-	google.golang.org/grpc v1.45.0 // indirect
+	google.golang.org/genproto v0.0.0-20220429170224-98d788798c3e // indirect
+	google.golang.org/grpc v1.46.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
