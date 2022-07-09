@@ -17,22 +17,22 @@ type ResponseMarshaller struct {
 	innerLoader InnerLoader
 }
 
-func (m *ResponseMarshaller) Load(ctx context.Context, s string, r *http.Request) ([]byte, time.Duration, error) {
+func (m *ResponseMarshaller) Load(ctx context.Context, s string, r *http.Request) ([]byte, *int, *string, time.Duration, error) {
 	value, specialDur, err := m.innerLoader.Load(ctx, s, r)
 	if err != nil {
-		return nil, specialDur, err
+		return nil, nil, nil, specialDur, err
 	}
 
 	if value == nil {
-		return nil, specialDur, errors.New("inner load value must not be nil when error is nil")
+		return nil, nil, nil, specialDur, errors.New("inner load value must not be nil when error is nil")
 	}
 
 	valueBytes, marshalErr := json.Marshal(value)
 	if marshalErr != nil {
-		return nil, specialDur, marshalErr
+		return nil, nil, nil, specialDur, marshalErr
 	}
 
-	return valueBytes, specialDur, nil
+	return valueBytes, nil, nil, specialDur, nil
 }
 
 func NewResponseMarshaller(innerLoader InnerLoader) *ResponseMarshaller {

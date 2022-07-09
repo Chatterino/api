@@ -30,7 +30,7 @@ func (r *Resolver) Check(ctx context.Context, url *url.URL) (context.Context, bo
 	return ctx, utils.IsSubdomainOf(url, "imgur.com")
 }
 
-func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	return r.imgurCache.Get(ctx, url.String(), req)
 }
 

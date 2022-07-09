@@ -2,10 +2,12 @@ package livestreamfails
 
 import (
 	"context"
+	"net/http"
 	"net/url"
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
@@ -107,48 +109,68 @@ func TestClipResolver(t *testing.T) {
 		})
 		c.Run("Not cached", func(c *qt.C) {
 			type runTest struct {
-				label         string
-				inputURL      *url.URL
-				inputClipID   string
-				expectedBytes []byte
-				expectedError error
-				rowsReturned  int
+				label            string
+				inputURL         *url.URL
+				inputClipID      string
+				expectedResponse *cache.Response
+				expectedError    error
+				rowsReturned     int
 			}
 
 			tests := []runTest{
 				{
-					label:         "normal",
-					inputURL:      utils.MustParseURL("https://livestreamfails.com/clip/123"),
-					inputClipID:   "123",
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://livestreamfails-image-prod.b-cdn.net/image/asd","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2010%20Nov%202019%0A%3C%2Fdiv%3E"}`),
+					label:       "normal",
+					inputURL:    utils.MustParseURL("https://livestreamfails.com/clip/123"),
+					inputClipID: "123",
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://livestreamfails-image-prod.b-cdn.net/image/asd","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2010%20Nov%202019%0A%3C%2Fdiv%3E"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
-					label:         "normal NSFW",
-					inputURL:      utils.MustParseURL("https://livestreamfails.com/clip/905"),
-					inputClipID:   "905",
-					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%22%3ENSFW%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2010%20Nov%202019%0A%3C%2Fdiv%3E"}`),
+					label:       "normal NSFW",
+					inputURL:    utils.MustParseURL("https://livestreamfails.com/clip/905"),
+					inputClipID: "905",
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%22%3ENSFW%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%0A%3Cb%3EClip%20Label%3C%2Fb%3E%3Chr%3E%0A%3Cb%3EStreamer:%3C%2Fb%3E%20Streamer%20Label%3Cbr%3E%0A%3Cb%3ECategory:%3C%2Fb%3E%20Category%20Label%3Cbr%3E%0A%3Cb%3EPlatform:%3C%2Fb%3E%20Twitch%3Cbr%3E%0A%3Cb%3EReddit%20score:%3C%2Fb%3E%2069%3Cbr%3E%0A%3Cb%3ECreated:%3C%2Fb%3E%2010%20Nov%202019%0A%3C%2Fdiv%3E"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
-					label:         "404",
-					inputURL:      utils.MustParseURL("https://livestreamfails.com/clip/404"),
-					inputClipID:   "404",
-					expectedBytes: []byte(`{"status":404,"message":"No LivestreamFails Clip with this ID found"}`),
+					label:       "404",
+					inputURL:    utils.MustParseURL("https://livestreamfails.com/clip/404"),
+					inputClipID: "404",
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":404,"message":"No LivestreamFails Clip with this ID found"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
-					label:         "500",
-					inputURL:      utils.MustParseURL("https://livestreamfails.com/clip/500"),
-					inputClipID:   "500",
-					expectedBytes: []byte(`{"status":500,"message":"Livestreamfails unhandled HTTP status code: 500"}`),
+					label:       "500",
+					inputURL:    utils.MustParseURL("https://livestreamfails.com/clip/500"),
+					inputClipID: "500",
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"Livestreamfails unhandled HTTP status code: 500"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
-					label:         "bad json",
-					inputURL:      utils.MustParseURL("https://livestreamfails.com/clip/666"),
-					inputClipID:   "666",
-					expectedBytes: []byte(`{"status":500,"message":"Livestreamfails API response decode error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+					label:       "bad json",
+					inputURL:    utils.MustParseURL("https://livestreamfails.com/clip/666"),
+					inputClipID: "666",
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"Livestreamfails API response decode error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 			}
@@ -157,13 +179,13 @@ func TestClipResolver(t *testing.T) {
 				c.Run(test.label, func(c *qt.C) {
 					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
 					pool.ExpectExec("INSERT INTO cache").
-						WithArgs("livestreamfails:clip:"+test.inputClipID, test.expectedBytes, pgxmock.AnyArg()).
+						WithArgs("livestreamfails:clip:"+test.inputClipID, test.expectedResponse.Payload, test.expectedResponse.StatusCode, test.expectedResponse.ContentType, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
 					ctx, checkResult := r.Check(ctx, test.inputURL)
 					c.Assert(checkResult, qt.IsTrue)
 					outputBytes, outputError := r.Run(ctx, test.inputURL, nil)
 					c.Assert(outputError, qt.Equals, test.expectedError)
-					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
+					c.Assert(outputBytes, qt.DeepEquals, test.expectedResponse)
 					c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
 				})
 			}

@@ -7,6 +7,8 @@ Go web service that serves as a cache to APIs that each Chatterino client could 
 
 ## Routes
 
+### Resolve Twitch emote set
+
 `twitchemotes/set/:setID`  
 Returns information about a given Twitch emote set. Example response:
 
@@ -20,18 +22,38 @@ Returns information about a given Twitch emote set. Example response:
 }
 ```
 
-`link_resolver/:url`  
-Resolves a url into a preview tooltip. Example response:
+### Resolve URL
 
-```
+`link_resolver/:url`  
+Resolves a url into a preview tooltip.  
+Route content type: `application/json`  
+Route HTTP Status Code is almost always `200` as long as we were able to generate information about the URL, even if the API we call returns 404 or 500.  
+If the given URL is not a valid url, the Route HTTP status code will be `400`.
+
+#### Examples
+
+`url` parameter: `https://example.com/page`
+
+```json
 {
-    "status": 200,                                               // status code returned from the page
-    "thumbnail": "http://api.url/thumbnail/web.com%2Fimage.png", // proxied thumbnail url if there's an image
-    "message": "",                                               // used to forward errors in case the website e.g. couldn't load
-    "tooltip": "<div>tooltip</div>",                             // HTML tooltip used in Chatterino
-    "link": "http://final.url.com/asd"                           // final url, after any redirects
+  "status": 200, // status code returned or inferred from the page
+  "thumbnail": "http://api.url/thumbnail/web.com%2Fimage.png", // proxied thumbnail url if there's an image
+  "message": "", // used to forward errors in case the website e.g. couldn't load
+  "tooltip": "<div>tooltip</div>", // HTML tooltip used in Chatterino
+  "link": "http://example.com/longer-page" // final url, after any redirects
 }
 ```
+
+`url` parameter: `https://example.com/error`
+
+```json
+{
+  "status": 404,
+  "message": "Page not found"
+}
+```
+
+### API Uptime
 
 `health/uptime`  
 Returns API service's uptime. Example response:
@@ -40,12 +62,16 @@ Returns API service's uptime. Example response:
 928h2m53.795354922s
 ```
 
+### API Memory usage
+
 `health/memory`  
 Returns information about memory usage. Example response:
 
 ```
 Alloc=505 MiB, TotalAlloc=17418866 MiB, Sys=3070 MiB, NumGC=111245
 ```
+
+### API Uptime and memory usage
 
 `health/combined`  
 Returns both uptime and information about memory usage. Example response:

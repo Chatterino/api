@@ -29,7 +29,7 @@ func (r *TrackResolver) Check(ctx context.Context, url *url.URL) (context.Contex
 	return ctx, true
 }
 
-func (r *TrackResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *TrackResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	matches := trackPathRegex.FindStringSubmatch(url.Path)
 	if len(matches) != 2 {
 		return nil, errInvalidTrackPath

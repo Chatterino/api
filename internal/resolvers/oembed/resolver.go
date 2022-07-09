@@ -24,7 +24,7 @@ func (r *Resolver) Check(ctx context.Context, url *url.URL) (context.Context, bo
 	return ctx, r.oEmbed.FindItem(url.String()) != nil
 }
 
-func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	return r.oEmbedCache.Get(ctx, url.String(), req)
 }
 

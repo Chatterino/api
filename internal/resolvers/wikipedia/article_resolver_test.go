@@ -2,10 +2,12 @@ package wikipedia
 
 import (
 	"context"
+	"net/http"
 	"net/url"
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
@@ -134,37 +136,57 @@ func TestArticleResolver(t *testing.T) {
 
 		c.Run("Not cached", func(c *qt.C) {
 			type runTest struct {
-				label         string
-				inputURL      *url.URL
-				expectedBytes []byte
-				rowsReturned  int
+				label            string
+				inputURL         *url.URL
+				expectedResponse *cache.Response
+				rowsReturned     int
 			}
 
 			tests := []runTest{
 				{
-					label:         "404",
-					inputURL:      utils.MustParseURL("https://wikipedia.org/wiki/404"),
-					expectedBytes: []byte(`{"status":404,"message":"No Wikipedia article found"}`),
+					label:    "404",
+					inputURL: utils.MustParseURL("https://wikipedia.org/wiki/404"),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":404,"message":"No Wikipedia article found"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "Normal page (HTML)",
-					inputURL:      utils.MustParseURL("https://wikipedia.org/wiki/test_html"),
-					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3E\u0026lt%3Bb\u0026gt%3BTest%20title\u0026lt%3B%2Fb\u0026gt%3B\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B\u0026lt%3Bb\u0026gt%3BTest%20description\u0026lt%3B%2Fb\u0026gt%3B%3C%2Fb%3E%3Cbr%3E\u0026lt%3Bb\u0026gt%3BTest%20extract\u0026lt%3B%2Fb\u0026gt%3B%3C%2Fdiv%3E"}`),
+					label:    "Normal page (HTML)",
+					inputURL: utils.MustParseURL("https://wikipedia.org/wiki/test_html"),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3E\u0026lt%3Bb\u0026gt%3BTest%20title\u0026lt%3B%2Fb\u0026gt%3B\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B\u0026lt%3Bb\u0026gt%3BTest%20description\u0026lt%3B%2Fb\u0026gt%3B%3C%2Fb%3E%3Cbr%3E\u0026lt%3Bb\u0026gt%3BTest%20extract\u0026lt%3B%2Fb\u0026gt%3B%3C%2Fdiv%3E"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "Normal page (No description)",
-					inputURL:      utils.MustParseURL("https://wikipedia.org/wiki/test_no_description"),
-					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETest%20title%3C%2Fb%3E%3Cbr%3ETest%20extract%3C%2Fdiv%3E"}`),
+					label:    "Normal page (No description)",
+					inputURL: utils.MustParseURL("https://wikipedia.org/wiki/test_no_description"),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETest%20title%3C%2Fb%3E%3Cbr%3ETest%20extract%3C%2Fdiv%3E"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "Normal page (with thumbnail)",
-					inputURL:      utils.MustParseURL("https://wikipedia.org/wiki/thumbnail"),
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETest%20title%3C%2Fb%3E%3Cbr%3ETest%20extract%3C%2Fdiv%3E"}`),
+					label:    "Normal page (with thumbnail)",
+					inputURL: utils.MustParseURL("https://wikipedia.org/wiki/thumbnail"),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETest%20title%3C%2Fb%3E%3Cbr%3ETest%20extract%3C%2Fdiv%3E"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "Bad JSON",
-					inputURL:      utils.MustParseURL("https://en.wikipedia.org/wiki/badjson"),
-					expectedBytes: []byte(`{"status":500,"message":"Wikipedia API unmarshal JSON error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+					label:    "Bad JSON",
+					inputURL: utils.MustParseURL("https://en.wikipedia.org/wiki/badjson"),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"Wikipedia API unmarshal JSON error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 			}
 
@@ -172,15 +194,17 @@ func TestArticleResolver(t *testing.T) {
 
 			for _, test := range tests {
 				c.Run(test.label, func(c *qt.C) {
+					c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
 					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
 					pool.ExpectExec("INSERT INTO cache").
-						WithArgs(pgxmock.AnyArg(), test.expectedBytes, pgxmock.AnyArg()).
+						WithArgs(pgxmock.AnyArg(), test.expectedResponse.Payload, test.expectedResponse.StatusCode, test.expectedResponse.ContentType, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
 					ctx, checkResult := r.Check(ctx, test.inputURL)
 					c.Assert(checkResult, qt.IsTrue)
 					outputBytes, outputError := r.Run(ctx, test.inputURL, nil)
 					c.Assert(outputError, qt.IsNil)
-					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
+					c.Assert(outputBytes, qt.DeepEquals, test.expectedResponse)
+					c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
 				})
 			}
 		})

@@ -43,9 +43,9 @@ type TwitchemotesLoader struct {
 	helixUsernameCache cache.Cache
 }
 
-func (l *TwitchemotesLoader) Load(ctx context.Context, setID string, r *http.Request) ([]byte, time.Duration, error) {
+func (l *TwitchemotesLoader) Load(ctx context.Context, setID string, r *http.Request) ([]byte, *int, *string, time.Duration, error) {
 	if l.helixAPI == nil || l.helixUsernameCache == nil {
-		return nil, 0, &twitchEmotesError{
+		return nil, nil, nil, 0, &twitchEmotesError{
 			UnderlyingError: errUnableToHandle,
 			Status:          500,
 		}
@@ -58,14 +58,14 @@ func (l *TwitchemotesLoader) Load(ctx context.Context, setID string, r *http.Req
 	}
 	resp, err := l.helixAPI.GetEmoteSets(params)
 	if err != nil {
-		return nil, 0, &twitchEmotesError{
+		return nil, nil, nil, 0, &twitchEmotesError{
 			UnderlyingError: err,
 			Status:          500,
 		}
 	}
 
 	if len(resp.Data.Emotes) == 0 {
-		return nil, 0, &twitchEmotesError{
+		return nil, nil, nil, 0, &twitchEmotesError{
 			UnderlyingError: errInvalidEmoteID,
 			Status:          404,
 		}
@@ -82,12 +82,12 @@ func (l *TwitchemotesLoader) Load(ctx context.Context, setID string, r *http.Req
 	} else {
 		// Load username from Helix
 		if usernameBytes, err := l.helixUsernameCache.Get(ctx, emote.OwnerID, nil); err != nil {
-			return nil, 0, &twitchEmotesError{
+			return nil, nil, nil, 0, &twitchEmotesError{
 				UnderlyingError: err,
 				Status:          404,
 			}
 		} else {
-			username = string(usernameBytes)
+			username = string(usernameBytes.Payload)
 		}
 	}
 
