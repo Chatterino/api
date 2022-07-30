@@ -15,7 +15,7 @@ var (
 	UnsupportedThumbnailType = []byte(`{"status":415,"message":"Unsupported thumbnail type"}`)
 	ErrorBuildingThumbnail   = []byte(`{"status":500,"message":"Error building thumbnail"}`)
 
-	invalidURL = []byte(`{"status":400,"message":"Could not fetch link info: Invalid URL"}`)
+	InvalidURLBytes = []byte(`{"status":400,"message":"Could not fetch link info: Invalid URL"}`)
 
 	// Dynamically created based on config
 	ResponseTooLarge []byte
@@ -24,13 +24,13 @@ var (
 func ReturnInvalidURL() ([]byte, *int, *string, time.Duration, error) {
 	statusCode := http.StatusBadRequest
 	contentType := "application/json"
-	return invalidURL, &statusCode, &contentType, NoSpecialDur, nil
+	return InvalidURLBytes, &statusCode, &contentType, NoSpecialDur, nil
 }
 
 func WriteInvalidURL(w http.ResponseWriter) (int, error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
-	return w.Write(invalidURL)
+	return w.Write(InvalidURLBytes)
 }
 
 func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
