@@ -31,21 +31,20 @@ func (s *StaticResponse) Return() ([]byte, *int, *string, time.Duration, error) 
 }
 
 func (s *StaticResponse) CacheError() (*cache.Response, error) {
-	statusCode := http.StatusOK
-	contentType := "application/json"
+	response := &cache.Response{
+		Payload:     s.payload,
+		StatusCode:  http.StatusOK,
+		ContentType: "application/json",
+	}
 
 	if s.statusCode != nil {
-		statusCode = *s.statusCode
+		response.StatusCode = *s.statusCode
 	}
 	if s.contentType != nil {
-		contentType = *s.contentType
+		response.ContentType = *s.contentType
 	}
 
-	return &cache.Response{
-		Payload:     s.payload,
-		StatusCode:  statusCode,
-		ContentType: contentType,
-	}, nil
+	return response, nil
 }
 
 func New(payload []byte) *StaticResponse {

@@ -82,7 +82,7 @@ func (c *MemoryCache) Get(ctx context.Context, key string, r *http.Request) (*Re
 			return &response, nil
 		}
 
-		return nil, errors.New("Error getting stuff from kvcache")
+		return nil, errors.New("error getting stuff from kvcache")
 	}
 
 	responseChannel := make(chan Response)
