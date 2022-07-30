@@ -26,7 +26,7 @@ var (
 	errInvalidVideoLink = errors.New("invalid video link")
 )
 
-func (r *YouTubeVideoResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *YouTubeVideoResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	videoID := getYoutubeVideoIDFromURL(url)
 
 	if videoID == "" {

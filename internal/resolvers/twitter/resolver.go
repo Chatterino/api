@@ -46,7 +46,7 @@ func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Cont
 	return ctx, isTwitterUser
 }
 
-func (r *TwitterResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *TwitterResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	tweetMatch := tweetRegexp.FindStringSubmatch(url.Path)
 	if len(tweetMatch) == 2 && len(tweetMatch[1]) > 0 {
 		tweetID := tweetMatch[1]

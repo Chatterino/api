@@ -10,6 +10,7 @@ import (
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/mocks"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
@@ -170,12 +171,12 @@ func TestResolver(t *testing.T) {
 
 		c.Run("Not cached", func(c *qt.C) {
 			type runTest struct {
-				label         string
-				inputURL      *url.URL
-				info          *imgur.GenericInfo
-				expectedBytes []byte
-				expectedError error
-				rowsReturned  int
+				label            string
+				inputURL         *url.URL
+				info             *imgur.GenericInfo
+				expectedResponse *cache.Response
+				expectedError    error
+				rowsReturned     int
 			}
 
 			tests := []runTest{
@@ -194,7 +195,11 @@ func TestResolver(t *testing.T) {
 						GAlbum: nil,
 						Limit:  &imgur.RateLimit{},
 					},
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Fa.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Fa.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+						StatusCode:  200,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
@@ -213,7 +218,11 @@ func TestResolver(t *testing.T) {
 						GAlbum: nil,
 						Limit:  &imgur.RateLimit{},
 					},
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Ftoobigl.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Ftoobigl.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+						StatusCode:  200,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
@@ -232,7 +241,11 @@ func TestResolver(t *testing.T) {
 						GAlbum: nil,
 						Limit:  &imgur.RateLimit{},
 					},
-					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+						StatusCode:  200,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
@@ -251,7 +264,11 @@ func TestResolver(t *testing.T) {
 						GAlbum: nil,
 						Limit:  &imgur.RateLimit{},
 					},
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Fb.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EANIMATED%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail/https%3A%2F%2Fi.imgur.com%2Fb.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EANIMATED%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+						StatusCode:  200,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 				{
@@ -270,7 +287,11 @@ func TestResolver(t *testing.T) {
 						GAlbum: nil,
 						Limit:  &imgur.RateLimit{},
 					},
-					expectedBytes: []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EANIMATED%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cli%3E%3Cb%3ETitle:%3C%2Fb%3E%20My%20Cool%20Title%3C%2Fli%3E%3Cli%3E%3Cb%3EDescription:%3C%2Fb%3E%20My%20Cool%20Description%3C%2Fli%3E%3Cli%3E%3Cb%3EUploaded:%3C%2Fb%3E%2010%20Nov%202019%20%E2%80%A2%2023:00%20UTC%3C%2Fli%3E%3Cli%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EANIMATED%3C%2Fspan%3E%3C%2Fb%3E%3C%2Fli%3E%3C%2Fdiv%3E"}`),
+						StatusCode:  200,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 			}
@@ -284,11 +305,12 @@ func TestResolver(t *testing.T) {
 						Return(test.info, 0, nil)
 					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
 					pool.ExpectExec("INSERT INTO cache").
-						WithArgs("imgur:"+test.inputURL.String(), test.expectedBytes, pgxmock.AnyArg()).
+						WithArgs("imgur:"+test.inputURL.String(), test.expectedResponse.Payload, test.expectedResponse.StatusCode, test.expectedResponse.ContentType, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
 					outputBytes, outputError := r.Run(ctx, test.inputURL, nil)
 					c.Assert(outputError, qt.Equals, test.expectedError)
-					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
+					c.Assert(outputBytes, qt.DeepEquals, test.expectedResponse)
+					c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
 				})
 			}
 		})

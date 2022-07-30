@@ -43,7 +43,8 @@ func setHandler(ctx context.Context, twitchemotesCache cache.Cache, w http.Respo
 		return
 	}
 
-	_, err = w.Write(response)
+	// TODO: STATUS CODE
+	_, err = w.Write(response.Payload)
 	if err != nil {
 		log.Println("Error writing response:", err)
 	}

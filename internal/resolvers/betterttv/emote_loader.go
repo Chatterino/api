@@ -119,7 +119,6 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: thumbnailURL,
 	}, resolver.NoSpecialDur, nil
-
 }
 
 func NewEmoteLoader(emoteAPIURL *url.URL) *EmoteLoader {

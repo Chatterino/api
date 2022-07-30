@@ -13,6 +13,8 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type TooltipData struct {
@@ -88,13 +90,15 @@ func (l *ClipLoader) Load(ctx context.Context, clipID string, r *http.Request) (
 		return resolver.Errorf("Livestreamfails API response decode error: %s", err)
 	}
 
+	caser := cases.Title(language.English)
+
 	// Build tooltip data from the API response
 	data := TooltipData{
 		NSFW:         clipData.IsNSFW,
 		Title:        clipData.Label,
 		Category:     clipData.Category.Label,
 		RedditScore:  humanize.Number(uint64(clipData.RedditScore)),
-		Platform:     strings.Title(strings.ToLower(clipData.SourcePlatform)),
+		Platform:     caser.String(strings.ToLower(clipData.SourcePlatform)),
 		StreamerName: clipData.Streamer.Label,
 		CreationDate: humanize.CreationDate(clipData.CreatedAt),
 	}

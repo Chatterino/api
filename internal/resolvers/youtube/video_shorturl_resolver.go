@@ -22,7 +22,7 @@ func (r *YouTubeVideoShortURLResolver) Check(ctx context.Context, url *url.URL) 
 	return ctx, videoID != "" && videoID != "."
 }
 
-func (r *YouTubeVideoShortURLResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *YouTubeVideoShortURLResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	videoID := getYoutubeVideoIDFromURL2(url)
 
 	if videoID == "" || videoID == "." {
