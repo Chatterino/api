@@ -422,8 +422,8 @@ github.com/nicklaw5/helix v1.25.0 h1:Mrz537izZVsGdM3I46uGAAlslj61frgkhS/9xQqyT/M
 github.com/nicklaw5/helix v1.25.0/go.mod h1:yvXZFapT6afIoxnAvlWiJiUMsYnoHl7tNs+t0bloAMw=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pascaldekloe/goe v0.1.0/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
-github.com/pashagolub/pgxmock v1.6.0 h1:4zugVDde5sBKEsuDog0e7aqQRu/mGpxxQP4GMZ1F7Kk=
-github.com/pashagolub/pgxmock v1.6.0/go.mod h1:4vnPWyFlZ0Z3au5yk9AmBXNOxLVBgRGxb33HBp+K34Y=
+github.com/pashagolub/pgxmock v1.7.0 h1:YFnyONrcx8TsXM6dejha3vbdRdiMK0FNJKSJkJfFX0k=
+github.com/pashagolub/pgxmock v1.7.0/go.mod h1:4vnPWyFlZ0Z3au5yk9AmBXNOxLVBgRGxb33HBp+K34Y=
 github.com/pashagolub/pgxstruct v0.0.0-20210217101842-40d357eec200/go.mod h1:fOTLLi1PtVUDXx28olVT/D2UMFCmBEYpnY5QIzghmDc=
 github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
 github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
