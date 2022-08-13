@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        go: [1.17, 1.18]
+        go: [1.18, 1.19]
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
@@ -40,11 +40,11 @@ jobs:
         run: go test -v -tags migrationtest ./...
 
       - name: Generate code coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.18'
+        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.19'
         run: go test -race -v -count=1 -coverprofile=coverage.out -tags test ./...
 
       - name: Upload Test Coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.18'
+        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.19'
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
@@ -67,17 +67,17 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: chatterino-api-1.18-ubuntu-latest
+          name: chatterino-api-1.19-ubuntu-latest
           path: bins/ubuntu/
 
       - uses: actions/download-artifact@v3
         with:
-          name: chatterino-api-1.18-macos-latest
+          name: chatterino-api-1.19-macos-latest
           path: bins/macos/
 
       - uses: actions/download-artifact@v3
         with:
-          name: chatterino-api-1.18-windows-latest
+          name: chatterino-api-1.19-windows-latest
           path: bins/windows/
 
       - name: display structure
