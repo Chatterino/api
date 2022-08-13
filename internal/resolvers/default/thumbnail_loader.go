@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -74,7 +74,7 @@ func (l *ThumbnailLoader) Load(ctx context.Context, urlString string, r *http.Re
 		return resolver.UnsupportedThumbnailType, nil, nil, cache.NoSpecialDur, nil
 	}
 
-	inputBuf, err := ioutil.ReadAll(resp.Body)
+	inputBuf, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Errorw("Error reading body from request", "error", err)
 		return resolver.ErrorBuildingThumbnail, nil, nil, cache.NoSpecialDur, nil

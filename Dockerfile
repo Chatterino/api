@@ -1,4 +1,4 @@
-FROM golang:1.18 AS build
+FROM golang:1.19 AS build
 ADD . /src
 RUN cd /src/cmd/api && GOOS=linux GOARCH=amd64 go build -tags netgo -ldflags '-extldflags "-static"'
 

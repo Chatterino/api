@@ -2,7 +2,7 @@ package seventv
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 
@@ -92,7 +92,7 @@ func testServer() *httptest.Server {
 
 		var q gqlQuery
 
-		xd, _ := ioutil.ReadAll(r.Body)
+		xd, _ := io.ReadAll(r.Body)
 		err := json.Unmarshal(xd, &q)
 		if err != nil {
 			panic(err)

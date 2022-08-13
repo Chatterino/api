@@ -2,7 +2,7 @@ package oembed
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -35,7 +35,7 @@ func getFacebookAppAccessToken(appID string, appSecret string) (string, error) {
 
 	d := &facebookTokenResponse{}
 
-	bytes, err := ioutil.ReadAll(resp.Body)
+	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("[oEmbed] error loading app access token", err)
 		return "", err

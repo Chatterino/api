@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -72,7 +72,7 @@ func (l *TrackLoader) Load(ctx context.Context, rawTrackID string, r *http.Reque
 	}
 
 	// Read response into a string
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,

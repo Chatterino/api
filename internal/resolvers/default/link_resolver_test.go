@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -152,7 +151,7 @@ func TestLinkResolver(t *testing.T) {
 				router.ServeHTTP(respRec, test.inputReq)
 				resp := respRec.Result()
 				response := resolver.Response{}
-				bod, _ := ioutil.ReadAll(resp.Body)
+				bod, _ := io.ReadAll(resp.Body)
 				fmt.Println(string(bod))
 				// err := json.NewDecoder(resp.Body).Decode(&response)
 				err := json.Unmarshal([]byte(bod), &response)
@@ -267,7 +266,7 @@ func TestLinkResolver(t *testing.T) {
 				router.ServeHTTP(respRec, test.inputReq)
 				resp := respRec.Result()
 				response := resolver.Response{}
-				// bod, _ := ioutil.ReadAll(resp.Body)
+				// bod, _ := io.ReadAll(resp.Body)
 				// fmt.Println(string(bod))
 				err := json.NewDecoder(resp.Body).Decode(&response)
 				c.Assert(err, qt.IsNil)
