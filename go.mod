@@ -20,7 +20,7 @@ require (
 	github.com/prometheus/client_golang v1.13.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.12.0
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 	golang.org/x/text v0.3.7
 	google.golang.org/api v0.91.0
 	honnef.co/go/tools v0.3.0-0.dev.0.20220306074811-23e1086441d2
