@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -86,7 +86,7 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 	}
 
 	// Read response into a string
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return resolver.Errorf("betterttv http body read error: %s", err)
 	}

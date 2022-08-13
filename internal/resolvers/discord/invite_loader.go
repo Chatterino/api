@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -83,7 +83,7 @@ func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Requ
 	}
 
 	// Read response into a string
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return &resolver.Response{
 			Status:  http.StatusInternalServerError,
