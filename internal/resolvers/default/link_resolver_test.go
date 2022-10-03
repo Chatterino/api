@@ -69,7 +69,7 @@ func TestLinkResolver(t *testing.T) {
 	router.Get("/link_resolver/{url}", r.HandleRequest)
 	router.Get("/thumbnail/{url}", r.HandleThumbnailRequest)
 
-	var resolverResponses = map[string]string{}
+	resolverResponses := map[string]string{}
 
 	resolverResponses["/"] = "<html><head><title>/ title</title></head><body>xD</body></html>"
 
@@ -84,14 +84,21 @@ func TestLinkResolver(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	var thumbnailResponses = map[string][]byte{}
+	thumbnailResponses := map[string][]byte{}
 
 	thumbnailResponses["/thumb1.png"] = []byte{'\x89', '\x50', '\x4e', '\x47', '\x0d', '\x0a', '\x1a', '\x0a', '\x00', '\x00', '\x00', '\x0d', '\x49', '\x48', '\x44', '\x52', '\x00', '\x00', '\x01', '\x00', '\x00', '\x00', '\x01', '\x00', '\x01', '\x03', '\x00', '\x00', '\x00', '\x66', '\xbc', '\x3a', '\x25', '\x00', '\x00', '\x00', '\x03', '\x50', '\x4c', '\x54', '\x45', '\xb5', '\xd0', '\xd0', '\x63', '\x04', '\x16', '\xea', '\x00', '\x00', '\x00', '\x1f', '\x49', '\x44', '\x41', '\x54', '\x68', '\x81', '\xed', '\xc1', '\x01', '\x0d', '\x00', '\x00', '\x00', '\xc2', '\xa0', '\xf7', '\x4f', '\x6d', '\x0e', '\x37', '\xa0', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\xbe', '\x0d', '\x21', '\x00', '\x00', '\x01', '\x9a', '\x60', '\xe1', '\xd5', '\x00', '\x00', '\x00', '\x00', '\x49', '\x45', '\x4e', '\x44', '\xae', '\x42', '\x60', '\x82'}
 	thumbnailResponses["/toobig.png"] = []byte{'\x89', '\x50', '\x4e', '\x47', '\x0d', '\x0a', '\x1a', '\x0a', '\x00', '\x00', '\x00', '\x0d', '\x49', '\x48', '\x44', '\x52', '\x00', '\x00', '\x01', '\x00', '\x00', '\x00', '\x01', '\x00', '\x01', '\x03', '\x00', '\x00', '\x00', '\x66', '\xbc', '\x3a', '\x25', '\x00', '\x00', '\x00', '\x03', '\x50', '\x4c', '\x54', '\x45', '\xb5', '\xd0', '\xd0', '\x63', '\x04', '\x16', '\xea', '\x00', '\x00', '\x00', '\x1f', '\x49', '\x44', '\x41', '\x54', '\x68', '\x81', '\xed', '\xc1', '\x01', '\x0d', '\x00', '\x00', '\x00', '\xc2', '\xa0', '\xf7', '\x4f', '\x6d', '\x0e', '\x37', '\xa0', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\xbe', '\x0d', '\x21', '\x00', '\x00', '\x01', '\x9a', '\x60', '\xe1', '\xd5', '\x00', '\x00', '\x00', '\x00', '\x49', '\x45', '\x4e', '\x44', '\xae', '\x42', '\x60', '\x82'}
+	thumbnailResponses["/unsupported-thumbnail-format.foo"] = []byte{'\x89', '\x50', '\x4e', '\x47', '\x0d', '\x0a', '\x1a', '\x0a', '\x00', '\x00', '\x00', '\x0d', '\x49', '\x48', '\x44', '\x52', '\x00', '\x00', '\x01', '\x00', '\x00', '\x00', '\x01', '\x00', '\x01', '\x03', '\x00', '\x00', '\x00', '\x66', '\xbc', '\x3a', '\x25', '\x00', '\x00', '\x00', '\x03', '\x50', '\x4c', '\x54', '\x45', '\xb5', '\xd0', '\xd0', '\x63', '\x04', '\x16', '\xea', '\x00', '\x00', '\x00', '\x1f', '\x49', '\x44', '\x41', '\x54', '\x68', '\x81', '\xed', '\xc1', '\x01', '\x0d', '\x00', '\x00', '\x00', '\xc2', '\xa0', '\xf7', '\x4f', '\x6d', '\x0e', '\x37', '\xa0', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\xbe', '\x0d', '\x21', '\x00', '\x00', '\x01', '\x9a', '\x60', '\xe1', '\xd5', '\x00', '\x00', '\x00', '\x00', '\x49', '\x45', '\x4e', '\x44', '\xae', '\x42', '\x60', '\x82'}
 
 	thumbnailTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/toobig.png" {
+		switch r.URL.Path {
+		case "/toobig.png":
 			w.Header().Add("Content-Length", "999999999999999999")
+
+		case "/unsupported-thumbnail-format.foo":
+			// Use some dummy Content-Type. If we used a real Content-Type that we later add support
+			// for, these tests would break
+			w.Header().Set("Content-Type", "application/foo")
 		}
 
 		if response, ok := thumbnailResponses[r.URL.Path]; ok {
@@ -251,6 +258,16 @@ func TestLinkResolver(t *testing.T) {
 				},
 				expectedContentType: "application/json",
 				expectedStatusCode:  http.StatusInternalServerError,
+			},
+			{
+				inputReq:     newThumbnailRequest(t, ctx, "GET", thumbnailTs.URL+"/unsupported-thumbnail-format.foo", nil),
+				inputLinkKey: thumbnailTs.URL + "/unsupported-thumbnail-format.foo",
+				expected: resolver.Response{
+					Status:  415,
+					Message: `Unsupported thumbnail type`,
+				},
+				expectedContentType: "application/json",
+				expectedStatusCode:  http.StatusOK,
 			},
 		}
 
