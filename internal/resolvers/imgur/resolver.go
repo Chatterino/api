@@ -18,6 +18,8 @@ import (
 	"github.com/koffeinsource/go-imgur"
 )
 
+var VALID_IMGUR_DOMAINS = []string{"imgur.com", "imgur.io"}
+
 type ImgurClient interface {
 	GetInfoFromURL(urlString string) (*imgur.GenericInfo, int, error)
 }
@@ -27,7 +29,19 @@ type Resolver struct {
 }
 
 func (r *Resolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
-	return ctx, utils.IsSubdomainOf(url, "imgur.com")
+	for _, domain := range VALID_IMGUR_DOMAINS {
+		result := utils.IsSubdomainOf(url, domain)
+		if result {
+			return nil, result
+		}
+
+		result = utils.IsDomain(url, domain)
+		if result {
+			return nil, result
+		}
+	}
+
+	return ctx, false
 }
 
 func (r *Resolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {

@@ -83,11 +83,12 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 
 			resolverHits.WithLabelValues(m.Name()).Inc()
 
-			if err != nil {
+			if err != nil || data == nil {
 				log.Errorw("Error in custom resolver, falling back to default",
 					"name", m.Name(),
 					"url", requestUrl,
 					"error", err,
+					"data", data,
 				)
 				break
 			}
