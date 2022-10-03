@@ -81,13 +81,15 @@ func (l *ThumbnailLoader) Load(ctx context.Context, urlString string, r *http.Re
 	}
 
 	var image []byte
+	tryAnimatedThumb := l.enableLilliput && thumbnail.IsAnimatedThumbnailType(contentType)
+
 	// attempt building an animated image
-	if l.enableLilliput {
+	if tryAnimatedThumb {
 		image, err = thumbnail.BuildAnimatedThumbnail(inputBuf, resp)
 	}
 
 	// fallback to static image if animated image building failed or is disabled
-	if !l.enableLilliput || err != nil {
+	if !tryAnimatedThumb || err != nil {
 		if err != nil {
 			log.Errorw("Error trying to build animated thumbnail, falling back to static thumbnail building",
 				"error", err)
