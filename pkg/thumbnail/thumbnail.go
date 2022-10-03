@@ -2,6 +2,7 @@ package thumbnail
 
 import (
 	"github.com/Chatterino/api/pkg/config"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 var (
@@ -11,14 +12,8 @@ var (
 	cfg config.APIConfig
 )
 
-func IsSupportedThumbnail(contentType string) bool {
-	for _, supportedType := range supportedThumbnails {
-		if contentType == supportedType {
-			return true
-		}
-	}
-
-	return false
+func IsSupportedThumbnailType(contentType string) bool {
+	return utils.Contains(supportedThumbnails, contentType)
 }
 
 func IsAnimatedThumbnailType(contentType string) bool {

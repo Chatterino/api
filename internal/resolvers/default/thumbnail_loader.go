@@ -70,7 +70,7 @@ func (l *ThumbnailLoader) Load(ctx context.Context, urlString string, r *http.Re
 
 	contentType := resp.Header.Get("Content-Type")
 
-	if !thumbnail.IsSupportedThumbnail(contentType) {
+	if !thumbnail.IsSupportedThumbnailType(contentType) {
 		return resolver.UnsupportedThumbnailType, nil, nil, cache.NoSpecialDur, nil
 	}
 
