@@ -40,8 +40,8 @@ jobs:
             Invoke-WebRequest -Uri https://github.com/libvips/build-win64-mxe/releases/download/v8.13.2/vips-dev-w64-web-8.13.2-static.zip -OutFile .\vips-dev.zip
             Expand-Archive -Path .\vips-dev.zip -DestinationPath .\
             $env:VIPS_PATH=$(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path)
-            $env:PKG_CONFIG_PATH += %VIPS_PATH%\lib\pkgconfig
-            $env:Path += %VIPS_PATH%\bin
+            $env:PKG_CONFIG_PATH += "%VIPS_PATH%\lib\pkgconfig"
+            $env:Path += ";%VIPS_PATH%\bin"
         shell: powershell
 
       - name: Get Go dependencies
