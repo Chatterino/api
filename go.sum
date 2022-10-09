@@ -308,8 +308,8 @@ github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/X
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/koffeinsource/go-imgur v0.3.0 h1:fJ2pffaWpdQC3TXYOdInQ8IyPTEi9OZEdkHs6Quhq/M=
-github.com/koffeinsource/go-imgur v0.3.0/go.mod h1:Bu1+VlbYv/5/rCFihEBX2IVK9WTga0AKkWFM9CoLDCA=
+github.com/koffeinsource/go-imgur v0.4.0 h1:xQSun+7yvQkYIm0Y7wjfIj5fp4A8fJWMhL5VBtFTYxA=
+github.com/koffeinsource/go-imgur v0.4.0/go.mod h1:Zwyz9VDJVekCxMfxx6psjijDZOUyzkNCia9YYWkjp60=
 github.com/koffeinsource/go-klogger v0.1.1 h1:FImHHVcDwEV4Ze3uOtRmBTQdJdzuBHtrvR4B8ssKkbw=
 github.com/koffeinsource/go-klogger v0.1.1/go.mod h1:oqHKXZOZt4uktar7WIYuEyWJRRlrkRSX+Uj1DWGZ79I=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
