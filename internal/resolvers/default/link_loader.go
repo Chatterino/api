@@ -124,7 +124,7 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 		Thumbnail: data.ImageSrc,
 	}
 
-	if thumbnail.IsSupportedThumbnail(resp.Header.Get("content-type")) {
+	if thumbnail.IsSupportedThumbnailType(resp.Header.Get("content-type")) {
 		response.Thumbnail = utils.FormatThumbnailURL(l.baseURL, r, resp.Request.URL.String())
 	}
 

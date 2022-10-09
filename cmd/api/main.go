@@ -114,6 +114,7 @@ func main() {
 
 	resolver.InitializeStaticResponses(ctx, cfg)
 	thumbnail.InitializeConfig(cfg)
+	defer thumbnail.Shutdown()
 
 	router := chi.NewRouter()
 
