@@ -24,6 +24,15 @@ func IsAnimatedThumbnailType(contentType string) bool {
 	return utils.Contains(animatedThumbnails, contentType)
 }
 
+func InitializeConfig(passedCfg config.APIConfig) {
+	cfg = passedCfg
+	vips.Startup(nil)
+}
+
+func Shutdown() {
+	vips.Shutdown()
+}
+
 func BuildStaticThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) {
 	image, err := vips.NewImageFromBuffer(inputBuf)
 

@@ -6,17 +6,7 @@ package thumbnail
 import (
 	"errors"
 	"net/http"
-
-	"github.com/Chatterino/api/pkg/config"
 )
-
-func InitializeConfig(passedCfg config.APIConfig) {
-	cfg = passedCfg
-}
-
-func Shutdown() {
-	// Nothing to shut down on Windows
-}
 
 func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) {
 	// Since the lilliput library currently does not support Windows, we error out early and fall back to the static thumbnail generation

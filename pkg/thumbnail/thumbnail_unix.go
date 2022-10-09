@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Chatterino/api/pkg/config"
-
 	"github.com/discord/lilliput"
 )
 
@@ -17,15 +15,6 @@ var encodeOptions = map[string]map[int]int{
 	".jpeg": {lilliput.JpegQuality: 85},
 	".png":  {lilliput.PngCompression: 7},
 	".webp": {lilliput.WebpQuality: 85},
-}
-
-func InitializeConfig(passedCfg config.APIConfig) {
-	cfg = passedCfg
-	vips.Startup(nil)
-}
-
-func Shutdown() {
-	vips.Shutdown()
 }
 
 func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) {
