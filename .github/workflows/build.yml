@@ -39,9 +39,10 @@ jobs:
             choco upgrade -y pkgconfiglite
             Invoke-WebRequest -Uri https://github.com/libvips/build-win64-mxe/releases/download/v8.13.2/vips-dev-w64-web-8.13.2-static.zip -OutFile .\vips-dev.zip
             Expand-Archive -Path .\vips-dev.zip -DestinationPath .\
-            [System.Environment]::SetEnvironmentVariable('VIPS_PATH', $(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path), [System.EnvironmentVariableTarget]::User)
-            [System.Environment]::SetEnvironmentVariable('PKG_CONFIG_PATH', "$($env:VIPS_PATH)\lib\pkgconfig", [System.EnvironmentVariableTarget]::User)
-            [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";$($env:VIPS_PATH)\bin", [System.EnvironmentVariableTarget]::User)
+            $env:VIPS_PATH=$(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path)
+            "VIPS_PATH=$(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path)" >> $env:GITHUB_ENV
+            "PKG_CONFIG_PATH=$env:VIPS_PATH/lib/pkgconfig" >> $env:GITHUB_ENV
+            "$VIPS_PATH/bin" >> $env:GITHUB_PATH
 
       - name: Get Go dependencies
         run: |
