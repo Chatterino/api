@@ -10,7 +10,7 @@
 
    For Windows when getting the [Windows binaries](https://github.com/libvips/build-win64-mxe/releases/latest) from the libvips link above make sure to get the ones suffixed with "-static".
    Install pkg-config via choco `choco upgrade -y pkgconfiglite` and setup the following environment variables:
-   `VIPS_PATH` to the directory where vips binaries are downloaded and extracted,
+   `VIPS_PATH` to the directory where vips-dev is downloaded and extracted,
    `PKG_CONFIG_PATH` to `%VIPS_PATH%\lib\pkgconfig`
    and append `%VIPS_PATH%\bin` to your `Path` environment variable.
 
