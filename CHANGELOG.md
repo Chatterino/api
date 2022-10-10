@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Breaking: Go version 1.17 is now the minimum required version to build this. (#292)
-- Breaking: Thumbnail generation now requires libvips. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#366)
+- Breaking: Thumbnail generation now requires libvips. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#366, #369)
 - Breaking: Resolver caches are now stored in PostgreSQL. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#271)
 - YouTube: Added support for 'YouTube shorts' URLs. (#299)
 - Fix: SevenTV emotes now resolve correctly. (#281, #288, #307)
