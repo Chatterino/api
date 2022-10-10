@@ -190,9 +190,9 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 		customResolvers:  customResolvers,
 	}
 	thumbnailLoader := &ThumbnailLoader{
-		baseURL:          cfg.BaseURL,
-		maxContentLength: cfg.MaxContentLength,
-		enableLilliput:   cfg.EnableLilliput,
+		baseURL:                  cfg.BaseURL,
+		maxContentLength:         cfg.MaxContentLength,
+		enableAnimatedThumbnails: cfg.EnableAnimatedThumbnails,
 	}
 
 	r := &LinkResolver{

@@ -3,11 +3,11 @@ package config
 type APIConfig struct {
 	// Core
 
-	BaseURL          string `mapstructure:"base-url" json:"base-url"`
-	BindAddress      string `mapstructure:"bind-address" json:"bind-address"`
-	MaxContentLength uint64 `mapstructure:"max-content-length" json:"max-content-length"`
-	EnableLilliput   bool   `mapstructure:"enable-lilliput" json:"enable-lilliput"`
-	MaxThumbnailSize uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
+	BaseURL                  string `mapstructure:"base-url" json:"base-url"`
+	BindAddress              string `mapstructure:"bind-address" json:"bind-address"`
+	MaxContentLength         uint64 `mapstructure:"max-content-length" json:"max-content-length"`
+	EnableAnimatedThumbnails bool   `mapstructure:"enable-animated-thumbnails" json:"enable-animated-thumbnails"`
+	MaxThumbnailSize         uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
 
 	LogLevel       string `mapstructure:"log-level" json:"log-level"`
 	LogDevelopment bool   `mapstructure:"log-development" json:"log-development"`
