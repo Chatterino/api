@@ -63,10 +63,19 @@ func clearOldTooltips(ctx context.Context, pool db.Pool) (pgconn.CommandTag, err
 func startTooltipClearer(ctx context.Context, pool db.Pool) {
 }
 
-func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request) ([]byte, error) {
+func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request) (*Response, error) {
 	log := logger.FromContext(ctx)
 
-	valueBytes, overrideDuration, err := c.loader.Load(ctx, key, r)
+	payload, statusCode, contentType, overrideDuration, err := c.loader.Load(ctx, key, r)
+
+	if statusCode == nil {
+		log.Warnw("Missing status code, setting to 200 default")
+		statusCode = &defaultStatusCode
+	}
+	if contentType == nil {
+		log.Warnw("Missing content type, setting to application/json default")
+		contentType = &defaultContentType
+	}
 
 	var dur = c.cacheDuration
 	if overrideDuration != 0 {
@@ -78,21 +87,26 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 	}
 
 	cacheKey := c.prefix + ":" + key
-	if _, err := c.pool.Exec(ctx, "INSERT INTO cache (key, value, cached_until) VALUES ($1, $2, $3)", cacheKey, valueBytes, time.Now().Add(dur)); err != nil {
+	if _, err := c.pool.Exec(ctx, "INSERT INTO cache (key, value, http_status_code, http_content_type, cached_until) VALUES ($1, $2, $3, $4, $5)", cacheKey, payload, *statusCode, *contentType, time.Now().Add(dur)); err != nil {
 		log.Errorw("Error inserting tooltip into cache",
 			"prefix", c.prefix,
 			"key", key,
 			"error", err,
 		)
 	}
-	return valueBytes, nil
+
+	return &Response{
+		Payload:     payload,
+		StatusCode:  *statusCode,
+		ContentType: *contentType,
+	}, nil
 }
 
-func (c *PostgreSQLCache) loadFromDatabase(ctx context.Context, cacheKey string) ([]byte, error) {
-	var value []byte
-	err := c.pool.QueryRow(ctx, "SELECT value FROM cache WHERE key=$1", cacheKey).Scan(&value)
+func (c *PostgreSQLCache) loadFromDatabase(ctx context.Context, cacheKey string) (*Response, error) {
+	var response Response
+	err := c.pool.QueryRow(ctx, "SELECT value, http_status_code, http_content_type FROM cache WHERE key=$1", cacheKey).Scan(&response.Payload, &response.StatusCode, &response.ContentType)
 	if err == nil {
-		return value, nil
+		return &response, nil
 	}
 
 	if err != pgx.ErrNoRows {
@@ -102,18 +116,23 @@ func (c *PostgreSQLCache) loadFromDatabase(ctx context.Context, cacheKey string)
 	return nil, nil
 }
 
-func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) ([]byte, error) {
+func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) (*Response, error) {
 	log := logger.FromContext(ctx)
 	cacheKey := c.prefix + ":" + key
 
-	value, err := c.loadFromDatabase(ctx, cacheKey)
+	cacheResponse, err := c.loadFromDatabase(ctx, cacheKey)
 	if err != nil {
 		log.Warnw("Unhandled sql error", "error", err)
-		return tooltipInternalError, err
-	} else if value != nil {
+		tooltipInternalError := Response{
+			Payload:     []byte(`{"status":500,"message":"Internal server error (PSQL) loading thumbnail"}`),
+			StatusCode:  500,
+			ContentType: "application/json",
+		}
+		return &tooltipInternalError, err
+	} else if cacheResponse != nil {
 		cacheHits.Inc()
 		log.Debugw("DB Get cache hit", "prefix", c.prefix, "key", key)
-		return value, nil
+		return cacheResponse, nil
 	}
 
 	cacheMisses.Inc()
@@ -121,7 +140,7 @@ func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) 
 	return c.load(ctx, key, r)
 }
 
-func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) []byte {
+func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) *Response {
 	log := logger.FromContext(ctx)
 	cacheKey := c.prefix + ":" + key
 
@@ -169,3 +188,5 @@ func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool,
 		pool:          pool,
 	}
 }
+
+var _ Cache = (*PostgreSQLCache)(nil)

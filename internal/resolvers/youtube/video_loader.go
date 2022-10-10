@@ -3,12 +3,11 @@ package youtube
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/internal/staticresponse"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -30,7 +29,7 @@ type VideoLoader struct {
 	youtubeClient *youtubeAPI.Service
 }
 
-func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Request) (*resolver.Response, time.Duration, error) {
+func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Request) ([]byte, *int, *string, time.Duration, error) {
 	log := logger.FromContext(ctx)
 	youtubeVideoParts := []string{
 		"statistics",
@@ -43,24 +42,24 @@ func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Reques
 	)
 	youtubeResponse, err := r.youtubeClient.Videos.List(youtubeVideoParts).Id(videoID).Do()
 	if err != nil {
-		return resolver.Errorf("YouTube API error: %s", err)
+		return resolver.InternalServerErrorf("YouTube API error: %s", err)
 	}
 
 	if len(youtubeResponse.Items) == 0 {
-		return &resolver.Response{
-			Status:  404,
-			Message: fmt.Sprintf("No YouTube video with the ID %s found", resolver.CleanResponse(videoID)),
-		}, 24 * time.Hour, nil
+		return staticresponse.NotFoundf("No YouTube video with the ID %s found", videoID).
+			WithCacheDuration(24 * time.Hour).
+			Return()
 	}
 
 	if len(youtubeResponse.Items) > 1 {
-		return resolver.Errorf("YouTube API returned more than %d videos", len(youtubeResponse.Items))
+		return staticresponse.InternalServerErrorf("YouTube API returned more than %d videos", len(youtubeResponse.Items)).
+			Return()
 	}
 
 	video := youtubeResponse.Items[0]
 
 	if video.ContentDetails == nil {
-		return resolver.Errorf("YouTube video unavailable")
+		return resolver.InternalServerErrorf("YouTube video unavailable")
 	}
 
 	// Check if a video is age resricted: https://stackoverflow.com/a/33750307
@@ -84,7 +83,7 @@ func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Reques
 
 	var tooltip bytes.Buffer
 	if err := youtubeVideoTooltipTemplate.Execute(&tooltip, data); err != nil {
-		return resolver.Errorf("YouTube template error: %s", err)
+		return resolver.InternalServerErrorf("YouTube template error: %s", err)
 	}
 
 	thumbnail := video.Snippet.Thumbnails.Default.Url
@@ -92,11 +91,10 @@ func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Reques
 		thumbnail = video.Snippet.Thumbnails.Medium.Url
 	}
 
-	return &resolver.Response{
-		Status:    http.StatusOK,
-		Tooltip:   url.PathEscape(tooltip.String()),
-		Thumbnail: thumbnail,
-	}, cache.NoSpecialDur, nil
+	statusCode := http.StatusOK
+	contentType := "application/json"
+
+	return buildChannelResponse(tooltip.String(), thumbnail), &statusCode, &contentType, cache.NoSpecialDur, nil
 }
 
 func NewVideoLoader(youtubeClient *youtubeAPI.Service) *VideoLoader {

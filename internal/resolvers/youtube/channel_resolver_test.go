@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
@@ -157,41 +158,45 @@ func TestChannelResolver(t *testing.T) {
 	c.Run("Run", func(c *qt.C) {
 		c.Run("Error", func(c *qt.C) {
 			type runTest struct {
-				label          string
-				inputURL       *url.URL
-				inputEmoteHash string
-				inputReq       *http.Request
-				expectedBytes  []byte
-				expectedError  error
+				label            string
+				inputURL         *url.URL
+				inputEmoteHash   string
+				inputReq         *http.Request
+				expectedResponse *cache.Response
+				expectedError    error
 			}
 
 			tests := []runTest{
 				{
-					label:         "Non-matching link",
-					inputURL:      utils.MustParseURL("https://clips.twitch.tv/"),
-					expectedBytes: []byte(`{"status":404,"message":"Could not fetch link info: No link info found"}`),
+					label:    "Non-matching link",
+					inputURL: utils.MustParseURL("https://clips.twitch.tv/"),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":404,"message":"Could not fetch link info: No link info found"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 					expectedError: nil,
 				},
 			}
 
 			for _, test := range tests {
 				c.Run(test.label, func(c *qt.C) {
-					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
+					outputResponse, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
 					c.Assert(outputError, qt.Equals, test.expectedError)
-					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
+					c.Assert(outputResponse, qt.DeepEquals, test.expectedResponse)
 				})
 			}
 		})
 
 		c.Run("Not cached", func(c *qt.C) {
 			type runTest struct {
-				label         string
-				inputURL      *url.URL
-				inputVideoID  string
-				inputReq      *http.Request
-				expectedBytes []byte
-				expectedError error
-				rowsReturned  int
+				label            string
+				inputURL         *url.URL
+				inputVideoID     string
+				inputReq         *http.Request
+				expectedResponse *cache.Response
+				expectedError    error
+				rowsReturned     int
 			}
 
 			tests := []runTest{
@@ -203,46 +208,70 @@ func TestChannelResolver(t *testing.T) {
 				// 	expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EVideo%20Title%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EChannel:%3C%2Fb%3E%20Channel%20Title%0A%3Cbr%3E%3Cb%3EDuration:%3C%2Fb%3E%2000:00:00%0A%3Cbr%3E%3Cb%3EPublished:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%2050%0A%3Cbr%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EAGE%20RESTRICTED%3C%2Fspan%3E%3C%2Fb%3E%0A%3Cbr%3E%3Cspan%20style=%22color:%20%232ecc71%3B%22%3E10%20likes%3C%2Fspan%3E\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B%3Cspan%20style=%22color:%20%23808892%3B%22%3E5%20comments%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A"}`),
 				// },
 				{
-					label:         "Channel:404",
-					inputURL:      utils.MustParseURL("https://youtube.com/channel/404"),
-					inputVideoID:  "channel:404",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":404,"message":"No YouTube channel with the ID 404 found"}`),
+					label:        "Channel:404",
+					inputURL:     utils.MustParseURL("https://youtube.com/channel/404"),
+					inputVideoID: "channel:404",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":404,"message":"No YouTube channel with the ID 404 found"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "Channel:Too many videos",
-					inputURL:      utils.MustParseURL("https://youtube.com/channel/toomany"),
-					inputVideoID:  "channel:toomany",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":500,"message":"YouTube channel response contained 2 items"}`),
+					label:        "Channel:Too many videos",
+					inputURL:     utils.MustParseURL("https://youtube.com/channel/toomany"),
+					inputVideoID: "channel:toomany",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"YouTube channel response contained 2 items"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "C:404",
-					inputURL:      utils.MustParseURL("https://youtube.com/c/404"),
-					inputVideoID:  "c:404",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":404,"message":"No YouTube channel with the ID 404 found"}`),
+					label:        "C:404",
+					inputURL:     utils.MustParseURL("https://youtube.com/c/404"),
+					inputVideoID: "c:404",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":404,"message":"No YouTube channel with the ID 404 found"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "C:Too many videos",
-					inputURL:      utils.MustParseURL("https://youtube.com/c/toomany"),
-					inputVideoID:  "c:toomany",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":500,"message":"YouTube search response contained 2 items"}`),
+					label:        "C:Too many videos",
+					inputURL:     utils.MustParseURL("https://youtube.com/c/toomany"),
+					inputVideoID: "c:toomany",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"YouTube search response contained 2 items"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "C:Custom",
-					inputURL:      utils.MustParseURL("https://youtube.com/c/custom"),
-					inputVideoID:  "c:custom",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3ECool%20YouTube%20Channel%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EJoined%20Date:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3ESubscribers:%3C%2Fb%3E%2069%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%0A%3C%2Fdiv%3E%0A"}`),
+					label:        "C:Custom",
+					inputURL:     utils.MustParseURL("https://youtube.com/c/custom"),
+					inputVideoID: "c:custom",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3ECool%20YouTube%20Channel%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EJoined%20Date:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3ESubscribers:%3C%2Fb%3E%2069%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%0A%3C%2Fdiv%3E%0A"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "User:zneix",
-					inputURL:      utils.MustParseURL("https://youtube.com/user/zneix"),
-					inputVideoID:  "user:zneix",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3ECool%20YouTube%20Channel%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EJoined%20Date:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3ESubscribers:%3C%2Fb%3E%2069%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%0A%3C%2Fdiv%3E%0A"}`),
+					label:        "User:zneix",
+					inputURL:     utils.MustParseURL("https://youtube.com/user/zneix"),
+					inputVideoID: "user:zneix",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3ECool%20YouTube%20Channel%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EJoined%20Date:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3ESubscribers:%3C%2Fb%3E%2069%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%0A%3C%2Fdiv%3E%0A"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				// {
 				// 	label:         "Unavailable",
@@ -252,25 +281,37 @@ func TestChannelResolver(t *testing.T) {
 				// 	expectedBytes: []byte(`{"status":500,"message":"YouTube video unavailable"}`),
 				// },
 				{
-					label:         "Channel:Medium thumbnail",
-					inputURL:      utils.MustParseURL("https://youtube.com/channel/mediumtn"),
-					inputVideoID:  "channel:mediumtn",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":200,"thumbnail":"https://example.com/medium.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3ECool%20YouTube%20Channel%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EJoined%20Date:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3ESubscribers:%3C%2Fb%3E%2069%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%0A%3C%2Fdiv%3E%0A"}`),
+					label:        "Channel:Medium thumbnail",
+					inputURL:     utils.MustParseURL("https://youtube.com/channel/mediumtn"),
+					inputVideoID: "channel:mediumtn",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/medium.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3ECool%20YouTube%20Channel%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EJoined%20Date:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3ESubscribers:%3C%2Fb%3E%2069%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%0A%3C%2Fdiv%3E%0A"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "C:Bad response",
-					inputURL:      utils.MustParseURL("https://youtube.com/c/badresp"),
-					inputVideoID:  "c:badresp",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":500,"message":"YouTube search API error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+					label:        "C:Bad response",
+					inputURL:     utils.MustParseURL("https://youtube.com/c/badresp"),
+					inputVideoID: "c:badresp",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"YouTube search API error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 				{
-					label:         "Channel:Bad response",
-					inputURL:      utils.MustParseURL("https://youtube.com/channel/badresp"),
-					inputVideoID:  "channel:badresp",
-					inputReq:      nil,
-					expectedBytes: []byte(`{"status":500,"message":"YouTube API error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+					label:        "Channel:Bad response",
+					inputURL:     utils.MustParseURL("https://youtube.com/channel/badresp"),
+					inputVideoID: "channel:badresp",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"YouTube API error: invalid character \u0026#39;x\u0026#39; looking for beginning of value"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
 				},
 			}
 
@@ -278,11 +319,13 @@ func TestChannelResolver(t *testing.T) {
 				c.Run(test.label, func(c *qt.C) {
 					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
 					pool.ExpectExec("INSERT INTO cache").
-						WithArgs("youtube:channel:"+test.inputVideoID, test.expectedBytes, pgxmock.AnyArg()).
+						WithArgs("youtube:channel:"+test.inputVideoID, test.expectedResponse.Payload, test.expectedResponse.StatusCode, test.expectedResponse.ContentType, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
 					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
 					c.Assert(outputError, qt.Equals, test.expectedError)
-					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
+					c.Assert(outputBytes, qt.DeepEquals, test.expectedResponse)
+
+					c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
 				})
 			}
 		})

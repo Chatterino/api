@@ -57,7 +57,7 @@ func (r *ClipResolver) Check(ctx context.Context, url *url.URL) (context.Context
 	return ctx, matches[1] != ""
 }
 
-func (r *ClipResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *ClipResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	clipSlug, err := parseClipSlug(url)
 	if err != nil {
 		return nil, err

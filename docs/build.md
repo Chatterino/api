@@ -2,7 +2,17 @@
 
 ## Prerequisites
 
-1. Resolved links are stored in PostgreSQL, so you must have PostgreSQL installed and accessible for the user running the API. For Ubuntu, you would install it with `sudo apt install postgresql`, create a DB user for your system user (`sudo -upostgres createuser pajlada`), then create a db for the api (`sudo -upostgres createdb chatterino-api --owner pajlada`).
+1. Resolved links are stored in PostgreSQL, so you must have PostgreSQL installed and accessible for the user running the API. For Ubuntu, you would install it with `sudo apt install postgresql`, create a DB user for your system user (`sudo -upostgres createuser pajlada`), then create a db for the api (`sudo -upostgres createdb chatterino-api --owner pajlada`). Make sure to edit `dsn` in your [configuration](./config.md). Example, using the details above, `dsn:"host=/var/run/postgresql user=pajlada database=chatterino-api"`.
+2. You must have [`libvips`](https://github.com/libvips/libvips) >=8.12.0 installed for thumbnail generation.
+
+   On Ubuntu 22.04, this can be done with `sudo apt install libvips libvips-dev`.
+   Different distros or releases may require adding a PPA or building and installing from source.
+
+   For Windows when getting the [Windows binaries](https://github.com/libvips/build-win64-mxe/releases/latest) from the libvips link above make sure to get the ones suffixed with "-static".
+   Install pkg-config via choco `choco upgrade -y pkgconfiglite` and setup the following environment variables:
+   `VIPS_PATH` to the directory where vips-dev is downloaded and extracted,
+   `PKG_CONFIG_PATH` to `%VIPS_PATH%\lib\pkgconfig`
+   and append `%VIPS_PATH%\bin` to your `Path` environment variable.
 
 ## Build
 

@@ -24,7 +24,7 @@ func (r *EmoteResolver) Check(ctx context.Context, url *url.URL) (context.Contex
 	return ctx, emotePathRegex.MatchString(url.Path)
 }
 
-func (r *EmoteResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *EmoteResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	matches := emotePathRegex.FindStringSubmatch(url.Path)
 	if len(matches) != 2 {
 		return nil, errInvalidSevenTVEmotePath

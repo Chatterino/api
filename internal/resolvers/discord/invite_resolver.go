@@ -22,7 +22,7 @@ func (r *InviteResolver) Check(ctx context.Context, url *url.URL) (context.Conte
 	return ctx, discordInviteURLRegex.MatchString(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
 }
 
-func (r *InviteResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *InviteResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	matches := discordInviteURLRegex.FindStringSubmatch(fmt.Sprintf("%s%s", strings.ToLower(url.Host), url.Path))
 	if len(matches) != 4 {
 		return nil, errInvalidDiscordInvite

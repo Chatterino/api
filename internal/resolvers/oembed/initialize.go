@@ -3,7 +3,7 @@ package oembed
 import (
 	"context"
 	"html/template"
-	"io/ioutil"
+	"os"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
@@ -27,7 +27,7 @@ var (
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
 
-	data, err := ioutil.ReadFile(cfg.OembedProvidersPath)
+	data, err := os.ReadFile(cfg.OembedProvidersPath)
 
 	if err != nil {
 		log.Warnw("[oEmbed] No providers.json file found, won't do oEmbed parsing")

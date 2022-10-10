@@ -9,6 +9,7 @@ import (
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/mocks"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
@@ -111,7 +112,7 @@ func TestClipResolver(t *testing.T) {
 				inputReq             *http.Request
 				expectedClipResponse *helix.ClipsResponse
 				expectedClipError    error
-				expectedBytes        []byte
+				expectedResponse     *cache.Response
 				expectedError        error
 				rowsReturned         int
 			}
@@ -138,8 +139,12 @@ func TestClipResolver(t *testing.T) {
 						},
 					},
 					expectedClipError: nil,
-					expectedBytes:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETitle%3C%2Fb%3E%3Chr%3E%3Cb%3EClipped%20by:%3C%2Fb%3E%20CreatorName%3Cbr%3E%3Cb%3EChannel:%3C%2Fb%3E%20BroadcasterName%3Cbr%3E%3Cb%3EDuration:%3C%2Fb%3E%205s%3Cbr%3E%3Cb%3ECreated:%3C%2Fb%3E%20%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%3C%2Fdiv%3E"}`),
-					expectedError:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETitle%3C%2Fb%3E%3Chr%3E%3Cb%3EClipped%20by:%3C%2Fb%3E%20CreatorName%3Cbr%3E%3Cb%3EChannel:%3C%2Fb%3E%20BroadcasterName%3Cbr%3E%3Cb%3EDuration:%3C%2Fb%3E%205s%3Cbr%3E%3Cb%3ECreated:%3C%2Fb%3E%20%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%3C%2Fdiv%3E"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+					expectedError: nil,
 				},
 				{
 					label:                "GetClipsError",
@@ -148,8 +153,12 @@ func TestClipResolver(t *testing.T) {
 					inputReq:             nil,
 					expectedClipResponse: nil,
 					expectedClipError:    errors.New("error"),
-					expectedBytes:        []byte(`{"status":500,"message":"Twitch clip load error: error"}`),
-					expectedError:        nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"Twitch clip load error: error"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+					expectedError: nil,
 				},
 				// {
 				// 	label:         "Bad JSON",
@@ -168,11 +177,12 @@ func TestClipResolver(t *testing.T) {
 					helixClient.EXPECT().GetClips(&helix.ClipsParams{IDs: []string{test.inputSlug}}).Times(1).Return(test.expectedClipResponse, test.expectedClipError)
 					pool.ExpectQuery("SELECT").WillReturnError(pgx.ErrNoRows)
 					pool.ExpectExec("INSERT INTO cache").
-						WithArgs("twitch:clip:"+test.inputSlug, test.expectedBytes, pgxmock.AnyArg()).
+						WithArgs("twitch:clip:"+test.inputSlug, test.expectedResponse.Payload, test.expectedResponse.StatusCode, test.expectedResponse.ContentType, pgxmock.AnyArg()).
 						WillReturnResult(pgxmock.NewResult("INSERT", 1))
 					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
 					c.Assert(outputError, qt.Equals, test.expectedError)
-					c.Assert(outputBytes, qt.DeepEquals, test.expectedBytes)
+					c.Assert(outputBytes, qt.DeepEquals, test.expectedResponse)
+					c.Assert(pool.ExpectationsWereMet(), qt.IsNil)
 				})
 			}
 		})

@@ -42,10 +42,10 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 	log.Debugw("Handle request",
 		"path", req.URL.Path,
 	)
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Content-Type", "application/json")
 	urlString, err := utils.UnescapeURLArgument(req, "url")
 	if err != nil {
-		_, err = w.Write(resolver.InvalidURL)
+		_, err = resolver.WriteInvalidURL(w)
 		if err != nil {
 			log.Errorw("Error writing response",
 				"error", err,
@@ -60,11 +60,13 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 			"url", urlString,
 			"error", err,
 		)
-		if _, err = w.Write(resolver.InvalidURL); err != nil {
+		_, err = resolver.WriteInvalidURL(w)
+		if err != nil {
 			log.Errorw("Error writing response",
 				"error", err,
 			)
 		}
+		return
 	}
 
 	for _, m := range r.customResolvers {
@@ -90,7 +92,9 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 				break
 			}
 
-			_, err = w.Write(data)
+			w.Header().Add("Content-Type", data.ContentType)
+			w.WriteHeader(data.StatusCode)
+			_, err = w.Write(data.Payload)
 			if err != nil {
 				log.Errorw("Error writing response",
 					"name", m.Name(),
@@ -109,8 +113,17 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 			"url", requestUrl,
 			"error", err,
 		)
+		_, err = resolver.WriteInternalServerErrorf(w, "Error resolving link")
+		if err != nil {
+			log.Errorw("Error in default resolver",
+				"url", requestUrl,
+				"error", err,
+			)
+		}
 	} else {
-		_, err = w.Write(response)
+		w.Header().Add("Content-Type", response.ContentType)
+		w.WriteHeader(response.StatusCode)
+		_, err = w.Write(response.Payload)
 		if err != nil {
 			log.Errorw("Error writing response",
 				"error", err,
@@ -125,7 +138,7 @@ func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.R
 
 	url, err := utils.UnescapeURLArgument(req, "url")
 	if err != nil {
-		_, err = w.Write(resolver.InvalidURL)
+		_, err = resolver.WriteInvalidURL(w)
 		if err != nil {
 			log.Errorw("Error writing response",
 				"error", err,
@@ -144,7 +157,9 @@ func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.R
 		return
 	}
 
-	_, err = w.Write(response)
+	w.Header().Add("Content-Type", response.ContentType)
+	w.WriteHeader(response.StatusCode)
+	_, err = w.Write(response.Payload)
 	if err != nil {
 		log.Errorw("Error writing response",
 			"error", err,

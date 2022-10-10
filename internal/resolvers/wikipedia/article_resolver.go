@@ -61,7 +61,7 @@ func (r *ArticleResolver) Check(ctx context.Context, u *url.URL) (context.Contex
 	return ctx, true
 }
 
-func (r *ArticleResolver) Run(ctx context.Context, url *url.URL, req *http.Request) ([]byte, error) {
+func (r *ArticleResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
 	return r.articleCache.Get(ctx, url.String(), req)
 }
 

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/internal/staticresponse"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
@@ -37,22 +38,22 @@ func (l *LinkLoader) defaultTooltipData(doc *goquery.Document, r *http.Request, 
 	return data
 }
 
-func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request) ([]byte, time.Duration, error) {
+func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request) ([]byte, *int, *string, time.Duration, error) {
 	requestUrl, err := url.Parse(urlString)
 	if err != nil {
-		return resolver.InvalidURL, cache.NoSpecialDur, nil
+		return resolver.ReturnInvalidURL()
 	}
 
 	resp, err := resolver.RequestGET(ctx, requestUrl.String())
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
+			return staticresponse.SNoLinkInfoFound.
+				Return()
 		}
 
-		return utils.MarshalNoDur(&resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: resolver.CleanResponse(err.Error()),
-		})
+		return staticresponse.InternalServerErrorf("Error loading link: %s", err.Error()).
+			WithStatusCode(http.StatusInternalServerError).
+			Return()
 	}
 
 	defer resp.Body.Close()
@@ -70,7 +71,7 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 					break
 				}
 
-				return data, cache.NoSpecialDur, err
+				return data.Payload, &data.StatusCode, &data.ContentType, cache.NoSpecialDur, err
 			}
 		}
 	}
@@ -78,16 +79,16 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
 		contentLengthBytes, err := strconv.Atoi(contentLength)
 		if err != nil {
-			return nil, cache.NoSpecialDur, err
+			return nil, nil, nil, cache.NoSpecialDur, err
 		}
 		if uint64(contentLengthBytes) > l.maxContentLength {
-			return resolver.ResponseTooLarge, cache.NoSpecialDur, nil
+			return resolver.ResponseTooLarge, nil, nil, cache.NoSpecialDur, nil
 		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
 		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
-		return resolver.NoLinkInfoFound, cache.NoSpecialDur, nil
+		return staticresponse.SNoLinkInfoFound.Return()
 	}
 
 	limiter := &resolver.WriteLimiter{Limit: l.maxContentLength}
@@ -123,7 +124,7 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 		Thumbnail: data.ImageSrc,
 	}
 
-	if thumbnail.IsSupportedThumbnail(resp.Header.Get("content-type")) {
+	if thumbnail.IsSupportedThumbnailType(resp.Header.Get("content-type")) {
 		response.Thumbnail = utils.FormatThumbnailURL(l.baseURL, r, resp.Request.URL.String())
 	}
 

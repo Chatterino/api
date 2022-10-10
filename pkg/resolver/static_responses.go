@@ -12,27 +12,32 @@ import (
 )
 
 var (
-	NoLinkInfoFound  = []byte(`{"status":404,"message":"Could not fetch link info: No link info found"}`)
-	InvalidURL       []byte
+	UnsupportedThumbnailType = []byte(`{"status":415,"message":"Unsupported thumbnail type"}`)
+	ErrorBuildingThumbnail   = []byte(`{"status":500,"message":"Error building thumbnail"}`)
+
+	InvalidURLBytes = []byte(`{"status":400,"message":"Could not fetch link info: Invalid URL"}`)
+
+	// Dynamically created based on config
 	ResponseTooLarge []byte
 )
+
+func ReturnInvalidURL() ([]byte, *int, *string, time.Duration, error) {
+	statusCode := http.StatusBadRequest
+	contentType := "application/json"
+	return InvalidURLBytes, &statusCode, &contentType, NoSpecialDur, nil
+}
+
+func WriteInvalidURL(w http.ResponseWriter) (int, error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusBadRequest)
+	return w.Write(InvalidURLBytes)
+}
 
 func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
 	log := logger.FromContext(ctx)
 
 	var err error
 	var r *Response
-
-	r = &Response{
-		Status:  500,
-		Message: "Could not fetch link info: Invalid URL",
-	}
-	InvalidURL, err = json.Marshal(r)
-	if err != nil {
-		log.Fatalw("Error marshalling prebuilt response",
-			"error", err,
-		)
-	}
 
 	r = &Response{
 		Status:  http.StatusInternalServerError,
@@ -53,4 +58,43 @@ func Errorf(format string, a ...interface{}) (*Response, time.Duration, error) {
 	}
 
 	return r, NoSpecialDur, nil
+}
+
+func WriteInternalServerErrorf(w http.ResponseWriter, format string, a ...interface{}) (int, error) {
+	r := &Response{
+		Status:  http.StatusInternalServerError,
+		Message: CleanResponse(fmt.Sprintf(format, a...)),
+	}
+
+	marshalledPayload, err := json.Marshal(r)
+	if err != nil {
+		return 0, err
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	return w.Write(marshalledPayload)
+}
+
+func InternalServerErrorf(format string, a ...interface{}) ([]byte, *int, *string, time.Duration, error) {
+	contentType := "application/json"
+
+	r := &Response{
+		Status:  http.StatusInternalServerError,
+		Message: CleanResponse(fmt.Sprintf(format, a...)),
+	}
+
+	marshalledPayload, err := json.Marshal(r)
+	if err != nil {
+		return nil, nil, nil, NoSpecialDur, err
+	}
+
+	return marshalledPayload, nil, &contentType, NoSpecialDur, nil
+}
+
+func FResponseTooLarge() ([]byte, *int, *string, time.Duration, error) {
+	statusCode := http.StatusInternalServerError
+	contentType := "application/json"
+
+	return ResponseTooLarge, &statusCode, &contentType, NoSpecialDur, nil
 }
