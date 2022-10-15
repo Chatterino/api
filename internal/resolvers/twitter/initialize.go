@@ -7,6 +7,7 @@ import (
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
@@ -33,6 +34,7 @@ const (
 )
 
 var (
+	cfg               config.APIConfig
 	tweetRegexp       = regexp.MustCompile(`^/.*\/status(?:es)?\/([^\/\?]+)`)
 	twitterUserRegexp = regexp.MustCompile(`^/([^\/\?\s]+)(?:\/?$|\?.*)$`)
 
@@ -60,15 +62,27 @@ var (
 	twitterUserTooltipTemplate = template.Must(template.New("twitterUserTooltip").Parse(twitterUserTooltip))
 )
 
-func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
+func Initialize(
+	ctx context.Context,
+	conf config.APIConfig,
+	pool db.Pool,
+	resolvers *[]resolver.Resolver,
+	collageCache cache.DependentCache,
+) {
 	log := logger.FromContext(ctx)
-	if cfg.TwitterBearerToken == "" {
+	if conf.TwitterBearerToken == "" {
 		log.Warnw("Twitter credentials missing, won't do special responses for Twitter")
 		return
 	}
+	cfg = conf
 
 	const userEndpointURLFormat = "https://api.twitter.com/1.1/users/show.json?screen_name=%s"
 	const tweetEndpointURLFormat = "https://api.twitter.com/1.1/statuses/show.json?id=%s&tweet_mode=extended"
 
-	*resolvers = append(*resolvers, NewTwitterResolver(ctx, cfg, pool, userEndpointURLFormat, tweetEndpointURLFormat))
+	*resolvers = append(
+		*resolvers,
+		NewTwitterResolver(
+			ctx, cfg, pool, userEndpointURLFormat, tweetEndpointURLFormat, collageCache,
+		),
+	)
 }

@@ -16,9 +16,7 @@ import (
 	youtubeAPI "google.golang.org/api/youtube/v3"
 )
 
-var (
-	youtubeChannelRegex = regexp.MustCompile(`^/(c\/|channel\/|user\/)?([a-zA-Z0-9\-]{1,})$`)
-)
+var youtubeChannelRegex = regexp.MustCompile(`^/(c\/|channel\/|user\/)?([a-zA-Z0-9\-]{1,})$`)
 
 type YouTubeChannelResolver struct {
 	channelCache cache.Cache
@@ -62,7 +60,9 @@ func NewYouTubeChannelResolver(ctx context.Context, cfg config.APIConfig, pool d
 	loader := NewYouTubeChannelLoader(youtubeClient)
 
 	r := &YouTubeChannelResolver{
-		channelCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "youtube:channel", loader, 24*time.Hour),
+		channelCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:channel"), loader, 24*time.Hour,
+		),
 	}
 
 	return r

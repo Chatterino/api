@@ -70,20 +70,45 @@ func (r *TwitterResolver) Name() string {
 	return "twitter"
 }
 
-func NewTwitterResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, userEndpointURLFormat, tweetEndpointURLFormat string) *TwitterResolver {
-	tweetLoader := &TweetLoader{
-		bearerKey:         cfg.TwitterBearerToken,
-		endpointURLFormat: tweetEndpointURLFormat,
-	}
+func NewTwitterResolver(
+	ctx context.Context,
+	cfg config.APIConfig,
+	pool db.Pool,
+	userEndpointURLFormat string,
+	tweetEndpointURLFormat string,
+	collageCache cache.DependentCache,
+) *TwitterResolver {
+	tweetCacheKeyProvider := cache.NewPrefixKeyProvider("twitter:tweet")
+	userCacheKeyProvider := cache.NewPrefixKeyProvider("twitter:user")
+
+	tweetLoader := NewTweetLoader(
+		cfg.BaseURL,
+		cfg.TwitterBearerToken,
+		tweetEndpointURLFormat,
+		tweetCacheKeyProvider,
+		collageCache,
+		cfg.MaxThumbnailSize,
+	)
 
 	userLoader := &UserLoader{
 		bearerKey:         cfg.TwitterBearerToken,
 		endpointURLFormat: userEndpointURLFormat,
 	}
 
+	tweetCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, tweetCacheKeyProvider, resolver.NewResponseMarshaller(tweetLoader),
+		24*time.Hour,
+	)
+	tweetCache.RegisterDependent(ctx, collageCache)
+
+	userCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, userCacheKeyProvider, resolver.NewResponseMarshaller(userLoader),
+		24*time.Hour,
+	)
+
 	r := &TwitterResolver{
-		tweetCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "twitter:tweet", resolver.NewResponseMarshaller(tweetLoader), 24*time.Hour),
-		userCache:  cache.NewPostgreSQLCache(ctx, cfg, pool, "twitter:user", resolver.NewResponseMarshaller(userLoader), 24*time.Hour),
+		tweetCache: tweetCache,
+		userCache:  userCache,
 	}
 
 	return r

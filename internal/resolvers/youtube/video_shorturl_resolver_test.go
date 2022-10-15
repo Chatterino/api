@@ -55,7 +55,9 @@ func TestVideoShortURLResolver(t *testing.T) {
 	c.Assert(err, qt.IsNil)
 
 	loader := NewVideoLoader(youtubeClient)
-	videoCache := cache.NewPostgreSQLCache(ctx, cfg, pool, "youtube:video", loader, 24*time.Hour)
+	videoCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:video"), loader, 24*time.Hour,
+	)
 
 	resolver := NewYouTubeVideoShortURLResolver(videoCache)
 

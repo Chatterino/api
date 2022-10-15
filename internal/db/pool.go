@@ -12,6 +12,7 @@ import (
 )
 
 type Pool interface {
+	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
 	QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row
 	Exec(ctx context.Context, sql string, arguments ...interface{}) (pgconn.CommandTag, error)
 	Ping(ctx context.Context) error
@@ -21,7 +22,6 @@ type Pool interface {
 
 func NewPool(ctx context.Context, dsn string) (Pool, error) {
 	pool, err := pgxpool.Connect(ctx, dsn)
-
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to pool: %w", err)
 	}

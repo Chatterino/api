@@ -55,8 +55,11 @@ func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, data [
 	}
 
 	r := &Resolver{
-		oEmbedCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "oembed", resolver.NewResponseMarshaller(loader), 1*time.Hour),
-		oEmbed:      oEmbed,
+		oEmbedCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("oembed"),
+			resolver.NewResponseMarshaller(loader), 1*time.Hour,
+		),
+		oEmbed: oEmbed,
 	}
 
 	return r, nil

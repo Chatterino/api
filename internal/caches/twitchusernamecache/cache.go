@@ -19,5 +19,7 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 		helixClient: helixClient,
 	}
 
-	return cache.NewPostgreSQLCache(ctx, cfg, pool, "twitch:username", usernameLoader, 1*time.Hour)
+	return cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("twitch:username"), usernameLoader, 1*time.Hour,
+	)
 }

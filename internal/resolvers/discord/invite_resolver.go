@@ -45,7 +45,9 @@ func NewInviteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) 
 	// We cache invites longer on purpose as the API is pretty strict with its rate limiting, and the information changes very seldomly anyway
 	// TODO: Log 429 errors from the loader
 	r := &InviteResolver{
-		inviteCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "discord:invite", resolver.NewResponseMarshaller(inviteLoader), 6*time.Hour),
+		inviteCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("discord:invite"),
+			resolver.NewResponseMarshaller(inviteLoader), 6*time.Hour),
 	}
 
 	return r
