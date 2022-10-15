@@ -195,11 +195,19 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 		enableLilliput:   cfg.EnableLilliput,
 	}
 
+	thumbnailCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:thumbnail"), thumbnailLoader,
+		10*time.Minute,
+	)
+	linkCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:link"), linkLoader, 10*time.Minute,
+	)
+
 	r := &LinkResolver{
 		customResolvers: customResolvers,
 
-		linkCache:      cache.NewPostgreSQLCache(ctx, cfg, pool, "default:link", linkLoader, 10*time.Minute),
-		thumbnailCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "default:thumbnail", thumbnailLoader, 10*time.Minute),
+		linkCache:      linkCache,
+		thumbnailCache: thumbnailCache,
 	}
 
 	return r

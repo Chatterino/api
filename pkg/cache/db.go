@@ -45,7 +45,7 @@ type PostgreSQLCache struct {
 
 	cacheDuration time.Duration
 
-	prefix string
+	keyProvider KeyProvider
 
 	pool db.Pool
 }
@@ -86,10 +86,10 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 		return nil, err
 	}
 
-	cacheKey := c.prefix + ":" + key
+	cacheKey := c.keyProvider.CacheKey(ctx, key)
 	if _, err := c.pool.Exec(ctx, "INSERT INTO cache (key, value, http_status_code, http_content_type, cached_until) VALUES ($1, $2, $3, $4, $5)", cacheKey, payload, *statusCode, *contentType, time.Now().Add(dur)); err != nil {
 		log.Errorw("Error inserting tooltip into cache",
-			"prefix", c.prefix,
+			"cacheKey", cacheKey,
 			"key", key,
 			"error", err,
 		)
@@ -118,7 +118,7 @@ func (c *PostgreSQLCache) loadFromDatabase(ctx context.Context, cacheKey string)
 
 func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) (*Response, error) {
 	log := logger.FromContext(ctx)
-	cacheKey := c.prefix + ":" + key
+	cacheKey := c.keyProvider.CacheKey(ctx, key)
 
 	cacheResponse, err := c.loadFromDatabase(ctx, cacheKey)
 	if err != nil {
@@ -131,18 +131,18 @@ func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) 
 		return &tooltipInternalError, err
 	} else if cacheResponse != nil {
 		cacheHits.Inc()
-		log.Debugw("DB Get cache hit", "prefix", c.prefix, "key", key)
+		log.Debugw("DB Get cache hit", "cacheKey", cacheKey)
 		return cacheResponse, nil
 	}
 
 	cacheMisses.Inc()
-	log.Debugw("DB Get cache miss", "prefix", c.prefix, "key", key)
+	log.Debugw("DB Get cache miss", "cacheKey", cacheKey)
 	return c.load(ctx, key, r)
 }
 
 func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) *Response {
 	log := logger.FromContext(ctx)
-	cacheKey := c.prefix + ":" + key
+	cacheKey := c.keyProvider.CacheKey(ctx, key)
 
 	value, err := c.loadFromDatabase(ctx, cacheKey)
 	if err != nil {
@@ -150,12 +150,12 @@ func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) *Response {
 		return nil
 	} else if value != nil {
 		cacheHits.Inc()
-		log.Debugw("DB GetOnly cache hit", "prefix", c.prefix, "key", key)
+		log.Debugw("DB GetOnly cache hit", "cacheKey", cacheKey)
 		return value
 	}
 
 	cacheMisses.Inc()
-	log.Debugw("DB GetOnly cache miss", "prefix", c.prefix, "key", key)
+	log.Debugw("DB GetOnly cache miss", "cacheKey", cacheKey)
 	return nil
 }
 
@@ -179,10 +179,10 @@ func StartCacheClearer(ctx context.Context, pool db.Pool) {
 	}
 }
 
-func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool, prefix string, loader Loader, cacheDuration time.Duration) *PostgreSQLCache {
+func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool, keyProvider KeyProvider, loader Loader, cacheDuration time.Duration) *PostgreSQLCache {
 	// Create connection pool if it's not already initialized
 	return &PostgreSQLCache{
-		prefix:        prefix,
+		keyProvider:   keyProvider,
 		loader:        loader,
 		cacheDuration: cacheDuration,
 		pool:          pool,

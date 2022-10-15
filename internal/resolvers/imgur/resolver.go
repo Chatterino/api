@@ -45,7 +45,9 @@ func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, imgurC
 	}
 
 	r := &Resolver{
-		imgurCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "imgur", resolver.NewResponseMarshaller(loader), 1*time.Hour),
+		imgurCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("imgur"),
+			resolver.NewResponseMarshaller(loader), 1*time.Hour),
 	}
 
 	return r

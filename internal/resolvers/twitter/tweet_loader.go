@@ -50,13 +50,26 @@ type tweetTooltipData struct {
 }
 
 type TweetLoader struct {
-	bearerKey         string
-	endpointURLFormat string
+	bearerKey             string
+	endpointURLFormat     string
+	tweetCacheKeyProvider cache.KeyProvider
 }
 
 var (
 	errTweetNotFound = errors.New("tweet not found")
 )
+
+func NewTweetLoader(
+	bearerKey string,
+	endpointURLFormat string,
+	tweetCacheKeyProvider cache.KeyProvider,
+) *TweetLoader {
+	return &TweetLoader{
+		bearerKey:             bearerKey,
+		endpointURLFormat:     endpointURLFormat,
+		tweetCacheKeyProvider: tweetCacheKeyProvider,
+	}
+}
 
 func (l *TweetLoader) getTweetByID(id string) (*TweetApiResponse, error) {
 	endpointUrl := fmt.Sprintf(l.endpointURLFormat, id)

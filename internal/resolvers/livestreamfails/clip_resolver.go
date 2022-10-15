@@ -51,7 +51,9 @@ func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, ap
 	}
 
 	r := &ClipResolver{
-		clipCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "livestreamfails:clip", resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
+		clipCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("livestreamfails:clip"),
+			resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
 	}
 
 	return r
