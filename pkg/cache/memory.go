@@ -30,6 +30,21 @@ type MemoryCache struct {
 	keyProvider KeyProvider
 }
 
+func (*MemoryCache) RegisterDependent(ctx context.Context, dependent DependentCache) {
+	// Required for Cache interface
+	panic("DependentCache management is unimplemented for MemoryCache")
+}
+
+func (*MemoryCache) commitDependents(ctx context.Context, key string) error {
+	// Required for Cache interface
+	panic("DependentCache management is unimplemented for MemoryCache")
+}
+
+func (*MemoryCache) rollbackDependents(ctx context.Context, key string) error {
+	// Required for Cache interface
+	panic("DependentCache management is unimplemented for MemoryCache")
+}
+
 func (c *MemoryCache) load(ctx context.Context, key string, r *http.Request) {
 	log := logger.FromContext(ctx)
 

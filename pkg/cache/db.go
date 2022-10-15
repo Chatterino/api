@@ -8,7 +8,6 @@ import (
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
-	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -48,16 +47,64 @@ type PostgreSQLCache struct {
 	keyProvider KeyProvider
 
 	pool db.Pool
+
+	dependentCaches []DependentCache
 }
 
-var (
-	// TODO: Make the "internal error" tooltip an actual tooltip
-	tooltipInternalError = []byte("internal error")
-)
+// TODO: Make the "internal error" tooltip an actual tooltip
+var tooltipInternalError = []byte("internal error")
 
-func clearOldTooltips(ctx context.Context, pool db.Pool) (pgconn.CommandTag, error) {
-	const query = "DELETE FROM cache WHERE now() > cached_until;"
-	return pool.Exec(ctx, query)
+// Returns the number of deleted tooltip entries
+func clearOldTooltips(ctx context.Context, pool db.Pool) (int, error) {
+	log := logger.FromContext(ctx)
+
+	const query = "DELETE FROM cache WHERE now() > cached_until RETURNING key;"
+
+	rows, err := pool.Query(ctx, query)
+	if err != nil {
+		log.Errorw("Error deleting old tooltips from cache",
+			"error", err,
+		)
+		return -1, err
+	}
+
+	// Remember the deleted keys: they may be parent keys of dependent values
+	var deletedParents []string
+	for rows.Next() {
+		var curKey string
+		err := rows.Scan(&curKey)
+		if err != nil {
+			log.Warnw("Could not scan a deleted key")
+			continue
+		}
+		deletedParents = append(deletedParents, curKey)
+	}
+
+	_, err = pool.Exec(ctx, "DELETE FROM dependent_values WHERE parent_key = ANY($1)", deletedParents)
+	if err != nil {
+		log.Errorw("Error deleting dependent values",
+			"err", err,
+		)
+		return -1, err
+	}
+
+	return len(deletedParents), nil
+}
+
+// This is meant as a safety measure in case a DependentCache user does not properly manage parent
+// keys.
+func clearExpiredDependentValues(ctx context.Context, pool db.Pool) error {
+	log := logger.FromContext(ctx)
+
+	_, err := pool.Exec(ctx, "DELETE FROM dependent_values WHERE now() > expiration_timestamp")
+	if err != nil {
+		log.Errorw("Error clearing expired dependent values",
+			"err", err,
+		)
+		return err
+	}
+
+	return nil
 }
 
 func startTooltipClearer(ctx context.Context, pool db.Pool) {
@@ -67,6 +114,8 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 	log := logger.FromContext(ctx)
 
 	payload, statusCode, contentType, overrideDuration, err := c.loader.Load(ctx, key, r)
+	// If the parent cannot be inserted into the cache, rollback the dependents
+	defer c.rollbackDependents(ctx, key)
 
 	if statusCode == nil {
 		log.Warnw("Missing status code, setting to 200 default")
@@ -94,6 +143,9 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 			"error", err,
 		)
 	}
+	// Parent entry was inserted correctly, commit the dependents to prevent them from being rolled
+	// back
+	c.commitDependents(ctx, key)
 
 	return &Response{
 		Payload:     payload,
@@ -162,21 +214,63 @@ func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) *Response {
 func StartCacheClearer(ctx context.Context, pool db.Pool) {
 	log := logger.FromContext(ctx)
 
-	ticker := time.NewTicker(1 * time.Minute)
+	tooltipTicker := time.NewTicker(1 * time.Minute)
+	dependentValuesTicker := time.NewTicker(12 * time.Hour)
 	for {
 		select {
 		case <-ctx.Done():
 			return
 
-		case <-ticker.C:
-			if ct, err := clearOldTooltips(ctx, pool); err != nil {
+		case <-tooltipTicker.C:
+			if numDeleted, err := clearOldTooltips(ctx, pool); err != nil {
 				log.Errorw("Error clearing old tooltips")
 			} else {
-				clearedEntries.Add(float64(ct.RowsAffected()))
-				log.Debugw("Cleared old tooltips", "rowsAffected", ct.RowsAffected())
+				clearedEntries.Add(float64(numDeleted))
+				log.Debugw("Cleared old tooltips", "rowsAffected", numDeleted)
+			}
+
+		case <-dependentValuesTicker.C:
+			if err := clearExpiredDependentValues(ctx, pool); err != nil {
+				log.Errorw("Error clearing expired dependent values")
 			}
 		}
 	}
+}
+
+func (c *PostgreSQLCache) RegisterDependent(ctx context.Context, dependent DependentCache) {
+	c.dependentCaches = append(c.dependentCaches, dependent)
+}
+
+func (c *PostgreSQLCache) commitDependents(ctx context.Context, key string) error {
+	parentKey := c.keyProvider.CacheKey(ctx, key)
+
+	// XXX: If we knew whether all dependent caches were PostgreSQLDependentCaches, this could be
+	//      optimized (since all commit queries will be the same). But there might be other
+	//      DependentCache implementations and thus we must delegate to each registered one.
+	for _, dependent := range c.dependentCaches {
+		err := dependent.commit(ctx, parentKey)
+		if err != nil {
+			continue
+		}
+	}
+
+	return nil
+}
+
+func (c *PostgreSQLCache) rollbackDependents(ctx context.Context, key string) error {
+	parentKey := c.keyProvider.CacheKey(ctx, key)
+
+	// XXX: If we knew whether all dependent caches were PostgreSQLDependentCaches, this could be
+	//      optimized (since all rollback queries will be the same). But there might be other
+	//      DependentCache implementations and thus we must delegate to each registered one.
+	for _, dependent := range c.dependentCaches {
+		err := dependent.rollback(ctx, parentKey)
+		if err != nil {
+			continue
+		}
+	}
+
+	return nil
 }
 
 func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool, keyProvider KeyProvider, loader Loader, cacheDuration time.Duration) *PostgreSQLCache {
@@ -190,3 +284,128 @@ func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool,
 }
 
 var _ Cache = (*PostgreSQLCache)(nil)
+
+type PostgreSQLDependentCache struct {
+	keyProvider KeyProvider
+
+	pool db.Pool
+}
+
+// The time after which dependent values will get cleaned up regardless of whether the parent key
+// exists or not. This is done as a fail-safe in case of improper parent key management.
+var dependentExpirationDuration = 24 * time.Hour
+
+func (c *PostgreSQLDependentCache) loadFromDatabase(ctx context.Context, cacheKey string) (*Response, error) {
+	var response Response
+	err := c.pool.QueryRow(
+		ctx,
+		"SELECT value, http_status_code, http_content_type FROM cache WHERE key=$1",
+		cacheKey,
+	).Scan(&response.Payload, &response.StatusCode, &response.ContentType)
+	if err == nil {
+		return &response, nil
+	}
+
+	if err != pgx.ErrNoRows {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func (c *PostgreSQLDependentCache) Get(ctx context.Context, key string) ([]byte, string, error) {
+	log := logger.FromContext(ctx)
+
+	cacheKey := c.keyProvider.CacheKey(ctx, key)
+	var value []byte
+	var contentType string
+
+	err := c.pool.QueryRow(
+		ctx,
+		"SELECT value, http_content_type FROM dependent_values WHERE key=$1",
+		cacheKey,
+	).Scan(&value, &contentType)
+	if err != nil {
+		if err != pgx.ErrNoRows {
+			// An actual error
+			log.Warnw("Unhandled sql error", "error", err)
+			return nil, "", err
+		}
+
+		// Cache entry didn't exist
+		return nil, "", nil
+	}
+
+	return value, contentType, nil
+}
+
+func (c *PostgreSQLDependentCache) Insert(
+	ctx context.Context, key string, parentKey string, value []byte, contentType string,
+) error {
+	log := logger.FromContext(ctx)
+
+	cacheKey := c.keyProvider.CacheKey(ctx, key)
+	if _, err := c.pool.Exec(
+		ctx,
+		"INSERT INTO dependent_values (key, parent_key, value, http_content_type, "+
+			"expiration_timestamp) VALUES ($1, $2, $3, $4, $5)",
+		cacheKey, parentKey, value, contentType, time.Now().Add(dependentExpirationDuration),
+	); err != nil {
+		log.Errorw("Error inserting dependent value",
+			"cacheKey", cacheKey,
+			"parentKey", parentKey,
+			"error", err,
+		)
+		return err
+	}
+
+	return nil
+}
+
+func (c *PostgreSQLDependentCache) commit(ctx context.Context, parentKey string) error {
+	log := logger.FromContext(ctx)
+
+	_, err := c.pool.Exec(
+		ctx,
+		"UPDATE dependent_values SET committed = TRUE WHERE parent_key = $1 AND NOT committed",
+		parentKey,
+	)
+	if err != nil {
+		log.Errorw("Error committing dependent values",
+			"parentKey", parentKey,
+			"err", err,
+		)
+		return err
+	}
+
+	return nil
+}
+
+func (c *PostgreSQLDependentCache) rollback(ctx context.Context, parentKey string) error {
+	log := logger.FromContext(ctx)
+
+	_, err := c.pool.Exec(
+		ctx,
+		"DELETE FROM dependent_values WHERE parent_key = $1 AND NOT committed",
+		parentKey,
+	)
+	if err != nil {
+		log.Errorw("Error rolling back dependent values",
+			"err", err,
+		)
+		return err
+	}
+
+	return nil
+}
+
+func NewPostgreSQLDependentCache(
+	ctx context.Context, cfg config.APIConfig, pool db.Pool, keyProvider KeyProvider,
+) *PostgreSQLDependentCache {
+	return &PostgreSQLDependentCache{
+		keyProvider: keyProvider,
+		pool:        pool,
+	}
+}
+
+var _ DependentCache = (*PostgreSQLDependentCache)(nil)
