@@ -61,6 +61,7 @@ type TweetLoader struct {
 	endpointURLFormat     string
 	tweetCacheKeyProvider cache.KeyProvider
 	collageCache          cache.DependentCache
+	maxThumbnailSize      uint
 }
 
 var (
@@ -74,6 +75,7 @@ func NewTweetLoader(
 	endpointURLFormat string,
 	tweetCacheKeyProvider cache.KeyProvider,
 	collageCache cache.DependentCache,
+	maxThumbnailSize uint,
 ) *TweetLoader {
 	return &TweetLoader{
 		baseURL:               baseURL,
@@ -81,6 +83,7 @@ func NewTweetLoader(
 		endpointURLFormat:     endpointURLFormat,
 		tweetCacheKeyProvider: tweetCacheKeyProvider,
 		collageCache:          collageCache,
+		maxThumbnailSize:      maxThumbnailSize,
 	}
 }
 
@@ -193,7 +196,7 @@ func (l *TweetLoader) buildThumbnailURL(
 	}
 
 	// More than one media item, need to compose a thumbnail
-	thumb, err := composeThumbnail(ctx, tweet.Entities.Media)
+	thumb, err := l.composeThumbnail(ctx, tweet.Entities.Media)
 	if err != nil {
 		log.Errorw("Couldn't compose Twitter collage",
 			"err", err,
@@ -224,7 +227,7 @@ func (l *TweetLoader) buildThumbnailURL(
 	return utils.FormatGeneratedThumbnailURL(l.baseURL, r, collageKey)
 }
 
-func composeThumbnail(
+func (l *TweetLoader) composeThumbnail(
 	ctx context.Context,
 	mediaEntities []APIEntitiesMedia,
 ) (*vips.ImageRef, error) {
@@ -316,7 +319,7 @@ func composeThumbnail(
 		return nil, err
 	}
 
-	maxThumbnailSize := int(cfg.MaxThumbnailSize)
+	maxThumbnailSize := int(l.maxThumbnailSize)
 	err = stem.ThumbnailWithSize(
 		maxThumbnailSize, maxThumbnailSize, vips.InterestingNone, vips.SizeDown,
 	)

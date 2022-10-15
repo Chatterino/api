@@ -87,6 +87,7 @@ func NewTwitterResolver(
 		tweetEndpointURLFormat,
 		tweetCacheKeyProvider,
 		collageCache,
+		cfg.MaxThumbnailSize,
 	)
 
 	userLoader := &UserLoader{
