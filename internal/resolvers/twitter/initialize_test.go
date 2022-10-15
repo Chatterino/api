@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/pashagolub/pgxmock"
@@ -22,8 +23,9 @@ func TestInitialize(t *testing.T) {
 	c.Run("No credentials", func(c *qt.C) {
 		cfg := config.APIConfig{}
 		customResolvers := []resolver.Resolver{}
+		collageCache := cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("test"))
 		c.Assert(customResolvers, qt.HasLen, 0)
-		Initialize(ctx, cfg, pool, &customResolvers)
+		Initialize(ctx, cfg, pool, &customResolvers, collageCache)
 		c.Assert(customResolvers, qt.HasLen, 0)
 	})
 
@@ -32,8 +34,9 @@ func TestInitialize(t *testing.T) {
 			TwitterBearerToken: "test",
 		}
 		customResolvers := []resolver.Resolver{}
+		collageCache := cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("test"))
 		c.Assert(customResolvers, qt.HasLen, 0)
-		Initialize(ctx, cfg, pool, &customResolvers)
+		Initialize(ctx, cfg, pool, &customResolvers, collageCache)
 		c.Assert(customResolvers, qt.HasLen, 1)
 	})
 }

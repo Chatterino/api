@@ -76,14 +76,17 @@ func NewTwitterResolver(
 	pool db.Pool,
 	userEndpointURLFormat string,
 	tweetEndpointURLFormat string,
+	collageCache cache.DependentCache,
 ) *TwitterResolver {
 	tweetCacheKeyProvider := cache.NewPrefixKeyProvider("twitter:tweet")
 	userCacheKeyProvider := cache.NewPrefixKeyProvider("twitter:user")
 
 	tweetLoader := NewTweetLoader(
+		cfg.BaseURL,
 		cfg.TwitterBearerToken,
 		tweetEndpointURLFormat,
 		tweetCacheKeyProvider,
+		collageCache,
 	)
 
 	userLoader := &UserLoader{
@@ -95,6 +98,7 @@ func NewTwitterResolver(
 		ctx, cfg, pool, tweetCacheKeyProvider, resolver.NewResponseMarshaller(tweetLoader),
 		24*time.Hour,
 	)
+	tweetCache.RegisterDependent(ctx, collageCache)
 
 	userCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, userCacheKeyProvider, resolver.NewResponseMarshaller(userLoader),

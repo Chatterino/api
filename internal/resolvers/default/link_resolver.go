@@ -33,6 +33,7 @@ type LinkResolver struct {
 
 	linkCache      cache.Cache
 	thumbnailCache cache.Cache
+	generatedCache cache.DependentCache
 }
 
 func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
@@ -167,7 +168,50 @@ func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.R
 	}
 }
 
+func (r *LinkResolver) HandleGeneratedValueRequest(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	log := logger.FromContext(ctx)
+
+	url, err := utils.UnescapeURLArgument(req, "url")
+	if err != nil {
+		_, err = resolver.WriteInvalidURL(w)
+		if err != nil {
+			log.Errorw("Error writing response",
+				"error", err,
+			)
+		}
+		return
+	}
+
+	payload, contentType, err := r.generatedCache.Get(ctx, url)
+	if err != nil {
+		log.Errorw("Error in request for generated value",
+			"url", url,
+			"error", err,
+		)
+		return
+	}
+
+	if payload == nil {
+		log.Warnw("Requested generated value does not exist",
+			"url", url,
+		)
+		return
+	}
+
+	w.Header().Add("Content-Type", contentType)
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(payload)
+	if err != nil {
+		log.Errorw("Error writing response",
+			"error", err,
+		)
+	}
+}
+
 func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client) *LinkResolver {
+	generatedCache := cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("default:dependent"))
+
 	customResolvers := []resolver.Resolver{}
 
 	// Register Link Resolvers from internal/resolvers/
@@ -179,7 +223,7 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 	oembed.Initialize(ctx, cfg, pool, &customResolvers)
 	supinic.Initialize(ctx, cfg, pool, &customResolvers)
 	twitch.Initialize(ctx, cfg, pool, helixClient, &customResolvers)
-	twitter.Initialize(ctx, cfg, pool, &customResolvers)
+	twitter.Initialize(ctx, cfg, pool, &customResolvers, generatedCache)
 	wikipedia.Initialize(ctx, cfg, pool, &customResolvers)
 	youtube.Initialize(ctx, cfg, pool, &customResolvers)
 	seventv.Initialize(ctx, cfg, pool, &customResolvers)
@@ -208,6 +252,7 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 
 		linkCache:      linkCache,
 		thumbnailCache: thumbnailCache,
+		generatedCache: generatedCache,
 	}
 
 	return r
