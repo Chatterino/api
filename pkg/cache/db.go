@@ -126,7 +126,7 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 		contentType = &defaultContentType
 	}
 
-	var dur = c.cacheDuration
+	dur := c.cacheDuration
 	if overrideDuration != 0 {
 		dur = overrideDuration
 	}

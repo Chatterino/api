@@ -149,7 +149,6 @@ func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.R
 	}
 
 	response, err := r.thumbnailCache.Get(ctx, url, req)
-
 	if err != nil {
 		log.Errorw("Error in thumbnail request",
 			"url", url,

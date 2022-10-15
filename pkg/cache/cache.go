@@ -45,5 +45,7 @@ var NoSpecialDur time.Duration
 
 var NewDefaultCache = NewPostgreSQLCache
 
-var defaultStatusCode int = 200
-var defaultContentType string = "application/json"
+var (
+	defaultStatusCode  int    = 200
+	defaultContentType string = "application/json"
+)

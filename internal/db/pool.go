@@ -22,7 +22,6 @@ type Pool interface {
 
 func NewPool(ctx context.Context, dsn string) (Pool, error) {
 	pool, err := pgxpool.Connect(ctx, dsn)
-
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to pool: %w", err)
 	}
