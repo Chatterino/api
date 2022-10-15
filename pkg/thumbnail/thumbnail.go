@@ -10,8 +10,10 @@ import (
 )
 
 var (
-	supportedThumbnails = []string{"image/jpeg", "image/png", "image/gif", "image/webp"}
-	animatedThumbnails  = []string{"image/gif", "image/webp"}
+	supportedThumbnails = []string{
+		"image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf",
+	}
+	animatedThumbnails = []string{"image/gif", "image/webp"}
 
 	cfg config.APIConfig
 )
@@ -58,7 +60,14 @@ func BuildStaticThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) 
 		return []byte{}, fmt.Errorf("could not transform image from url: %s", resp.Request.URL)
 	}
 
-	outputBuf, _, err := image.ExportNative()
+	var outputBuf []byte
+	if image.Format() == vips.ImageTypePDF {
+		// Export thumbnails for PDF as PNG
+		outputBuf, _, err = image.ExportPng(vips.NewPngExportParams())
+	} else {
+		outputBuf, _, err = image.ExportNative()
+	}
+
 	if err != nil {
 		return []byte{}, fmt.Errorf("could not export image from url: %s", resp.Request.URL)
 	}

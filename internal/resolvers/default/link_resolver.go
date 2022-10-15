@@ -228,6 +228,7 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 	seventv.Initialize(ctx, cfg, pool, &customResolvers)
 
 	contentTypeResolvers := []ContentTypeResolver{}
+	contentTypeResolvers = append(contentTypeResolvers, NewPDFResolver(cfg.BaseURL, cfg.MaxContentLength))
 
 	linkLoader := &LinkLoader{
 		baseURL:              cfg.BaseURL,
