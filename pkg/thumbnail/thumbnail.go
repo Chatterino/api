@@ -11,9 +11,18 @@ import (
 
 var (
 	supportedThumbnails = []string{
-		"image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf",
+		"image/jpeg",
+		"image/png",
+		"image/gif",
+		"image/webp",
+		"application/pdf",
 	}
-	animatedThumbnails = []string{"image/gif", "image/webp"}
+
+	// Subset of supportedThumbnails that should be treated as animated
+	animatedThumbnails = []string{
+		"image/gif",
+		"image/webp",
+	}
 
 	cfg config.APIConfig
 )
