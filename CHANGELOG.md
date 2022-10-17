@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Breaking: Go version 1.17 is now the minimum required version to build this. (#292)
-- Breaking: Thumbnail generation now requires libvips. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#366, #369)
+- Breaking: Thumbnail generation now requires libvips. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#366, #369, #312)
 - Breaking: Resolver caches are now stored in PostgreSQL. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#271)
 - PDF: Generate customized tooltips for PDF files. (#374)
 - Twitter: Generate thumbnails with all images of a tweet. (#373)
