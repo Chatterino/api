@@ -22,7 +22,6 @@ var (
 	animatedThumbnails = []string{
 		"image/gif",
 		"image/webp",
-    "image/avif"
 	}
 
 	cfg config.APIConfig
@@ -105,7 +104,7 @@ func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error
 	format := image.Format()
 
 	// n=-1 is used for animated images to make sure to get all frames and not just the first one.
-	if format == vips.ImageTypeGIF || format == vips.ImageTypeWEBP || format == vips.ImageTypeAVIF {
+	if format == vips.ImageTypeGIF || format == vips.ImageTypeWEBP {
 		importParams.NumPages.Set(-1)
 	}
 
@@ -116,11 +115,8 @@ func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error
 		return []byte{}, fmt.Errorf("could not transform image from url: %s", resp.Request.URL)
 	}
 
-	// exportParams := vips.NewWebpExportParams()
-	// exportParams.Quality = 10
-	// outputBuf, _, err := image.ExportWebp(exportParams)
-
-	outputBuf, _, err := image.ExportNative()
+	exportParams := vips.NewWebpExportParams()
+	outputBuf, _, err := image.ExportWebp(exportParams)
 
 	if err != nil {
 		return []byte{}, fmt.Errorf("could not export image from url: %s", resp.Request.URL)
