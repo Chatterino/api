@@ -6,7 +6,7 @@ import (
 
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
-	vips "github.com/davidbyttow/govips/v2/vips"
+	"github.com/davidbyttow/govips/v2/vips"
 )
 
 var (
@@ -91,12 +91,9 @@ func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error
 		return []byte{}, fmt.Errorf("could not load image from url: %s", resp.Request.URL)
 	}
 
-	// govips has the height & width values in int, which means we're converting uint to int.
 	maxThumbnailSize := int(cfg.MaxThumbnailSize)
 
-	// Only resize if the original image has bigger dimensions than maxThumbnailSize
 	if image.Width() <= maxThumbnailSize && image.Height() <= maxThumbnailSize {
-		// We don't need to resize image nor does it need to be passed through govips.
 		return inputBuf, nil
 	}
 
@@ -115,6 +112,7 @@ func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error
 		return []byte{}, fmt.Errorf("could not transform image from url: %s", resp.Request.URL)
 	}
 
+	// We export to WebP by default to save on bandwidth and cache storage.
 	exportParams := vips.NewWebpExportParams()
 	outputBuf, _, err := image.ExportWebp(exportParams)
 
