@@ -40,6 +40,7 @@ func TestResolver(t *testing.T) {
 		pool,
 		ts.URL+"/1.1/users/show.json?screen_name=%s",
 		ts.URL+"/1.1/statuses/show.json?id=%s&tweet_mode=extended",
+		cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("test")),
 	)
 
 	c.Assert(r, qt.IsNotNil)

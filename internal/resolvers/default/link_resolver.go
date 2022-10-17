@@ -33,6 +33,7 @@ type LinkResolver struct {
 
 	linkCache      cache.Cache
 	thumbnailCache cache.Cache
+	generatedCache cache.DependentCache
 }
 
 func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
@@ -148,7 +149,6 @@ func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.R
 	}
 
 	response, err := r.thumbnailCache.Get(ctx, url, req)
-
 	if err != nil {
 		log.Errorw("Error in thumbnail request",
 			"url", url,
@@ -167,7 +167,50 @@ func (r *LinkResolver) HandleThumbnailRequest(w http.ResponseWriter, req *http.R
 	}
 }
 
+func (r *LinkResolver) HandleGeneratedValueRequest(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	log := logger.FromContext(ctx)
+
+	url, err := utils.UnescapeURLArgument(req, "url")
+	if err != nil {
+		_, err = resolver.WriteInvalidURL(w)
+		if err != nil {
+			log.Errorw("Error writing response",
+				"error", err,
+			)
+		}
+		return
+	}
+
+	payload, contentType, err := r.generatedCache.Get(ctx, url)
+	if err != nil {
+		log.Errorw("Error in request for generated value",
+			"url", url,
+			"error", err,
+		)
+		return
+	}
+
+	if payload == nil {
+		log.Warnw("Requested generated value does not exist",
+			"url", url,
+		)
+		return
+	}
+
+	w.Header().Add("Content-Type", contentType)
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(payload)
+	if err != nil {
+		log.Errorw("Error writing response",
+			"error", err,
+		)
+	}
+}
+
 func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client) *LinkResolver {
+	generatedCache := cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("default:dependent"))
+
 	customResolvers := []resolver.Resolver{}
 
 	// Register Link Resolvers from internal/resolvers/
@@ -179,15 +222,19 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 	oembed.Initialize(ctx, cfg, pool, &customResolvers)
 	supinic.Initialize(ctx, cfg, pool, &customResolvers)
 	twitch.Initialize(ctx, cfg, pool, helixClient, &customResolvers)
-	twitter.Initialize(ctx, cfg, pool, &customResolvers)
+	twitter.Initialize(ctx, cfg, pool, &customResolvers, generatedCache)
 	wikipedia.Initialize(ctx, cfg, pool, &customResolvers)
 	youtube.Initialize(ctx, cfg, pool, &customResolvers)
 	seventv.Initialize(ctx, cfg, pool, &customResolvers)
 
+	contentTypeResolvers := []ContentTypeResolver{}
+	contentTypeResolvers = append(contentTypeResolvers, NewPDFResolver(cfg.BaseURL, cfg.MaxContentLength))
+
 	linkLoader := &LinkLoader{
-		baseURL:          cfg.BaseURL,
-		maxContentLength: cfg.MaxContentLength,
-		customResolvers:  customResolvers,
+		baseURL:              cfg.BaseURL,
+		maxContentLength:     cfg.MaxContentLength,
+		customResolvers:      customResolvers,
+		contentTypeResolvers: contentTypeResolvers,
 	}
 	thumbnailLoader := &ThumbnailLoader{
 		baseURL:                  cfg.BaseURL,
@@ -195,11 +242,20 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 		enableAnimatedThumbnails: cfg.EnableAnimatedThumbnails,
 	}
 
+	thumbnailCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:thumbnail"), thumbnailLoader,
+		10*time.Minute,
+	)
+	linkCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:link"), linkLoader, 10*time.Minute,
+	)
+
 	r := &LinkResolver{
 		customResolvers: customResolvers,
 
-		linkCache:      cache.NewPostgreSQLCache(ctx, cfg, pool, "default:link", linkLoader, 10*time.Minute),
-		thumbnailCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "default:thumbnail", thumbnailLoader, 10*time.Minute),
+		linkCache:      linkCache,
+		thumbnailCache: thumbnailCache,
+		generatedCache: generatedCache,
 	}
 
 	return r

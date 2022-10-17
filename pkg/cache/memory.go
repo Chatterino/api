@@ -27,7 +27,22 @@ type MemoryCache struct {
 
 	cacheDuration time.Duration
 
-	prefix string
+	keyProvider KeyProvider
+}
+
+func (*MemoryCache) RegisterDependent(ctx context.Context, dependent DependentCache) {
+	// Required for Cache interface
+	panic("DependentCache management is unimplemented for MemoryCache")
+}
+
+func (*MemoryCache) commitDependents(ctx context.Context, key string) error {
+	// Required for Cache interface
+	panic("DependentCache management is unimplemented for MemoryCache")
+}
+
+func (*MemoryCache) rollbackDependents(ctx context.Context, key string) error {
+	// Required for Cache interface
+	panic("DependentCache management is unimplemented for MemoryCache")
 }
 
 func (c *MemoryCache) load(ctx context.Context, key string, r *http.Request) {
@@ -44,7 +59,7 @@ func (c *MemoryCache) load(ctx context.Context, key string, r *http.Request) {
 		contentType = &defaultContentType
 	}
 
-	var dur = c.cacheDuration
+	dur := c.cacheDuration
 	if overrideDuration != 0 {
 		dur = overrideDuration
 	}
@@ -57,7 +72,7 @@ func (c *MemoryCache) load(ctx context.Context, key string, r *http.Request) {
 
 	// Cache it
 	if err == nil {
-		cacheKey := c.prefix + ":" + key
+		cacheKey := c.keyProvider.CacheKey(ctx, key)
 		kvCache.Set(cacheKey, response, dur)
 	} else {
 		fmt.Println("Error when some load function was called:", err)
@@ -73,11 +88,11 @@ func (c *MemoryCache) load(ctx context.Context, key string, r *http.Request) {
 
 func (c *MemoryCache) Get(ctx context.Context, key string, r *http.Request) (*Response, error) {
 	log := logger.FromContext(ctx)
-	cacheKey := c.prefix + ":" + key
+	cacheKey := c.keyProvider.CacheKey(ctx, key)
 
 	// If key is in cache, return value
 	if value, found := kvCache.Get(cacheKey); found && value != nil {
-		log.Debugw("Memory Get cache hit", "prefix", c.prefix, "key", key)
+		log.Debugw("Memory Get cache hit", "cacheKey", cacheKey)
 		if response, ok := value.(Response); ok {
 			return &response, nil
 		}
@@ -96,7 +111,7 @@ func (c *MemoryCache) Get(ctx context.Context, key string, r *http.Request) (*Re
 	c.requestsMutex.Unlock()
 
 	if first {
-		log.Debugw("Memory Get cache miss", "prefix", c.prefix, "key", key)
+		log.Debugw("Memory Get cache miss", "cacheKey", cacheKey)
 		go c.load(ctx, key, r)
 	}
 
@@ -108,25 +123,25 @@ func (c *MemoryCache) Get(ctx context.Context, key string, r *http.Request) (*Re
 
 func (c *MemoryCache) GetOnly(ctx context.Context, key string) *Response {
 	log := logger.FromContext(ctx)
-	cacheKey := c.prefix + ":" + key
+	cacheKey := c.keyProvider.CacheKey(ctx, key)
 
 	if value, _ := kvCache.Get(cacheKey); value != nil {
-		log.Debugw("Memory GetOnly cache hit", "prefix", c.prefix, "key", key)
+		log.Debugw("Memory GetOnly cache hit", "cacheKey", cacheKey)
 		if response, ok := value.(Response); ok {
 			return &response
 		}
 
-		log.Debugw("Memory GetOnly cache type mismatch", "prefix", c.prefix, "key", key)
+		log.Debugw("Memory GetOnly cache type mismatch", "cacheKey", cacheKey)
 		return nil
 	}
 
-	log.Debugw("Memory GetOnly cache miss", "prefix", c.prefix, "key", key)
+	log.Debugw("Memory GetOnly cache miss", "cacheKey", cacheKey)
 	return nil
 }
 
-func NewMemoryCache(cfg config.APIConfig, prefix string, loader Loader, cacheDuration time.Duration) *MemoryCache {
+func NewMemoryCache(cfg config.APIConfig, keyProvider KeyProvider, loader Loader, cacheDuration time.Duration) *MemoryCache {
 	return &MemoryCache{
-		prefix:        prefix,
+		keyProvider:   keyProvider,
 		loader:        loader,
 		requests:      make(map[string][]chan Response),
 		cacheDuration: cacheDuration,

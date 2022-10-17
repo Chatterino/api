@@ -47,7 +47,9 @@ func NewEmoteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, e
 	emoteLoader := NewEmoteLoader(emoteAPIURL)
 
 	r := &EmoteResolver{
-		emoteCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "frankerfacez:emote", resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),
+		emoteCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("frankerfacez:emote"),
+			resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),
 	}
 
 	return r

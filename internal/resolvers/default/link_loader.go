@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/staticresponse"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
@@ -21,9 +22,10 @@ import (
 )
 
 type LinkLoader struct {
-	baseURL          string
-	customResolvers  []resolver.Resolver
-	maxContentLength uint64
+	baseURL              string
+	customResolvers      []resolver.Resolver
+	contentTypeResolvers []ContentTypeResolver
+	maxContentLength     uint64
 }
 
 func (l *LinkLoader) defaultTooltipData(doc *goquery.Document, r *http.Request, resp *http.Response) tooltipData {
@@ -39,6 +41,8 @@ func (l *LinkLoader) defaultTooltipData(doc *goquery.Document, r *http.Request, 
 }
 
 func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request) ([]byte, *int, *string, time.Duration, error) {
+	log := logger.FromContext(ctx)
+
 	requestUrl, err := url.Parse(urlString)
 	if err != nil {
 		return resolver.ReturnInvalidURL()
@@ -91,8 +95,28 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 		return staticresponse.SNoLinkInfoFound.Return()
 	}
 
-	limiter := &resolver.WriteLimiter{Limit: l.maxContentLength}
+	contentType := resp.Header.Get("Content-Type")
+	for _, ctResolver := range l.contentTypeResolvers {
+		if ctResolver.Check(ctx, contentType) {
+			ttResponse, err := ctResolver.Run(ctx, r, resp)
+			if err != nil {
+				log.Errorw("error running ContentTypeResolver",
+					"resolver", ctResolver.Name(),
+					"err", err,
+				)
 
+				return utils.MarshalNoDur(&resolver.Response{
+					Status:  http.StatusInternalServerError,
+					Message: "ContentTypeResolver error " + resolver.CleanResponse(err.Error()),
+				})
+			}
+
+			return utils.MarshalNoDur(ttResponse)
+		}
+	}
+
+	// Fallback to parsing via goquery
+	limiter := &resolver.WriteLimiter{Limit: l.maxContentLength}
 	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
 	if err != nil {
 		return utils.MarshalNoDur(&resolver.Response{
@@ -124,7 +148,7 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 		Thumbnail: data.ImageSrc,
 	}
 
-	if thumbnail.IsSupportedThumbnailType(resp.Header.Get("content-type")) {
+	if thumbnail.IsSupportedThumbnailType(contentType) {
 		response.Thumbnail = utils.FormatThumbnailURL(l.baseURL, r, resp.Request.URL.String())
 	}
 

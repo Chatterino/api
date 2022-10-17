@@ -43,7 +43,9 @@ var (
 
 func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, pool db.Pool, youtubeClient *youtubeAPI.Service) (resolver.Resolver, resolver.Resolver) {
 	videoLoader := NewVideoLoader(youtubeClient)
-	videoCache := cache.NewPostgreSQLCache(ctx, cfg, pool, "youtube:video", videoLoader, 24*time.Hour)
+	videoCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:video"), videoLoader, 24*time.Hour,
+	)
 
 	videoResolver := NewYouTubeVideoResolver(videoCache)
 	videoShortURLResolver := NewYouTubeVideoShortURLResolver(videoCache)

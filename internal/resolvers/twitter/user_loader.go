@@ -13,6 +13,7 @@ import (
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
@@ -37,9 +38,7 @@ type UserLoader struct {
 	endpointURLFormat string
 }
 
-var (
-	errUserNotFound = errors.New("user not found")
-)
+var errUserNotFound = errors.New("user not found")
 
 func (l *UserLoader) getUserByName(userName string) (*TwitterUserApiResponse, error) {
 	endpointUrl := fmt.Sprintf(l.endpointURLFormat, userName)
@@ -106,4 +105,15 @@ func (l *UserLoader) Load(ctx context.Context, userName string, r *http.Request)
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: userData.Thumbnail,
 	}, cache.NoSpecialDur, nil
+}
+
+func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipData {
+	data := &twitterUserTooltipData{}
+	data.Name = user.Name
+	data.Username = user.Username
+	data.Description = user.Description
+	data.Followers = humanize.Number(user.Followers)
+	data.Thumbnail = user.ProfileImageUrl
+
+	return data
 }
