@@ -63,7 +63,7 @@ func init() {
 	pflag.StringP("base-url", "b", "", "Base URL to which clients will make their requests. Useful if the API is proxied through reverse proxy like nginx. Value needs to contain full URL with protocol scheme, e.g. https://braize.pajlada.com/chatterino")
 	pflag.StringP("bind-address", "l", ":1234", "Address to which API will bind and start listening on")
 	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size in bytes - requests with body bigger than this value will be skipped")
-	pflag.Bool("enable-animated-thumbnails", true, "When enabled, will attempt to use libvips library to build animated thumbnails. Can increase CPU usage and cache storage by a lot")
+	pflag.Bool("enable-animated-thumbnails", true, "When enabled, will attempt to use libvips library to build animated thumbnails. Can increase CPU usage and cache storage by a lot. Enabled by default")
 	pflag.Uint("max-thumbnail-size", 300, "Maximum width/height pixel size count of the thumbnails sent to the clients.")
 	pflag.String("log-level", "info", "Log level")
 	pflag.Bool("log-development", false, "Enable development logging for warnings and above, this includes stack traces")

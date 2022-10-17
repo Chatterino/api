@@ -10,7 +10,7 @@
 #max-content-length: 5242880
 
 # When enabled, will attempt to use libvips library to build animated thumbnails.
-# Can increase CPU usage and cache storage by a lot.
+# Can increase CPU usage and cache storage by a lot. Enabled by default.
 #enable-animated-thumbnails: true
 
 # Maximum width/height pixel size count of the thumbnails sent to the clients.
