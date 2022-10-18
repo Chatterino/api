@@ -53,9 +53,10 @@ func BuildStaticThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) 
 
 	// govips has the height & width values in int, which means we're converting uint to int.
 	maxThumbnailSize := int(cfg.MaxThumbnailSize)
+	format := image.Format()
 
 	// Only resize if the original image has bigger dimensions than maxThumbnailSize
-	if image.Width() <= maxThumbnailSize && image.Height() <= maxThumbnailSize {
+	if image.Width() <= maxThumbnailSize && image.Height() <= maxThumbnailSize && format != vips.ImageTypePDF {
 		// We don't need to resize image nor does it need to be passed through govips.
 		return inputBuf, nil
 	}
@@ -70,7 +71,7 @@ func BuildStaticThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) 
 	}
 
 	var outputBuf []byte
-	if image.Format() == vips.ImageTypePDF {
+	if format == vips.ImageTypePDF {
 		// Export thumbnails for PDF as PNG
 		outputBuf, _, err = image.ExportPng(vips.NewPngExportParams())
 	} else {
