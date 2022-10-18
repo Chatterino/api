@@ -32,12 +32,12 @@ func (r *Resolver) Check(ctx context.Context, url *url.URL) (context.Context, bo
 	for _, domain := range VALID_IMGUR_DOMAINS {
 		result := utils.IsSubdomainOf(url, domain)
 		if result {
-			return nil, result
+			return ctx, result
 		}
 
 		result = utils.IsDomain(url, domain)
 		if result {
-			return nil, result
+			return ctx, result
 		}
 	}
 
