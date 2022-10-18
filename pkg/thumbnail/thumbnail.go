@@ -93,13 +93,13 @@ func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error
 	}
 
 	maxThumbnailSize := int(cfg.MaxThumbnailSize)
+	format := image.Format()
 
 	if image.Width() <= maxThumbnailSize && image.Height() <= maxThumbnailSize {
 		return inputBuf, nil
 	}
 
 	importParams := vips.NewImportParams()
-	format := image.Format()
 
 	// n=-1 is used for animated images to make sure to get all frames and not just the first one.
 	if format == vips.ImageTypeGIF || format == vips.ImageTypeWEBP {
