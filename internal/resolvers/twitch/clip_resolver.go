@@ -13,9 +13,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-var (
-	clipSlugRegex = regexp.MustCompile(`^\/(\w{2,25}\/clip\/)?(clip\/)?([a-zA-Z0-9]+(?:-[-\w]{16})?)$`)
-)
+var clipSlugRegex = regexp.MustCompile(`^\/(\w{2,25}\/clip\/)?(clip\/)?([a-zA-Z0-9]+(?:-[-\w]{16})?)$`)
 
 type ClipResolver struct {
 	clipCache cache.Cache
@@ -76,7 +74,10 @@ func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, he
 	}
 
 	r := &ClipResolver{
-		clipCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "twitch:clip", resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
+		clipCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("twitch:clip"),
+			resolver.NewResponseMarshaller(clipLoader), 1*time.Hour,
+		),
 	}
 
 	return r

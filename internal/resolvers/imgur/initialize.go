@@ -25,15 +25,13 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolve
 		return
 	}
 
-	imgurClient, err := imgur.NewClient(
-		resolver.HTTPClient(),
-		cfg.ImgurClientID,
-		"",
-	)
+	imgurClient, err := imgur.NewClient(resolver.HTTPClient(), cfg.ImgurClientID, "")
 	if err != nil {
-		log.Errorw("Error creating imgur client", err.Error())
+		log.Warnw("Error initializing imgur client:", err)
 		return
 	}
+
+	imgurClient.Log = &NullLogger{}
 
 	*resolvers = append(*resolvers, NewResolver(ctx, cfg, pool, imgurClient))
 }

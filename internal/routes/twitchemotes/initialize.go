@@ -58,7 +58,10 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router 
 		helixAPI:           helixClient,
 		helixUsernameCache: helixUsernameCache,
 	}
-	twitchemotesCache := cache.NewPostgreSQLCache(ctx, cfg, pool, "twitchemotes", loader, time.Duration(30)*time.Minute)
+	twitchemotesCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("twitchemotes"), loader,
+		time.Duration(30)*time.Minute,
+	)
 
 	router.Get("/twitchemotes/set/{setID}", func(w http.ResponseWriter, r *http.Request) {
 		setHandler(ctx, twitchemotesCache, w, r)

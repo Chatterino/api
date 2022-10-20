@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         go: [1.18, 1.19]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-22.04, windows-latest, macos-latest]
 
     steps:
       - uses: actions/setup-go@v3
@@ -25,7 +25,26 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - name: Get dependencies
+      - name: Get external dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-22.04'
+        run: sudo apt update && sudo apt -y install build-essential libvips-dev
+
+      - name: Get external dependencies (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install vips
+
+      - name: Get external dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+            choco upgrade -y pkgconfiglite
+            Invoke-WebRequest -Uri https://github.com/libvips/build-win64-mxe/releases/download/v8.13.2/vips-dev-w64-web-8.13.2-static.zip -OutFile .\vips-dev.zip
+            Expand-Archive -Path .\vips-dev.zip -DestinationPath .\
+            $env:VIPS_PATH=$(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path)
+            "VIPS_PATH=$(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path)" >> $env:GITHUB_ENV
+            "PKG_CONFIG_PATH=$env:VIPS_PATH\lib\pkgconfig" >> $env:GITHUB_ENV
+            "$env:VIPS_PATH\bin" >> $env:GITHUB_PATH
+
+      - name: Get Go dependencies
         run: |
           go get -v -t -d ./...
 
@@ -40,11 +59,11 @@ jobs:
         run: go test -v -tags migrationtest ./...
 
       - name: Generate code coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.19'
+        if: matrix.os == 'ubuntu-22.04' && matrix.go == '1.19'
         run: go test -race -v -count=1 -coverprofile=coverage.out -tags test ./...
 
       - name: Upload Test Coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.go == '1.19'
+        if: matrix.os == 'ubuntu-22.04' && matrix.go == '1.19'
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
@@ -57,7 +76,7 @@ jobs:
 
   create-release:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
@@ -67,7 +86,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: chatterino-api-1.19-ubuntu-latest
+          name: chatterino-api-1.19-ubuntu-22.04
           path: bins/ubuntu/
 
       - uses: actions/download-artifact@v3

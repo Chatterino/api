@@ -48,7 +48,9 @@ func NewTrackResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *
 	trackLoader := &TrackLoader{}
 
 	r := &TrackResolver{
-		trackCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "supinic:track", resolver.NewResponseMarshaller(trackLoader), 1*time.Hour),
+		trackCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("supinic:track"),
+			resolver.NewResponseMarshaller(trackLoader), 1*time.Hour),
 	}
 
 	return r

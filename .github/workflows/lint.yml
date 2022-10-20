@@ -10,7 +10,7 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
@@ -25,6 +25,9 @@ jobs:
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt update && sudo apt -y install build-essential libvips-dev
 
       # This will install the staticcheck version as described in the go.mod file
       - name: Install linter

@@ -75,7 +75,10 @@ func NewArticleResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool,
 	}
 
 	r := &ArticleResolver{
-		articleCache: cache.NewPostgreSQLCache(ctx, cfg, pool, "wikipedia:article", resolver.NewResponseMarshaller(articleLoader), 1*time.Hour),
+		articleCache: cache.NewPostgreSQLCache(
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("wikipedia:article"),
+			resolver.NewResponseMarshaller(articleLoader), 1*time.Hour,
+		),
 	}
 
 	return r
