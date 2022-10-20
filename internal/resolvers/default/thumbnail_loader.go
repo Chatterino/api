@@ -85,7 +85,7 @@ func (l *ThumbnailLoader) Load(ctx context.Context, urlString string, r *http.Re
 
 	// attempt building an animated image
 	if tryAnimatedThumb {
-		image, err = thumbnail.BuildAnimatedThumbnail(inputBuf, resp)
+		image, err = thumbnail.BuildAnimatedThumbnail(ctx, inputBuf, resp)
 	}
 
 	// fallback to static image if animated image building failed or is disabled

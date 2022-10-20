@@ -1,9 +1,11 @@
 package thumbnail
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/davidbyttow/govips/v2/vips"
@@ -85,11 +87,14 @@ func BuildStaticThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) 
 	return outputBuf, nil
 }
 
-func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) {
+func BuildAnimatedThumbnail(ctx context.Context, inputBuf []byte, resp *http.Response) ([]byte, error) {
+	log := logger.FromContext(ctx)
+
 	image, err := vips.NewImageFromBuffer(inputBuf)
 
 	if err != nil {
-		return []byte{}, fmt.Errorf("could not load image from url: %s", resp.Request.URL)
+		log.Errorw("could not load image from url: %s", resp.Request.URL, err)
+		return []byte{}, err
 	}
 
 	maxThumbnailSize := int(cfg.MaxThumbnailSize)
@@ -109,8 +114,8 @@ func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error
 	image, err = vips.LoadThumbnailFromBuffer(inputBuf, maxThumbnailSize, maxThumbnailSize, vips.InterestingAll, vips.SizeDown, importParams)
 
 	if err != nil {
-		fmt.Println(err)
-		return []byte{}, fmt.Errorf("could not transform image from url: %s", resp.Request.URL)
+		log.Errorw("could not transform image from url: %s", resp.Request.URL, err)
+		return []byte{}, err
 	}
 
 	// We export to WebP by default to save on bandwidth and cache storage.
@@ -118,7 +123,8 @@ func BuildAnimatedThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error
 	outputBuf, _, err := image.ExportWebp(exportParams)
 
 	if err != nil {
-		return []byte{}, fmt.Errorf("could not export image from url: %s", resp.Request.URL)
+		log.Errorw("could not export image from url %s", resp.Request.URL, err)
+		return []byte{}, err
 	}
 
 	return outputBuf, nil
