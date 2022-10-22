@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FChatterino%2Fapi%2Fbadge&style=flat)](https://actions-badge.atrox.dev/Chatterino/api/goto)
+[![Build status](https://github.com/Chatterino/api/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Chatterino/api/actions/workflows/build.yml?query=branch%3Amaster)
 [![codecov](https://codecov.io/gh/Chatterino/api/branch/master/graph/badge.svg?token=gz6EYE3bQQ)](https://codecov.io/gh/Chatterino/api)
 
 # API
@@ -9,10 +9,10 @@ Go web service that serves as a cache to APIs that each Chatterino client could 
 
 ### Resolve Twitch emote set
 
-`twitchemotes/set/:setID`  
+`twitchemotes/set/:setID`
 Returns information about a given Twitch emote set. Example response:
 
-```
+```javascript
 {
     "channel_name": "forsen", // twitch user name
     "channel_id": "22484632", // twitch user id
@@ -34,13 +34,13 @@ If the given URL is not a valid url, the Route HTTP status code will be `400`.
 
 `url` parameter: `https://example.com/page`
 
-```json
+```javascript
 {
-  "status": 200, // status code returned or inferred from the page
+  "status": 200,                                               // status code returned or inferred from the page
   "thumbnail": "http://api.url/thumbnail/web.com%2Fimage.png", // proxied thumbnail url if there's an image
-  "message": "", // used to forward errors in case the website e.g. couldn't load
-  "tooltip": "<div>tooltip</div>", // HTML tooltip used in Chatterino
-  "link": "http://example.com/longer-page" // final url, after any redirects
+  "message": "",                                               // used to forward errors in case the website e.g. couldn't load
+  "tooltip": "<div>tooltip</div>",                             // HTML tooltip used in Chatterino
+  "link": "http://example.com/longer-page"                     // final url, after any redirects
 }
 ```
 
