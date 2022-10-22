@@ -14,11 +14,11 @@ Returns information about a given Twitch emote set. Example response:
 
 ```javascript
 {
-    "channel_name": "forsen", // twitch user name
-    "channel_id": "22484632", // twitch user id
-    "type": "sub",            // string describing what type of emote set this is (e.g. "sub")
-    "custom": false           // indicates whether this is added/modified by us or straight passthrough from the twitchemotes API
-    "tier": 1,                // integer describing what tier the sub emote is part of
+  "channel_name": "forsen", // twitch user name
+  "channel_id": "22484632", // twitch user id
+  "type": "sub",            // string describing what type of emote set this is (e.g. "sub")
+  "custom": false           // indicates whether this is added/modified by us or straight passthrough from the twitchemotes API
+  "tier": 1,                // integer describing what tier the sub emote is part of
 }
 ```
 
