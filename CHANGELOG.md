@@ -26,6 +26,7 @@
 - Dev: Improve FrankerFaceZ tests. (#295)
 - Dev: Improve Livestreamfails tests. (#297, #301)
 - Dev: Improve default resolver tests. (#300)
+- Dev: Resolve imgur.io links. (#365)
 
 ## 1.2.3
 
