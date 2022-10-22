@@ -12,8 +12,10 @@ var (
 )
 
 func FromContext(ctx context.Context) Logger {
-	if v := ctx.Value(contextKey); v != nil {
-		return v.(Logger)
+	if ctx != nil {
+		if v := ctx.Value(contextKey); v != nil {
+			return v.(Logger)
+		}
 	}
 
 	log.Fatal("No logger found in context")
