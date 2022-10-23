@@ -10,6 +10,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	qt "github.com/frankban/quicktest"
 	"github.com/golang/mock/gomock"
+	"github.com/nicklaw5/helix"
 	"github.com/pashagolub/pgxmock"
 )
 
@@ -28,6 +29,20 @@ func TestInitialize(t *testing.T) {
 		customResolvers := []resolver.Resolver{}
 		c.Assert(customResolvers, qt.HasLen, 0)
 		Initialize(ctx, cfg, pool, nil, &customResolvers)
+		c.Assert(customResolvers, qt.HasLen, 0)
+	})
+	c.Run("No helix client", func(c *qt.C) {
+		customResolvers := []resolver.Resolver{}
+		var helixClient TwitchAPIClient = nil
+		c.Assert(customResolvers, qt.HasLen, 0)
+		Initialize(ctx, cfg, pool, helixClient, &customResolvers)
+		c.Assert(customResolvers, qt.HasLen, 0)
+	})
+	c.Run("No helix client", func(c *qt.C) {
+		customResolvers := []resolver.Resolver{}
+		var helixClient *helix.Client = nil
+		c.Assert(customResolvers, qt.HasLen, 0)
+		Initialize(ctx, cfg, pool, helixClient, &customResolvers)
 		c.Assert(customResolvers, qt.HasLen, 0)
 	})
 	c.Run("Helix client", func(c *qt.C) {
