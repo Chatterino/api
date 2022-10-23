@@ -9,7 +9,7 @@ Go web service that serves as a cache to APIs that each Chatterino client could 
 
 ### Resolve Twitch emote set
 
-`twitchemotes/set/:setID`
+`twitchemotes/set/:setID`  
 Returns information about a given Twitch emote set. Example response:
 
 ```javascript
