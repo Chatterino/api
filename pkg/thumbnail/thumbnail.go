@@ -94,7 +94,7 @@ func BuildAnimatedThumbnail(ctx context.Context, inputBuf []byte, resp *http.Res
 
 	if err != nil {
 		log.Errorw("could not load image from url", "url", resp.Request.URL, "err", err)
-		return []byte{}, err
+		return []byte{}, fmt.Errorf("could not load image from url: %s", resp.Request.URL)
 	}
 
 	maxThumbnailSize := int(cfg.MaxThumbnailSize)
@@ -115,7 +115,7 @@ func BuildAnimatedThumbnail(ctx context.Context, inputBuf []byte, resp *http.Res
 
 	if err != nil {
 		log.Errorw("could not transform image from url", "url", resp.Request.URL, "err", err)
-		return []byte{}, err
+		return []byte{}, fmt.Errorf("could not transform image from url: %s", resp.Request.URL)
 	}
 
 	exportParams := vips.NewWebpExportParams()
@@ -123,7 +123,7 @@ func BuildAnimatedThumbnail(ctx context.Context, inputBuf []byte, resp *http.Res
 
 	if err != nil {
 		log.Errorw("could not export image from url", "url", resp.Request.URL, "err", err)
-		return []byte{}, err
+		return []byte{}, fmt.Errorf("could not export image from url: %s", resp.Request.URL)
 	}
 
 	return outputBuf, nil
