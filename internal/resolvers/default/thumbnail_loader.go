@@ -19,9 +19,9 @@ import (
 )
 
 type ThumbnailLoader struct {
-	baseURL          string
-	maxContentLength uint64
-	enableLilliput   bool
+	baseURL                  string
+	maxContentLength         uint64
+	enableAnimatedThumbnails bool
 }
 
 func (l *ThumbnailLoader) Load(ctx context.Context, urlString string, r *http.Request) ([]byte, *int, *string, time.Duration, error) {
@@ -81,11 +81,11 @@ func (l *ThumbnailLoader) Load(ctx context.Context, urlString string, r *http.Re
 	}
 
 	var image []byte
-	tryAnimatedThumb := l.enableLilliput && thumbnail.IsAnimatedThumbnailType(contentType)
+	tryAnimatedThumb := l.enableAnimatedThumbnails && thumbnail.IsAnimatedThumbnailType(contentType)
 
 	// attempt building an animated image
 	if tryAnimatedThumb {
-		image, err = thumbnail.BuildAnimatedThumbnail(inputBuf, resp)
+		image, err = thumbnail.BuildAnimatedThumbnail(ctx, inputBuf, resp)
 	}
 
 	// fallback to static image if animated image building failed or is disabled

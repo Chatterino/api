@@ -1,12 +1,14 @@
 package thumbnail
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
-	vips "github.com/davidbyttow/govips/v2/vips"
+	"github.com/davidbyttow/govips/v2/vips"
 )
 
 var (
@@ -79,6 +81,48 @@ func BuildStaticThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) 
 	}
 
 	if err != nil {
+		return []byte{}, fmt.Errorf("could not export image from url: %s", resp.Request.URL)
+	}
+
+	return outputBuf, nil
+}
+
+func BuildAnimatedThumbnail(ctx context.Context, inputBuf []byte, resp *http.Response) ([]byte, error) {
+	log := logger.FromContext(ctx)
+
+	image, err := vips.NewImageFromBuffer(inputBuf)
+
+	if err != nil {
+		log.Errorw("could not load image from url", "url", resp.Request.URL, "err", err)
+		return []byte{}, fmt.Errorf("could not load image from url: %s", resp.Request.URL)
+	}
+
+	maxThumbnailSize := int(cfg.MaxThumbnailSize)
+	format := image.Format()
+
+	if image.Width() <= maxThumbnailSize && image.Height() <= maxThumbnailSize {
+		return inputBuf, nil
+	}
+
+	importParams := vips.NewImportParams()
+
+	// n=-1 is used for animated images to make sure to get all frames and not just the first one.
+	if format == vips.ImageTypeGIF || format == vips.ImageTypeWEBP {
+		importParams.NumPages.Set(-1)
+	}
+
+	image, err = vips.LoadThumbnailFromBuffer(inputBuf, maxThumbnailSize, maxThumbnailSize, vips.InterestingAll, vips.SizeDown, importParams)
+
+	if err != nil {
+		log.Errorw("could not transform image from url", "url", resp.Request.URL, "err", err)
+		return []byte{}, fmt.Errorf("could not transform image from url: %s", resp.Request.URL)
+	}
+
+	exportParams := vips.NewWebpExportParams()
+	outputBuf, _, err := image.ExportWebp(exportParams)
+
+	if err != nil {
+		log.Errorw("could not export image from url", "url", resp.Request.URL, "err", err)
 		return []byte{}, fmt.Errorf("could not export image from url: %s", resp.Request.URL)
 	}
 

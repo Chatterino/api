@@ -237,9 +237,9 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 		contentTypeResolvers: contentTypeResolvers,
 	}
 	thumbnailLoader := &ThumbnailLoader{
-		baseURL:          cfg.BaseURL,
-		maxContentLength: cfg.MaxContentLength,
-		enableLilliput:   cfg.EnableLilliput,
+		baseURL:                  cfg.BaseURL,
+		maxContentLength:         cfg.MaxContentLength,
+		enableAnimatedThumbnails: cfg.EnableAnimatedThumbnails,
 	}
 
 	thumbnailCache := cache.NewPostgreSQLCache(
