@@ -11,6 +11,7 @@ import (
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 	"github.com/nicklaw5/helix"
 )
 
@@ -44,7 +45,8 @@ var (
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient TwitchAPIClient, resolvers *[]resolver.Resolver) {
 	log := logger.FromContext(ctx)
-	if helixClient == nil {
+
+	if utils.IsInterfaceNil(helixClient) {
 		log.Warnw("[Config] Twitch credentials missing, won't do special responses for Twitch")
 		return
 	}
