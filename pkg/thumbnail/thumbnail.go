@@ -118,7 +118,6 @@ func BuildAnimatedThumbnail(ctx context.Context, inputBuf []byte, resp *http.Res
 		return []byte{}, err
 	}
 
-	// We export to WebP by default to save on bandwidth and cache storage.
 	exportParams := vips.NewWebpExportParams()
 	outputBuf, _, err := image.ExportWebp(exportParams)
 
