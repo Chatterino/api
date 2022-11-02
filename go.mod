@@ -22,12 +22,13 @@ require (
 	github.com/spf13/viper v1.13.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/text v0.4.0
-	google.golang.org/api v0.101.0
+	google.golang.org/api v0.102.0
 	honnef.co/go/tools v0.3.3
 )
 
 require (
-	cloud.google.com/go/compute v1.10.0 // indirect
+	cloud.google.com/go/compute v1.12.1 // indirect
+	cloud.google.com/go/compute/metadata v0.2.1 // indirect
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/Jeffail/gabs v1.4.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
@@ -81,7 +82,7 @@ require (
 	golang.org/x/sys v0.0.0-20220817070843-5a390386f1f2 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20221018160656-63c7b68cfc55 // indirect
+	google.golang.org/genproto v0.0.0-20221024183307-1bc688fe9f3e // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
