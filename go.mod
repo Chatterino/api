@@ -17,7 +17,7 @@ require (
 	github.com/pashagolub/pgxmock v1.8.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pdfcpu/pdfcpu v0.3.13
-	github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang v1.13.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.13.0
 	go.uber.org/zap v1.23.0
