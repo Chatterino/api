@@ -220,11 +220,13 @@ func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) 
 				ch <- response
 			}
 			delete(c.requests, key)
+			c.requestsMutex.Unlock()
 		}()
 	}
 
 	// If key is not in cache, sign up as a listener and ensure loader is only called once
 	// Wait for loader to complete, then return value from loader
+	log.Debugw("DB Waiting for response channel", "cacheKey", cacheKey)
 	response := <-responseChannel
 	return response, nil
 }
