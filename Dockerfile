@@ -1,12 +1,10 @@
-FROM ubuntu:22.04 AS build
-ENV GOVER=1.19.2
+FROM golang:1.19-alpine AS build
 ADD . /src
-RUN apt update && apt -y install libvips-dev wget build-essential
-RUN wget -qO- https://go.dev/dl/go$GOVER.linux-amd64.tar.gz | tar -C /src -xzf -
-RUN cd /src/cmd/api && /src/go/bin/go build
+RUN apk add --no-cache build-base pkgconfig vips-dev
+RUN cd /src/cmd/api && go build
 
-FROM ubuntu:22.04
+FROM alpine:latest
 WORKDIR /app
 COPY --from=build /src/cmd/api/api /app/
-RUN apt update && apt install -y ca-certificates libvips && apt clean
+RUN apk add --no-cache ca-certificates vips
 CMD ["./api"]

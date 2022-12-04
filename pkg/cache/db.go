@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/Chatterino/api/internal/db"
@@ -49,6 +50,9 @@ type PostgreSQLCache struct {
 	pool db.Pool
 
 	dependentCaches []DependentCache
+
+	requestsMutex sync.Mutex
+	requests      map[string][]chan *Response
 }
 
 // TODO: Make the "internal error" tooltip an actual tooltip
@@ -189,7 +193,40 @@ func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) 
 
 	cacheMisses.Inc()
 	log.Debugw("DB Get cache miss", "cacheKey", cacheKey)
-	return c.load(ctx, key, r)
+	responseChannel := make(chan *Response)
+
+	c.requestsMutex.Lock()
+
+	c.requests[key] = append(c.requests[key], responseChannel)
+
+	first := len(c.requests[key]) == 1
+
+	c.requestsMutex.Unlock()
+
+	if first {
+		log.Debugw("DB Get cache miss!!", "cacheKey", cacheKey)
+		go func() {
+			response, err := c.load(ctx, key, r)
+			if err != nil {
+				log.Warnw("Error loading DB request", "error", err)
+				response = &Response{
+					Payload:     []byte(`{"status":500,"message":"Internal server error (PSQL) loading cache"}`),
+					StatusCode:  500,
+					ContentType: "application/json",
+				}
+			}
+			c.requestsMutex.Lock()
+			for _, ch := range c.requests[key] {
+				ch <- response
+			}
+			delete(c.requests, key)
+		}()
+	}
+
+	// If key is not in cache, sign up as a listener and ensure loader is only called once
+	// Wait for loader to complete, then return value from loader
+	response := <-responseChannel
+	return response, nil
 }
 
 func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) *Response {
@@ -280,6 +317,7 @@ func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool,
 		loader:        loader,
 		cacheDuration: cacheDuration,
 		pool:          pool,
+		requests:      make(map[string][]chan *Response),
 	}
 }
 
