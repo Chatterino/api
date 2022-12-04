@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/Chatterino/api/internal/db"
@@ -33,6 +34,11 @@ var (
 	)
 )
 
+type wrappedResponse struct {
+	response *Response
+	err      error
+}
+
 func init() {
 	prometheus.MustRegister(cacheHits)
 	prometheus.MustRegister(cacheMisses)
@@ -49,6 +55,9 @@ type PostgreSQLCache struct {
 	pool db.Pool
 
 	dependentCaches []DependentCache
+
+	requestsMutex sync.Mutex
+	requests      map[string][]chan wrappedResponse
 }
 
 // TODO: Make the "internal error" tooltip an actual tooltip
@@ -187,9 +196,39 @@ func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) 
 		return cacheResponse, nil
 	}
 
+	// If key is not in cache, sign up as a listener and ensure loader is only called once
 	cacheMisses.Inc()
 	log.Debugw("DB Get cache miss", "cacheKey", cacheKey)
-	return c.load(ctx, key, r)
+	responseChannel := make(chan wrappedResponse)
+
+	c.requestsMutex.Lock()
+
+	c.requests[key] = append(c.requests[key], responseChannel)
+
+	first := len(c.requests[key]) == 1
+
+	c.requestsMutex.Unlock()
+
+	if first {
+		go func() {
+			response, err := c.load(ctx, key, r)
+
+			r := wrappedResponse{
+				response,
+				err,
+			}
+			c.requestsMutex.Lock()
+			for _, ch := range c.requests[key] {
+				ch <- r
+			}
+			delete(c.requests, key)
+			c.requestsMutex.Unlock()
+		}()
+	}
+
+	// Wait for loader to complete, then return value from loader
+	response := <-responseChannel
+	return response.response, response.err
 }
 
 func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) *Response {
@@ -280,6 +319,7 @@ func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool,
 		loader:        loader,
 		cacheDuration: cacheDuration,
 		pool:          pool,
+		requests:      make(map[string][]chan wrappedResponse),
 	}
 }
 
