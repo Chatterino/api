@@ -27,6 +27,7 @@
 - Dev: Improve Livestreamfails tests. (#297, #301)
 - Dev: Improve default resolver tests. (#300)
 - Dev: Resolve imgur.io links. (#365)
+- Dev: Don't use `stampede` for link resolver links. (#394)
 
 ## 1.2.3
 
