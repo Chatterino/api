@@ -15,6 +15,7 @@
 - Fix: JSON responses now always return the proper content type. (#334)
 - Dev: Improve BetterTTV emote tests. (#282)
 - Minor: BetterTTV cache key changed from plural to singular form. (#282)
+- Dev: Add docker-compose support. (#395)
 - Dev: Improve Twitch.tv clip tests. (#283)
 - Dev: Improve YouTube tests. (#284)
 - Dev: Resolver Check now returns a context. (#287)
