@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  api:
+    restart: always
+    image: ghcr.io/chatterino/api:latest
+    environment:
+      - CHATTERINO_API_DSN=postgres://${PG_USER:-api}:${PG_PASS:-api}@db:5432/${PG_USER:-api}
+      - CHATTERINO_API_PROMETHEUS_BIND_ADDRESS=0.0.0.0:9182
+    env_file: docker/chatterino2-api.env
+    ports:
+      - "${API_PORT:-1234}:1234"
+    depends_on:
+      - "db"
+  db:
+    image: postgres:15-alpine
+    restart: always
+    env_file: docker/env
+    environment:
+      - POSTGRES_USER=${PG_USER:-api}
+      - POSTGRES_PASSWORD=${PG_PASS:-api}
+    volumes:
+      - db:/var/lib/postgresql/data
+  prometheus:
+    restart: always
+    image: prom/prometheus:latest
+    env_file: docker/env
+    volumes:
+      - $PWD/docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROM_PORT:-9090}:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+  pg_exporter:
+    restart: always
+    image: quay.io/prometheuscommunity/postgres-exporter:latest
+    env_file: docker/env
+    environment:
+      - DATA_SOURCE_URI=db?sslmode=disable
+      - DATA_SOURCE_USER=${PG_USER:-api}
+      - DATA_SOURCE_PASS=${PG_PASS:-api}
+      - PG_EXPORTER_EXCLUDE_DATABASES=template0,template1
+    depends_on:
+      - "db"
+volumes:
+  db:
+  prometheus_data:
