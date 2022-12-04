@@ -34,6 +34,11 @@ var (
 	)
 )
 
+type wrappedResponse struct {
+	response *Response
+	err      error
+}
+
 func init() {
 	prometheus.MustRegister(cacheHits)
 	prometheus.MustRegister(cacheMisses)
@@ -52,7 +57,7 @@ type PostgreSQLCache struct {
 	dependentCaches []DependentCache
 
 	requestsMutex sync.Mutex
-	requests      map[string][]chan *Response
+	requests      map[string][]chan wrappedResponse
 }
 
 // TODO: Make the "internal error" tooltip an actual tooltip
@@ -191,9 +196,10 @@ func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) 
 		return cacheResponse, nil
 	}
 
+	// If key is not in cache, sign up as a listener and ensure loader is only called once
 	cacheMisses.Inc()
 	log.Debugw("DB Get cache miss", "cacheKey", cacheKey)
-	responseChannel := make(chan *Response)
+	responseChannel := make(chan wrappedResponse)
 
 	c.requestsMutex.Lock()
 
@@ -204,31 +210,25 @@ func (c *PostgreSQLCache) Get(ctx context.Context, key string, r *http.Request) 
 	c.requestsMutex.Unlock()
 
 	if first {
-		log.Debugw("DB Get cache miss!!", "cacheKey", cacheKey)
 		go func() {
 			response, err := c.load(ctx, key, r)
-			if err != nil {
-				log.Warnw("Error loading DB request", "error", err)
-				response = &Response{
-					Payload:     []byte(`{"status":500,"message":"Internal server error (PSQL) loading cache"}`),
-					StatusCode:  500,
-					ContentType: "application/json",
-				}
+
+			r := wrappedResponse{
+				response,
+				err,
 			}
 			c.requestsMutex.Lock()
 			for _, ch := range c.requests[key] {
-				ch <- response
+				ch <- r
 			}
 			delete(c.requests, key)
 			c.requestsMutex.Unlock()
 		}()
 	}
 
-	// If key is not in cache, sign up as a listener and ensure loader is only called once
 	// Wait for loader to complete, then return value from loader
-	log.Debugw("DB Waiting for response channel", "cacheKey", cacheKey)
 	response := <-responseChannel
-	return response, nil
+	return response.response, response.err
 }
 
 func (c *PostgreSQLCache) GetOnly(ctx context.Context, key string) *Response {
@@ -319,7 +319,7 @@ func NewPostgreSQLCache(ctx context.Context, cfg config.APIConfig, pool db.Pool,
 		loader:        loader,
 		cacheDuration: cacheDuration,
 		pool:          pool,
-		requests:      make(map[string][]chan *Response),
+		requests:      make(map[string][]chan wrappedResponse),
 	}
 }
 
