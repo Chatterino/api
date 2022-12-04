@@ -28,7 +28,6 @@ var defaultTooltip = template.Must(template.New("default_tooltip").Parse(default
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router *chi.Mux, helixClient *helix.Client) {
 	defaultLinkResolver := New(ctx, cfg, pool, helixClient)
 
-	// cached := stampede.Handler(512, 10*time.Second)
 	imageCached := stampede.Handler(256, 2*time.Second)
 	generatedValuesCached := stampede.Handler(256, 2*time.Second)
 
