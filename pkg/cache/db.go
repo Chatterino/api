@@ -127,11 +127,11 @@ func (c *PostgreSQLCache) load(ctx context.Context, key string, r *http.Request)
 	defer c.rollbackDependents(ctx, key)
 
 	if statusCode == nil {
-		log.Warnw("Missing status code, setting to 200 default")
+		log.Debugw("Missing status code, setting to 200 default")
 		statusCode = &defaultStatusCode
 	}
 	if contentType == nil {
-		log.Warnw("Missing content type, setting to application/json default")
+		log.Debugw("Missing content type, setting to application/json default")
 		contentType = &defaultContentType
 	}
 
