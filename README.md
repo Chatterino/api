@@ -86,3 +86,4 @@ If you host your own version of this API, you can modify which url Chatterino2 u
 [Change link resolver](https://wiki.chatterino.com/Environment%20Variables/#chatterino2_link_resolver_url)  
 [Change Twitch emote resolver](https://wiki.chatterino.com/Environment%20Variables/#chatterino2_twitch_emote_set_resolver_url)  
 [How to build and host](docs/build.md)
+[Running in Docker](docker/README.md)
