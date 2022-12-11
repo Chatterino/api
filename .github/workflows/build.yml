@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         go: [1.18, 1.19]
-        os: [ubuntu-22.04, windows-latest, macos-latest]
+        os: [ubuntu-22.04, macos-latest]
 
     steps:
       - uses: actions/setup-go@v3
@@ -32,17 +32,6 @@ jobs:
       - name: Get external dependencies (MacOS)
         if: matrix.os == 'macos-latest'
         run: brew install vips
-
-      - name: Get external dependencies (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-            choco upgrade -y pkgconfiglite --download-checksum 2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f --download-checksum-type sha256
-            Invoke-WebRequest -Uri https://github.com/libvips/build-win64-mxe/releases/download/v8.13.2/vips-dev-w64-web-8.13.2-static.zip -OutFile .\vips-dev.zip
-            Expand-Archive -Path .\vips-dev.zip -DestinationPath .\
-            $env:VIPS_PATH=$(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path)
-            "VIPS_PATH=$(Resolve-Path ".\vips-dev-8.13" | select -ExpandProperty Path)" >> $env:GITHUB_ENV
-            "PKG_CONFIG_PATH=$env:VIPS_PATH\lib\pkgconfig" >> $env:GITHUB_ENV
-            "$env:VIPS_PATH\bin" >> $env:GITHUB_PATH
 
       - name: Get Go dependencies
         run: |
@@ -94,11 +83,6 @@ jobs:
           name: chatterino-api-1.19-macos-latest
           path: bins/macos/
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: chatterino-api-1.19-windows-latest
-          path: bins/windows/
-
       - name: display structure
         run: ls -lR
 
@@ -106,7 +90,6 @@ jobs:
         run: |
             mkdir final-bins
             mv bins/ubuntu/chatterino-api final-bins/chatterino-api-ubuntu-x86_64
-            mv bins/windows/chatterino-api final-bins/chatterino-api-windows-x86_64.exe
             mv bins/macos/chatterino-api final-bins/chatterino-api-macos-x86_64
 
       - name: build-changelog
@@ -120,7 +103,6 @@ jobs:
           body_path: release-body
           files: |
             final-bins/chatterino-api-ubuntu-x86_64
-            final-bins/chatterino-api-windows-x86_64.exe
             final-bins/chatterino-api-macos-x86_64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
