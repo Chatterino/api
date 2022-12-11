@@ -64,7 +64,11 @@ func TestLinkResolver(t *testing.T) {
 
 	router := chi.NewRouter()
 
-	r := New(ctx, cfg, pool, nil)
+	ignoredHosts := map[string]struct{}{
+		"ignoredhost.com": {},
+	}
+
+	r := New(ctx, cfg, pool, nil, ignoredHosts)
 
 	router.Get("/link_resolver/{url}", r.HandleRequest)
 	router.Get("/thumbnail/{url}", r.HandleThumbnailRequest)
@@ -198,6 +202,24 @@ func TestLinkResolver(t *testing.T) {
 					Status:  http.StatusBadRequest,
 					Link:    "",
 					Message: `Could not fetch link info: Invalid URL`,
+				},
+			},
+			{
+				inputReq:     newLinkResolverRequest(t, ctx, "GET", "https://ignoredhost.com/forsen", nil),
+				inputLinkKey: ts.URL,
+				expected: resolver.Response{
+					Status:  http.StatusForbidden,
+					Link:    "",
+					Message: `Link forbidden`,
+				},
+			},
+			{
+				inputReq:     newLinkResolverRequest(t, ctx, "GET", "https://IgnoredHost.com/forsen", nil),
+				inputLinkKey: ts.URL,
+				expected: resolver.Response{
+					Status:  http.StatusForbidden,
+					Link:    "",
+					Message: `Link forbidden`,
 				},
 			},
 		}
