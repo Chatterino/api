@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Chatterino/api/internal/db"
@@ -31,9 +32,20 @@ import (
 type LinkResolver struct {
 	customResolvers []resolver.Resolver
 
+	ignoredHosts map[string]struct{}
+
 	linkCache      cache.Cache
 	thumbnailCache cache.Cache
 	generatedCache cache.DependentCache
+}
+
+func (r *LinkResolver) shouldIgnore(u *url.URL) bool {
+	if _, ok := r.ignoredHosts[strings.ToLower(u.Hostname())]; ok {
+		// Ignoring url because host is ignored
+		return true
+	}
+
+	return false
 }
 
 func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
@@ -62,6 +74,16 @@ func (r *LinkResolver) HandleRequest(w http.ResponseWriter, req *http.Request) {
 			"error", err,
 		)
 		_, err = resolver.WriteInvalidURL(w)
+		if err != nil {
+			log.Errorw("Error writing response",
+				"error", err,
+			)
+		}
+		return
+	}
+
+	if r.shouldIgnore(requestUrl) {
+		_, err = resolver.WriteForbiddenURL(w)
 		if err != nil {
 			log.Errorw("Error writing response",
 				"error", err,
@@ -208,7 +230,7 @@ func (r *LinkResolver) HandleGeneratedValueRequest(w http.ResponseWriter, req *h
 	}
 }
 
-func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client) *LinkResolver {
+func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *helix.Client, ignoredHosts map[string]struct{}) *LinkResolver {
 	generatedCache := cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("default:dependent"))
 
 	customResolvers := []resolver.Resolver{}
@@ -252,6 +274,8 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 
 	r := &LinkResolver{
 		customResolvers: customResolvers,
+
+		ignoredHosts: ignoredHosts,
 
 		linkCache:      linkCache,
 		thumbnailCache: thumbnailCache,

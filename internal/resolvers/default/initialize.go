@@ -26,7 +26,10 @@ const (
 var defaultTooltip = template.Must(template.New("default_tooltip").Parse(defaultTooltipString))
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router *chi.Mux, helixClient *helix.Client) {
-	defaultLinkResolver := New(ctx, cfg, pool, helixClient)
+	// Ignored hosts can be added here at request of the hoster
+	ignoredHosts := map[string]struct{}{}
+
+	defaultLinkResolver := New(ctx, cfg, pool, helixClient, ignoredHosts)
 
 	imageCached := stampede.Handler(256, 2*time.Second)
 	generatedValuesCached := stampede.Handler(256, 2*time.Second)

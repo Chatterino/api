@@ -17,6 +17,8 @@ var (
 
 	InvalidURLBytes = []byte(`{"status":400,"message":"Could not fetch link info: Invalid URL"}`)
 
+	ForbiddenURLBytes = []byte(`{"status":403,"message":"Link forbidden"}`)
+
 	// Dynamically created based on config
 	ResponseTooLarge []byte
 )
@@ -31,6 +33,12 @@ func WriteInvalidURL(w http.ResponseWriter) (int, error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
 	return w.Write(InvalidURLBytes)
+}
+
+func WriteForbiddenURL(w http.ResponseWriter) (int, error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusForbidden)
+	return w.Write(ForbiddenURLBytes)
 }
 
 func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
