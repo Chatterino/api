@@ -61,7 +61,7 @@ func NewYouTubeChannelResolver(ctx context.Context, cfg config.APIConfig, pool d
 
 	r := &YouTubeChannelResolver{
 		channelCache: cache.NewPostgreSQLCache(
-			ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:channel"), loader, 24*time.Hour,
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:channel"), loader, 48*time.Hour,
 		),
 	}
 
