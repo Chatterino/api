@@ -73,6 +73,11 @@ func (l *UserLoader) getUserByName(userName string) (*TwitterUserApiResponse, er
 		return nil, errors.New("unable to unmarshal response")
 	}
 
+	// TODO: is this check needed? API seems to throw 400 if the user is not found
+	if len(user.Data) == 0 {
+		return nil, errors.New("user not found")
+	}
+
 	/* By default, Twitter returns a low resolution image.
 	 * This modification removes "_normal" to get the original sized image, based on Twitter's API documentation:
 	 * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/user-profile-images-and-banners
