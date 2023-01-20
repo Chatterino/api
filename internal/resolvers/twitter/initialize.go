@@ -76,7 +76,7 @@ func Initialize(
 	}
 	cfg = conf
 
-	const userEndpointURLFormat = "https://api.twitter.com/1.1/users/show.json?screen_name=%s"
+	const userEndpointURLFormat = "https://api.twitter.com/2/users/by?usernames=%s&user.fields=description,profile_image_url,public_metrics"
 	const tweetEndpointURLFormat = "https://api.twitter.com/1.1/statuses/show.json?id=%s&tweet_mode=extended"
 
 	*resolvers = append(

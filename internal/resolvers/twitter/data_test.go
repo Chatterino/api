@@ -15,11 +15,17 @@ var (
 
 func init() {
 	users["pajlada"] = &TwitterUserApiResponse{
-		Name:            "PAJLADA",
-		Username:        "pajlada",
-		Description:     "Cool memer",
-		Followers:       69,
-		ProfileImageUrl: "https://pbs.twimg.com/profile_images/1385924241619628033/fW7givJA_400x400.jpg",
+		Data: []TwitterUserData{
+			{
+				Name:            "PAJLADA",
+				Username:        "pajlada",
+				Description:     "Cool memer",
+				ProfileImageUrl: "https://pbs.twimg.com/profile_images/1385924241619628033/fW7givJA_400x400.jpg",
+				PublicMetrics: TwitterUserPublicMetrics{
+					Followers: 69,
+				},
+			},
+		},
 	}
 
 	// Tweet with no entities
