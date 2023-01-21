@@ -35,15 +35,18 @@ type Data struct {
 	PublicMetrics PublicMetrics `json:"public_metrics"`
 	ID            string        `json:"id"`
 	Text          string        `json:"text"`
-	CreatedAt     string        `json:"created_at"`
+	CreatedAt     time.Time     `json:"created_at"`
 }
+
 type Media struct {
 	URL string `json:"url"`
 }
+
 type Users struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
 }
+
 type Includes struct {
 	Media []Media `json:"media"`
 	Users []Users `json:"users"`
@@ -178,15 +181,7 @@ func (l *TweetLoader) buildTweetTooltip(
 	data.Username = tweet.Includes.Users[0].Username
 	data.Likes = humanize.Number(tweet.Data.PublicMetrics.LikeCount)
 	data.Retweets = humanize.Number(tweet.Data.PublicMetrics.RetweetCount)
-
-	// TODO: what time format is this exactly? can we move to humanize a la CreationDteRFC3339?
-	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Data.CreatedAt)
-	if err != nil {
-		data.Timestamp = ""
-	} else {
-		data.Timestamp = humanize.CreationDateTime(timestamp)
-	}
-
+	data.Timestamp = humanize.CreationDateTime(tweet.Data.CreatedAt)
 	data.Thumbnail = l.buildThumbnailURL(ctx, tweet, r)
 
 	return data
