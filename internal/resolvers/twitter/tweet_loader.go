@@ -197,8 +197,12 @@ func (l *TweetLoader) buildThumbnailURL(
 ) string {
 	log := logger.FromContext(ctx)
 
-	// If tweet contains exactly one image, it will be used as thumbnail
 	numMedia := len(tweet.Includes.Media)
+	if numMedia == 0 {
+		return ""
+	}
+
+	// If tweet contains exactly one image, it will be used as thumbnail
 	if numMedia == 1 {
 		if tweet.Includes.Media[0].Type == "video" {
 			return tweet.Includes.Media[0].PreviewImageUrl
