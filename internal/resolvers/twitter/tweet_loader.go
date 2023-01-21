@@ -121,6 +121,12 @@ func (l *TweetLoader) getTweetByID(id string) (*TweetApiResponse, error) {
 		return nil, errors.New("unable to unmarshal response")
 	}
 
+	// deleted tweets do not return 404, but contain no data instead
+	// example ID: 1616441855495016450
+	if tweet.Data.ID == "" {
+		return nil, errTweetNotFound
+	}
+
 	return tweet, nil
 }
 
