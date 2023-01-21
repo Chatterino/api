@@ -21,28 +21,32 @@ import (
 	"github.com/davidbyttow/govips/v2/vips"
 )
 
-type APIUser struct {
-	Name            string `json:"name"`
-	Username        string `json:"screen_name"`
-	ProfileImageUrl string `json:"profile_image_url_https"`
-}
-
-type APIEntitiesMedia struct {
-	Url string `json:"media_url_https"`
-}
-
-type APIEntities struct {
-	Media []APIEntitiesMedia `json:"media"`
-}
-
 type TweetApiResponse struct {
-	ID        string      `json:"id_str"`
-	Text      string      `json:"full_text"`
-	Timestamp string      `json:"created_at"`
-	Likes     uint64      `json:"favorite_count"`
-	Retweets  uint64      `json:"retweet_count"`
-	User      APIUser     `json:"user"`
-	Entities  APIEntities `json:"extended_entities"`
+	Data     Data     `json:"data"`
+	Includes Includes `json:"includes"`
+}
+
+type PublicMetrics struct {
+	RetweetCount int `json:"retweet_count"`
+	LikeCount    int `json:"like_count"`
+}
+
+type Data struct {
+	PublicMetrics PublicMetrics `json:"public_metrics"`
+	ID            string        `json:"id"`
+	Text          string        `json:"text"`
+	CreatedAt     string        `json:"created_at"`
+}
+type Media struct {
+	URL string `json:"url"`
+}
+type Users struct {
+	Username string `json:"username"`
+	Name     string `json:"name"`
+}
+type Includes struct {
+	Media []Media `json:"media"`
+	Users []Users `json:"users"`
 }
 
 type tweetTooltipData struct {
@@ -163,14 +167,14 @@ func (l *TweetLoader) buildTweetTooltip(
 	r *http.Request,
 ) *tweetTooltipData {
 	data := &tweetTooltipData{}
-	data.Text = tweet.Text
-	data.Name = tweet.User.Name
-	data.Username = tweet.User.Username
-	data.Likes = humanize.Number(tweet.Likes)
-	data.Retweets = humanize.Number(tweet.Retweets)
+	data.Text = tweet.Data.Text
+	data.Name = tweet.Includes.Users[0].Name
+	data.Username = tweet.Includes.Users[0].Username
+	data.Likes = humanize.Number(uint64(tweet.Data.PublicMetrics.LikeCount))
+	data.Retweets = humanize.Number(uint64(tweet.Data.PublicMetrics.RetweetCount))
 
 	// TODO: what time format is this exactly? can we move to humanize a la CreationDteRFC3339?
-	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Timestamp)
+	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Data.CreatedAt)
 	if err != nil {
 		data.Timestamp = ""
 	} else {
@@ -189,14 +193,14 @@ func (l *TweetLoader) buildThumbnailURL(
 ) string {
 	log := logger.FromContext(ctx)
 
-	numMedia := len(tweet.Entities.Media)
+	numMedia := len(tweet.Includes.Media)
 	if numMedia == 1 {
 		// If tweet contains exactly one image, it will be used as thumbnail
-		return tweet.Entities.Media[0].Url
+		return tweet.Includes.Media[0].URL
 	}
 
 	// More than one media item, need to compose a thumbnail
-	thumb, err := l.composeThumbnail(ctx, tweet.Entities.Media)
+	thumb, err := l.composeThumbnail(ctx, tweet.Includes.Media)
 	if err != nil {
 		log.Errorw("Couldn't compose Twitter collage",
 			"err", err,
@@ -212,8 +216,8 @@ func (l *TweetLoader) buildThumbnailURL(
 		return ""
 	}
 
-	parentKey := l.tweetCacheKeyProvider.CacheKey(ctx, tweet.ID)
-	collageKey := buildCollageKey(tweet.ID)
+	parentKey := l.tweetCacheKeyProvider.CacheKey(ctx, tweet.Data.ID)
+	collageKey := buildCollageKey(tweet.Data.ID)
 	contentType := utils.MimeType(metaData.Format)
 
 	err = l.collageCache.Insert(ctx, collageKey, parentKey, outputBuf, contentType)
@@ -229,7 +233,7 @@ func (l *TweetLoader) buildThumbnailURL(
 
 func (l *TweetLoader) composeThumbnail(
 	ctx context.Context,
-	mediaEntities []APIEntitiesMedia,
+	mediaEntities []Media,
 ) (*vips.ImageRef, error) {
 	log := logger.FromContext(ctx)
 
@@ -247,10 +251,10 @@ func (l *TweetLoader) composeThumbnail(
 		go func() {
 			defer wg.Done()
 
-			resp, err := resolver.RequestGET(ctx, media.Url)
+			resp, err := resolver.RequestGET(ctx, media.URL)
 			if err != nil {
 				log.Errorw("Couldn't download Twitter media",
-					"url", media.Url,
+					"url", media.URL,
 					"err", err,
 				)
 				return
@@ -259,7 +263,7 @@ func (l *TweetLoader) composeThumbnail(
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Errorw("Couldn't read response body",
-					"url", media.Url,
+					"url", media.URL,
 					"err", err,
 				)
 				return

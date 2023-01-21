@@ -77,7 +77,7 @@ func Initialize(
 	cfg = conf
 
 	const userEndpointURLFormat = "https://api.twitter.com/2/users/by?usernames=%s&user.fields=description,profile_image_url,public_metrics"
-	const tweetEndpointURLFormat = "https://api.twitter.com/1.1/statuses/show.json?id=%s&tweet_mode=extended"
+	const tweetEndpointURLFormat = "https://api.twitter.com/2/tweets/%s?expansions=author_id,attachments.media_keys&user.fields=profile_image_url&media.fields=url&tweet.fields=created_at,public_metrics"
 
 	*resolvers = append(
 		*resolvers,

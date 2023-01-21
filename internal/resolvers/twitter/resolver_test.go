@@ -38,8 +38,8 @@ func TestResolver(t *testing.T) {
 	r := NewTwitterResolver(ctx,
 		cfg,
 		pool,
-		ts.URL+"/1.1/users/show.json?screen_name=%s",
-		ts.URL+"/1.1/statuses/show.json?id=%s&tweet_mode=extended",
+		ts.URL+"/2/users/by?usernames=%s&user.fields=description,profile_image_url,public_metrics",
+		ts.URL+"/2/tweets/%s?expansions=author_id,attachments.media_keys&user.fields=profile_image_url&media.fields=url&tweet.fields=created_at,public_metrics",
 		cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("test")),
 	)
 
