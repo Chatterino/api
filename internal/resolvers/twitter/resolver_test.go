@@ -176,17 +176,6 @@ func TestResolver(t *testing.T) {
 					expectedError: nil,
 				},
 				{
-					label:      "Poorly formatted timestamp",
-					inputURL:   utils.MustParseURL("https://twitter.com/pajlada/status/1505121705290874881"),
-					inputTweet: "1505121705290874881",
-					expectedResponse: &cache.Response{
-						Payload:     []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EPAJLADA%20%28@pajlada%29%3C%2Fb%3E%0A%3Cspan%20style=%22white-space:%20pre-wrap%3B%20word-wrap:%20break-word%3B%22%3E%0ABad%20timestamp%0A%3C%2Fspan%3E%0A%3Cspan%20style=%22color:%20%23808892%3B%22%3E420%20likes\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B69%20retweets\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A"}`),
-						StatusCode:  http.StatusOK,
-						ContentType: "application/json",
-					},
-					expectedError: nil,
-				},
-				{
 					label:      "404",
 					inputURL:   utils.MustParseURL("https://twitter.com/pajlada/status/404"),
 					inputTweet: "404",

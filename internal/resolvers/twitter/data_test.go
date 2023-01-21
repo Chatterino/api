@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -31,8 +32,9 @@ func init() {
 	// Tweet with no entities
 	tweets["1507648130682077194"] = &TweetApiResponse{
 		Data: Data{
+			ID:        "1507648130682077194",
 			Text:      "Digging a hole",
-			CreatedAt: "Sat Mar 26 17:15:50 +0200 2022",
+			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
 			PublicMetrics: PublicMetrics{
 				RetweetCount: 420,
 				LikeCount:    69,
@@ -51,8 +53,9 @@ func init() {
 	// Tweet with entities
 	tweets["1506968434134953986"] = &TweetApiResponse{
 		Data: Data{
+			ID:        "1506968434134953986",
 			Text:      "",
-			CreatedAt: "Sat Mar 26 17:15:50 +0200 2022",
+			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
 			PublicMetrics: PublicMetrics{
 				RetweetCount: 420,
 				LikeCount:    69,
@@ -76,8 +79,9 @@ func init() {
 	// Tweet with no entities
 	tweets["1505121705290874881"] = &TweetApiResponse{
 		Data: Data{
+			ID:        "1505121705290874881",
 			Text:      "Bad timestamp",
-			CreatedAt: "asdasd",
+			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
 			PublicMetrics: PublicMetrics{
 				RetweetCount: 69,
 				LikeCount:    420,
