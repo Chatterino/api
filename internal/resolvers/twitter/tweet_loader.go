@@ -27,8 +27,8 @@ type TweetApiResponse struct {
 }
 
 type PublicMetrics struct {
-	RetweetCount int `json:"retweet_count"`
-	LikeCount    int `json:"like_count"`
+	RetweetCount uint64 `json:"retweet_count"`
+	LikeCount    uint64 `json:"like_count"`
 }
 
 type Data struct {
@@ -170,8 +170,8 @@ func (l *TweetLoader) buildTweetTooltip(
 	data.Text = tweet.Data.Text
 	data.Name = tweet.Includes.Users[0].Name
 	data.Username = tweet.Includes.Users[0].Username
-	data.Likes = humanize.Number(uint64(tweet.Data.PublicMetrics.LikeCount))
-	data.Retweets = humanize.Number(uint64(tweet.Data.PublicMetrics.RetweetCount))
+	data.Likes = humanize.Number(tweet.Data.PublicMetrics.LikeCount)
+	data.Retweets = humanize.Number(tweet.Data.PublicMetrics.RetweetCount)
 
 	// TODO: what time format is this exactly? can we move to humanize a la CreationDteRFC3339?
 	timestamp, err := time.Parse("Mon Jan 2 15:04:05 -0700 2006", tweet.Data.CreatedAt)
