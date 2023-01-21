@@ -39,7 +39,10 @@ type Data struct {
 }
 
 type Media struct {
-	URL string `json:"url"`
+	Type string `json:"type"`
+	URL  string `json:"url"`
+	// used for videos
+	PreviewImageUrl string `json:"preview_image_url"`
 }
 
 type Users struct {
@@ -194,9 +197,13 @@ func (l *TweetLoader) buildThumbnailURL(
 ) string {
 	log := logger.FromContext(ctx)
 
+	// If tweet contains exactly one image, it will be used as thumbnail
 	numMedia := len(tweet.Includes.Media)
 	if numMedia == 1 {
-		// If tweet contains exactly one image, it will be used as thumbnail
+		if tweet.Includes.Media[0].Type == "video" {
+			return tweet.Includes.Media[0].PreviewImageUrl
+		}
+
 		return tweet.Includes.Media[0].URL
 	}
 
@@ -249,13 +256,18 @@ func (l *TweetLoader) composeThumbnail(
 		idx := idx
 		media := media
 
+		url := media.URL
+		if media.Type == "video" {
+			url = media.PreviewImageUrl
+		}
+
 		go func() {
 			defer wg.Done()
 
-			resp, err := resolver.RequestGET(ctx, media.URL)
+			resp, err := resolver.RequestGET(ctx, url)
 			if err != nil {
 				log.Errorw("Couldn't download Twitter media",
-					"url", media.URL,
+					"url", url,
 					"err", err,
 				)
 				return
@@ -264,7 +276,7 @@ func (l *TweetLoader) composeThumbnail(
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Errorw("Couldn't read response body",
-					"url", media.URL,
+					"url", url,
 					"err", err,
 				)
 				return
