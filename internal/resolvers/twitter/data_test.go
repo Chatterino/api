@@ -29,7 +29,32 @@ func init() {
 		},
 	}
 
-	// Tweet with no entities
+	// Tweet with image media
+	tweets["1506968434134953986"] = &TweetApiResponse{
+		Data: Data{
+			ID:        "1506968434134953986",
+			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
+			PublicMetrics: PublicMetrics{
+				RetweetCount: 420,
+				LikeCount:    69,
+			},
+		},
+		Includes: Includes{
+			Users: []Users{
+				{
+					Name:     "PAJLADA",
+					Username: "pajlada",
+				},
+			},
+			Media: []Media{
+				{
+					URL: "https://pbs.twimg.com/media/FOnTzeQWUAMU6L1?format=jpg&name=medium",
+				},
+			},
+		},
+	}
+
+	// Tweet with video media
 	tweets["1507648130682077194"] = &TweetApiResponse{
 		Data: Data{
 			ID:        "1507648130682077194",
@@ -47,30 +72,10 @@ func init() {
 					Username: "pajlada",
 				},
 			},
-		},
-	}
-
-	// Tweet with entities
-	tweets["1506968434134953986"] = &TweetApiResponse{
-		Data: Data{
-			ID:        "1506968434134953986",
-			Text:      "",
-			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
-			PublicMetrics: PublicMetrics{
-				RetweetCount: 420,
-				LikeCount:    69,
-			},
-		},
-		Includes: Includes{
-			Users: []Users{
-				{
-					Name:     "PAJLADA",
-					Username: "pajlada",
-				},
-			},
 			Media: []Media{
 				{
-					URL: "https://pbs.twimg.com/media/FOnTzeQWUAMU6L1?format=jpg&name=medium",
+					Type:            "video",
+					PreviewImageUrl: "https://pbs.twimg.com/ext_tw_video_thumb/1507648047609745413/pu/img/YZQAxKt-O68sKoXQ.jpg",
 				},
 			},
 		},

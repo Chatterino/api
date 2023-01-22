@@ -158,14 +158,14 @@ func TestResolver(t *testing.T) {
 					inputURL:   utils.MustParseURL("https://twitter.com/pajlada/status/1507648130682077194"),
 					inputTweet: "1507648130682077194",
 					expectedResponse: &cache.Response{
-						Payload:     []byte(`{"status":200,"tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EPAJLADA%20%28@pajlada%29%3C%2Fb%3E%0A%3Cspan%20style=%22white-space:%20pre-wrap%3B%20word-wrap:%20break-word%3B%22%3E%0ADigging%20a%20hole%0A%3C%2Fspan%3E%0A%3Cspan%20style=%22color:%20%23808892%3B%22%3E69%20likes\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B420%20retweets\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B26%20Mar%202022%20%E2%80%A2%2017:15%20UTC%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A"}`),
+						Payload:     []byte(`{"status":200,"thumbnail":"https://pbs.twimg.com/ext_tw_video_thumb/1507648047609745413/pu/img/YZQAxKt-O68sKoXQ.jpg","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EPAJLADA%20%28@pajlada%29%3C%2Fb%3E%0A%3Cspan%20style=%22white-space:%20pre-wrap%3B%20word-wrap:%20break-word%3B%22%3E%0ADigging%20a%20hole%0A%3C%2Fspan%3E%0A%3Cspan%20style=%22color:%20%23808892%3B%22%3E69%20likes\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B420%20retweets\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B26%20Mar%202022%20%E2%80%A2%2017:15%20UTC%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A"}`),
 						StatusCode:  http.StatusOK,
 						ContentType: "application/json",
 					},
 					expectedError: nil,
 				},
 				{
-					label:      "with entities",
+					label:      "with image media",
 					inputURL:   utils.MustParseURL("https://twitter.com/pajlada/status/1506968434134953986"),
 					inputTweet: "1506968434134953986",
 					expectedResponse: &cache.Response{
