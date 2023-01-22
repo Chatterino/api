@@ -76,11 +76,11 @@ func init() {
 		},
 	}
 
-	// Tweet with no entities
+	// Tweet with no ID
 	tweets["1505121705290874881"] = &TweetApiResponse{
 		Data: Data{
-			ID:        "1505121705290874881",
-			Text:      "Bad timestamp",
+			ID:        "",
+			Text:      "No ID",
 			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
 			PublicMetrics: PublicMetrics{
 				RetweetCount: 69,

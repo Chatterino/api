@@ -176,6 +176,17 @@ func TestResolver(t *testing.T) {
 					expectedError: nil,
 				},
 				{
+					label:      "no ID",
+					inputURL:   utils.MustParseURL("https://twitter.com/pajlada/status/1505121705290874881"),
+					inputTweet: "1505121705290874881",
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":404,"message":"Twitter tweet not found: 1505121705290874881"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+					expectedError: nil,
+				},
+				{
 					label:      "404",
 					inputURL:   utils.MustParseURL("https://twitter.com/pajlada/status/404"),
 					inputTweet: "404",
