@@ -10,7 +10,7 @@ import (
 func MaxAgeHeaders(ttl time.Duration) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Add("Cache-Control", fmt.Sprintf("max-age=%.0f", ttl.Seconds()))
+			w.Header().Add("Cache-Control", fmt.Sprintf("public, max-age=%.0f", ttl.Seconds()))
 			next.ServeHTTP(w, r)
 		})
 	}
