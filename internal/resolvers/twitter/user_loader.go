@@ -18,11 +18,18 @@ import (
 )
 
 type TwitterUserApiResponse struct {
-	Name            string `json:"name"`
-	Username        string `json:"screen_name"`
-	Description     string `json:"description"`
-	Followers       uint64 `json:"followers_count"`
-	ProfileImageUrl string `json:"profile_image_url_https"`
+	Data []TwitterUserData `json:"data"`
+}
+type TwitterUserData struct {
+	Name            string                   `json:"name"`
+	Username        string                   `json:"username"`
+	Description     string                   `json:"description"`
+	ProfileImageUrl string                   `json:"profile_image_url"`
+	PublicMetrics   TwitterUserPublicMetrics `json:"public_metrics"`
+}
+
+type TwitterUserPublicMetrics struct {
+	Followers uint64 `json:"followers_count"`
 }
 
 type twitterUserTooltipData struct {
@@ -66,11 +73,15 @@ func (l *UserLoader) getUserByName(userName string) (*TwitterUserApiResponse, er
 		return nil, errors.New("unable to unmarshal response")
 	}
 
+	if len(user.Data) == 0 {
+		return nil, errors.New("user not found")
+	}
+
 	/* By default, Twitter returns a low resolution image.
 	 * This modification removes "_normal" to get the original sized image, based on Twitter's API documentation:
 	 * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/user-profile-images-and-banners
 	 */
-	user.ProfileImageUrl = strings.Replace(user.ProfileImageUrl, "_normal", "", 1)
+	user.Data[0].ProfileImageUrl = strings.Replace(user.Data[0].ProfileImageUrl, "_normal", "", 1)
 
 	return user, nil
 }
@@ -109,11 +120,11 @@ func (l *UserLoader) Load(ctx context.Context, userName string, r *http.Request)
 
 func buildTwitterUserTooltip(user *TwitterUserApiResponse) *twitterUserTooltipData {
 	data := &twitterUserTooltipData{}
-	data.Name = user.Name
-	data.Username = user.Username
-	data.Description = user.Description
-	data.Followers = humanize.Number(user.Followers)
-	data.Thumbnail = user.ProfileImageUrl
+	data.Name = user.Data[0].Name
+	data.Username = user.Data[0].Username
+	data.Description = user.Data[0].Description
+	data.Followers = humanize.Number(user.Data[0].PublicMetrics.Followers)
+	data.Thumbnail = user.Data[0].ProfileImageUrl
 
 	return data
 }

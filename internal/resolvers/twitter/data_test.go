@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -15,61 +16,97 @@ var (
 
 func init() {
 	users["pajlada"] = &TwitterUserApiResponse{
-		Name:            "PAJLADA",
-		Username:        "pajlada",
-		Description:     "Cool memer",
-		Followers:       69,
-		ProfileImageUrl: "https://pbs.twimg.com/profile_images/1385924241619628033/fW7givJA_400x400.jpg",
-	}
-
-	// Tweet with no entities
-	tweets["1507648130682077194"] = &TweetApiResponse{
-		Text: "Digging a hole",
-		User: APIUser{
-			Name:     "PAJLADA",
-			Username: "pajlada",
-		},
-		Likes:     69,
-		Retweets:  420,
-		Timestamp: "Sat Mar 26 17:15:50 +0200 2022",
-	}
-
-	// Tweet with entities
-	tweets["1506968434134953986"] = &TweetApiResponse{
-		Text: "",
-		User: APIUser{
-			Name:     "PAJLADA",
-			Username: "pajlada",
-		},
-		Likes:     69,
-		Retweets:  420,
-		Timestamp: "Sat Mar 26 17:15:50 +0200 2022",
-		Entities: APIEntities{
-			Media: []APIEntitiesMedia{
-				{
-					Url: "https://pbs.twimg.com/media/FOnTzeQWUAMU6L1?format=jpg&name=medium",
+		Data: []TwitterUserData{
+			{
+				Name:            "PAJLADA",
+				Username:        "pajlada",
+				Description:     "Cool memer",
+				ProfileImageUrl: "https://pbs.twimg.com/profile_images/1385924241619628033/fW7givJA_400x400.jpg",
+				PublicMetrics: TwitterUserPublicMetrics{
+					Followers: 69,
 				},
 			},
 		},
 	}
 
-	// Tweet with poorly formatted timestamp
-	tweets["1505121705290874881"] = &TweetApiResponse{
-		Text: "Bad timestamp",
-		User: APIUser{
-			Name:     "PAJLADA",
-			Username: "pajlada",
+	// Tweet with image media
+	tweets["1506968434134953986"] = &TweetApiResponse{
+		Data: Data{
+			ID:        "1506968434134953986",
+			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
+			PublicMetrics: PublicMetrics{
+				RetweetCount: 420,
+				LikeCount:    69,
+			},
 		},
-		Likes:     420,
-		Retweets:  69,
-		Timestamp: "asdasd",
+		Includes: Includes{
+			Users: []Users{
+				{
+					Name:     "PAJLADA",
+					Username: "pajlada",
+				},
+			},
+			Media: []Media{
+				{
+					URL: "https://pbs.twimg.com/media/FOnTzeQWUAMU6L1?format=jpg&name=medium",
+				},
+			},
+		},
+	}
+
+	// Tweet with video media
+	tweets["1507648130682077194"] = &TweetApiResponse{
+		Data: Data{
+			ID:        "1507648130682077194",
+			Text:      "Digging a hole",
+			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
+			PublicMetrics: PublicMetrics{
+				RetweetCount: 420,
+				LikeCount:    69,
+			},
+		},
+		Includes: Includes{
+			Users: []Users{
+				{
+					Name:     "PAJLADA",
+					Username: "pajlada",
+				},
+			},
+			Media: []Media{
+				{
+					Type:            "video",
+					PreviewImageUrl: "https://pbs.twimg.com/ext_tw_video_thumb/1507648047609745413/pu/img/YZQAxKt-O68sKoXQ.jpg",
+				},
+			},
+		},
+	}
+
+	// Tweet with no ID
+	tweets["1505121705290874881"] = &TweetApiResponse{
+		Data: Data{
+			ID:        "",
+			Text:      "No ID",
+			CreatedAt: time.Date(2022, time.March, 26, 17, 15, 50, 0, time.UTC),
+			PublicMetrics: PublicMetrics{
+				RetweetCount: 69,
+				LikeCount:    420,
+			},
+		},
+		Includes: Includes{
+			Users: []Users{
+				{
+					Name:     "PAJLADA",
+					Username: "pajlada",
+				},
+			},
+		},
 	}
 }
 
 func testServer() *httptest.Server {
 	r := chi.NewRouter()
-	r.Get("/1.1/users/show.json", func(w http.ResponseWriter, r *http.Request) {
-		screenName := r.URL.Query().Get("screen_name")
+	r.Get("/2/users/by", func(w http.ResponseWriter, r *http.Request) {
+		screenName := r.URL.Query().Get("usernames")
 
 		var response *TwitterUserApiResponse
 		var ok bool
@@ -90,8 +127,8 @@ func testServer() *httptest.Server {
 
 		w.Write(b)
 	})
-	r.Get("/1.1/statuses/show.json", func(w http.ResponseWriter, r *http.Request) {
-		tweetID := r.URL.Query().Get("id")
+	r.Get("/2/tweets/{id}", func(w http.ResponseWriter, r *http.Request) {
+		tweetID := chi.URLParam(r, "id")
 
 		var response *TweetApiResponse
 		var ok bool
