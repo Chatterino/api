@@ -35,6 +35,7 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router 
 	imageCached := stampede.Handler(256, 2*time.Second)
 	generatedValuesCached := stampede.Handler(256, 2*time.Second)
 
+	// TODO: Make the max age headers be applied based on the resolved link's configured cache timer
 	router.With(cache.MaxAgeHeaders(time.Minute*10)).Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
 	router.With(cache.MaxAgeHeaders(time.Minute*10), imageCached).Get("/thumbnail/{url}", defaultLinkResolver.HandleThumbnailRequest)
 	router.With(generatedValuesCached).Get("/generated/{url}", defaultLinkResolver.HandleGeneratedValueRequest)
