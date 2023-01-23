@@ -30,6 +30,7 @@
 - Dev: Improve default resolver tests. (#300)
 - Dev: Resolve imgur.io links. (#365)
 - Dev: Don't use `stampede` for link resolver links. (#394)
+- Dev: Update to Twitter's v2 API. (#414)
 
 ## 1.2.3
 
