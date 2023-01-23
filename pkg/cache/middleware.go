@@ -14,5 +14,4 @@ func MaxAgeHeaders(ttl time.Duration) func(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
-
 }
