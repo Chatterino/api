@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
@@ -266,10 +265,10 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 
 	thumbnailCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:thumbnail"), thumbnailLoader,
-		10*time.Minute,
+		cfg.DefaultThumbnailCacheDuration,
 	)
 	linkCache := cache.NewPostgreSQLCache(
-		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:link"), linkLoader, 10*time.Minute,
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:link"), linkLoader, cfg.DefaultLinkCacheDuration,
 	)
 
 	r := &LinkResolver{

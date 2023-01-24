@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -77,7 +76,7 @@ func NewArticleResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool,
 	r := &ArticleResolver{
 		articleCache: cache.NewPostgreSQLCache(
 			ctx, cfg, pool, cache.NewPrefixKeyProvider("wikipedia:article"),
-			resolver.NewResponseMarshaller(articleLoader), 1*time.Hour,
+			resolver.NewResponseMarshaller(articleLoader), cfg.WikipediaArticleCacheDuration,
 		),
 	}
 

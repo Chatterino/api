@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -57,7 +56,7 @@ func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, data [
 	r := &Resolver{
 		oEmbedCache: cache.NewPostgreSQLCache(
 			ctx, cfg, pool, cache.NewPrefixKeyProvider("oembed"),
-			resolver.NewResponseMarshaller(loader), 1*time.Hour,
+			resolver.NewResponseMarshaller(loader), cfg.OembedCacheDuration,
 		),
 		oEmbed: oEmbed,
 	}

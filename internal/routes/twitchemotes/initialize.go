@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -60,7 +59,7 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router 
 	}
 	twitchemotesCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, cache.NewPrefixKeyProvider("twitchemotes"), loader,
-		time.Duration(30)*time.Minute,
+		cfg.TwitchEmoteCacheDuration,
 	)
 
 	router.Get("/twitchemotes/set/{setID}", func(w http.ResponseWriter, r *http.Request) {

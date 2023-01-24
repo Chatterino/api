@@ -13,6 +13,26 @@
 # Can increase CPU usage and cache storage by a lot. Enabled by default.
 #enable-animated-thumbnails: true
 
+# Cache timeout values
+#twitch-username-cache-duration: 1h
+#twitch-emote-cache-duration: 30m
+#bttv-emote-cache-duration: 1h
+#default-thumbnail-cache-duration: 10m
+#default-link-cache-duration: 10m
+#discord-invite-cache-duration: 6h
+#ffz-emote-cache-duration: 1h
+#imgur-cache-duration: 1h
+#livestreamfails-clip-cache-duration: 1h
+#oembed-cache-duration: 1h
+#seventv-emote-cache-duration: 1h
+#supinic-track-cache-duration: 1h
+#twitch-clip-cache-duration: 1h
+#twitter-tweet-cache-duration: 24h
+#twitter-user-cache-duration: 24h
+#wikipedia-article-cache-duration: 1h
+#youtube-channel-cache-duration: 48h
+#youtube-video-cache-duration: 48h
+
 # Maximum width/height pixel size count of the thumbnails sent to the clients.
 #max-thumbnail-size: 300
 
