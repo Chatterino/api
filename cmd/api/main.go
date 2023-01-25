@@ -117,6 +117,7 @@ func main() {
 	defer thumbnail.Shutdown()
 
 	router := chi.NewRouter()
+        router.Use(PrometheusMiddleware)
 
 	// Strip trailing slashes from API requests
 	router.Use(middleware.StripSlashes)
@@ -145,3 +146,4 @@ func main() {
 
 	listen(ctx, cfg.BindAddress, mountRouter(router, cfg, log), log)
 }
+
