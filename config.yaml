@@ -13,26 +13,6 @@
 # Can increase CPU usage and cache storage by a lot. Enabled by default.
 #enable-animated-thumbnails: true
 
-# Cache timeout values
-#twitch-username-cache-duration: 1h
-#twitch-emote-cache-duration: 30m
-#bttv-emote-cache-duration: 1h
-#thumbnail-cache-duration: 10m
-#default-link-cache-duration: 10m
-#discord-invite-cache-duration: 6h
-#ffz-emote-cache-duration: 1h
-#imgur-cache-duration: 1h
-#livestreamfails-clip-cache-duration: 1h
-#oembed-cache-duration: 1h
-#seventv-emote-cache-duration: 1h
-#supinic-track-cache-duration: 1h
-#twitch-clip-cache-duration: 1h
-#twitter-tweet-cache-duration: 24h
-#twitter-user-cache-duration: 24h
-#wikipedia-article-cache-duration: 1h
-#youtube-channel-cache-duration: 48h
-#youtube-video-cache-duration: 48h
-
 # Maximum width/height pixel size count of the thumbnails sent to the clients.
 #max-thumbnail-size: 300
 
@@ -50,18 +30,41 @@
 # Discord token, provides rich information for Discord invite links
 #discord-token: ""
 
+# Cache duration for Discord invite links
+#discord-invite-cache-duration: 6h
+
 # Twitch Developer Application client ID and Twitch Developer Application client secret, provide rich information for Twitch Clips
 #twitch-client-id: ""
 #twitch-client-secret: ""
 
+# Cache duration for Twitch Username -> Twitch ID lookups
+#twitch-username-cache-duration: 1h
+# Cache duration for Twitch Username -> Twitch ID lookups
+#twitch-emote-cache-duration: 30m
+# Cache duration for Twitch clip links
+#twitch-clip-cache-duration: 1h
+
 # YouTube API key, provides rich information for YouTube video links
 #youtube-api-key: ""
+
+# Cache duration for YouTube channel/user profile links
+#youtube-channel-cache-duration: 48h
+# Cache duration for YouTube video links
+#youtube-video-cache-duration: 48h
 
 # Twitter bearer token, provides rich information for tweet and Twitter user links
 #twitter-bearer-token: ""
 
+# Cache duration for Twitter post/tweet links
+#twitter-tweet-cache-duration: 24h
+# Cache duration for Twitter user profile links
+#twitter-user-cache-duration: 24h
+
 # Imgur client ID, provides rich information for imgur image links
 #imgur-client-id: ""
+
+# Cache duration for Imgur image and album links
+#imgur-cache-duration: 1h
 
 # oEmbed Facebook app ID and app secret, provide rich information for Facebook and Instagram links
 #oembed-facebook-app-id: ""
@@ -69,3 +72,30 @@
 
 # Path to a json file containing supported oEmbed resolvers
 #oembed-providers-path: "./data/oembed/providers.json"
+
+# Cache duration for oEmbed links
+#oembed-cache-duration: 1h
+
+# Cache duration proxied thumbnails
+#thumbnail-cache-duration: 10m
+
+# Cache duration for links that don't have a specialized resolver
+#default-link-cache-duration: 10m
+
+# Cache duration for BetterTTV emote links
+#bttv-emote-cache-duration: 1h
+
+# Cache duration for FrankerFaceZ emote links
+#ffz-emote-cache-duration: 1h
+
+# Cache duration for 7TV emote links
+#seventv-emote-cache-duration: 1h
+
+# Cache duration for livestreamfails.com clip links
+#livestreamfails-clip-cache-duration: 1h
+
+# Cache duration for Supinic.com track links
+#supinic-track-cache-duration: 1h
+
+# Cache duration for Wikipedia article links
+#wikipedia-article-cache-duration: 1h
