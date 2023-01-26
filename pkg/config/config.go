@@ -84,7 +84,6 @@ func init() {
         pflag.Duration("wikipedia-article-cache-duration", 1*time.Hour, "Cache timeout for wikipedia articles")
         pflag.Duration("youtube-channel-cache-duration", 48*time.Hour, "Cache timeout for youtube channels")
         pflag.Duration("youtube-video-cache-duration", 48*time.Hour, "Cache timeout for youtube videos")
-        pflag.Duration("max-age-headers-cache-duration", 10*time.Minute, "Cache timeout included in response headers")
 	pflag.String("log-level", "info", "Log level")
 	pflag.Bool("log-development", false, "Enable development logging for warnings and above, this includes stack traces")
 	pflag.String("discord-token", "", "Discord token")
