@@ -14,7 +14,7 @@ type APIConfig struct {
 	TwitchUsernameCacheDuration      time.Duration `mapstructure:"twitch-username-cache-duration" json:"twitch-username-cache-duration"`
 	TwitchEmoteCacheDuration         time.Duration `mapstructure:"twitch-emote-cache-duration" json:"twitch-emote-cache-duration"`
 	BttvEmoteCacheDuration           time.Duration `mapstructure:"bttv-emote-cache-duration" json:"bttv-emote-cache-duration"`
-	DefaultThumbnailCacheDuration    time.Duration `mapstructure:"default-thumbnail-cache-duration" json:"default-thumbnail-cache-duration"`
+	ThumbnailCacheDuration           time.Duration `mapstructure:"thumbnail-cache-duration" json:"thumbnail-cache-duration"`
 	DefaultLinkCacheDuration         time.Duration `mapstructure:"default-link-cache-duration" json:"default-link-cache-duration"`
 	DiscordInviteCacheDuration       time.Duration `mapstructure:"discord-invite-cache-duration" json:"discord-invite-cache-duration"`
 	FfzEmoteCacheDuration            time.Duration `mapstructure:"ffz-emote-cache-duration" json:"ffz-emote-cache-duration"`

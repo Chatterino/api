@@ -17,7 +17,7 @@
 #twitch-username-cache-duration: 1h
 #twitch-emote-cache-duration: 30m
 #bttv-emote-cache-duration: 1h
-#default-thumbnail-cache-duration: 10m
+#thumbnail-cache-duration: 10m
 #default-link-cache-duration: 10m
 #discord-invite-cache-duration: 6h
 #ffz-emote-cache-duration: 1h

@@ -265,7 +265,7 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 
 	thumbnailCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:thumbnail"), thumbnailLoader,
-		cfg.DefaultThumbnailCacheDuration,
+		cfg.ThumbnailCacheDuration,
 	)
 	linkCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, cache.NewPrefixKeyProvider("default:link"), linkLoader, cfg.DefaultLinkCacheDuration,

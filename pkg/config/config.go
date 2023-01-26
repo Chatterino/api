@@ -69,7 +69,7 @@ func init() {
 	pflag.Duration("twitch-username-cache-duration", 1*time.Hour, "Cache timeout for twitch usernames")
 	pflag.Duration("twitch-emote-cache-duration", 30*time.Minute, "Cache timeout for twitch emotes")
 	pflag.Duration("bttv-emote-cache-duration", 1*time.Hour, "Cache timeout for bttv emotes")
-	pflag.Duration("default-thumbnail-cache-duration", 10*time.Minute, "Cache timeout for default thumbnails")
+	pflag.Duration("thumbnail-cache-duration", 10*time.Minute, "Cache timeout for default thumbnails")
 	pflag.Duration("default-link-cache-duration", 10*time.Minute, "Cache timeout for default links")
 	pflag.Duration("discord-invite-cache-duration", 6*time.Hour, "Cache timeout for discord invite")
 	pflag.Duration("ffz-emote-cache-duration", 1*time.Hour, "Cache timeout for ffz emotes")
