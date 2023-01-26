@@ -118,9 +118,6 @@ func main() {
 
 	router := chi.NewRouter()
 
-	// Strip trailing slashes from API requests
-	router.Use(middleware.StripSlashes)
-
 	var helixUsernameCache cache.Cache
 
 	helixClient, err := twitchapiclient.New(ctx, cfg)
