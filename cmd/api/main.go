@@ -20,7 +20,6 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 )
 
@@ -119,7 +118,7 @@ func main() {
 	router := chi.NewRouter()
 
 	// Strip trailing slashes from API requests
-	router.Use(middleware.StripSlashes)
+	router.Use(StripSlashes)
 
 	var helixUsernameCache cache.Cache
 
@@ -144,4 +143,15 @@ func main() {
 	defaultresolver.Initialize(ctx, cfg, pool, router, helixClient)
 
 	listen(ctx, cfg.BindAddress, mountRouter(router, cfg, log), log)
+}
+
+func StripSlashes(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+                if len(path) > 1 && (path[len(path)-1] == '/' || path[len(path)-3:len(path)-1] == "%2F") {
+			r.URL.Path = path[:len(path)-1]
+		}
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
 }
