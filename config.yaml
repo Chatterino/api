@@ -32,6 +32,7 @@
 #wikipedia-article-cache-duration: 1h
 #youtube-channel-cache-duration: 48h
 #youtube-video-cache-duration: 48h
+#max-age-headers-cache-duration: 10m
 
 # Maximum width/height pixel size count of the thumbnails sent to the clients.
 #max-thumbnail-size: 300
