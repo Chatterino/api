@@ -145,10 +145,13 @@ func main() {
 	listen(ctx, cfg.BindAddress, mountRouter(router, cfg, log), log)
 }
 
+// the middleware provided in chi has a bug, so a custom solution has to be used
+// TODO: can be switched to chi middleware,
+// if bug described in https://github.com/Chatterino/api/pull/422 is fixed
 func StripSlashes(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
-		if len(path) > 1 && (path[len(path)-1] == '/' || path[len(path)-3:len(path)-1] == "%2F") {
+		if len(path) > 1 && path[len(path)-1] == '/' {
 			r.URL.Path = path[:len(path)-1]
 		}
 		next.ServeHTTP(w, r)
