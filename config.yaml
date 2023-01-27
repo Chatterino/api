@@ -39,10 +39,11 @@
 
 # Cache duration for Twitch Username -> Twitch ID lookups
 #twitch-username-cache-duration: 1h
-# Cache duration for Twitch Username -> Twitch ID lookups
-#twitch-emote-cache-duration: 30m
 # Cache duration for Twitch clip links
 #twitch-clip-cache-duration: 1h
+
+# Cache duration for the Twitchemotes.com emote cache
+#twitchemotes-emote-cache-duration: 30m
 
 # YouTube API key, provides rich information for YouTube video links
 #youtube-api-key: ""

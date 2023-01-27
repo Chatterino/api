@@ -59,7 +59,7 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router 
 	}
 	twitchemotesCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, cache.NewPrefixKeyProvider("twitchemotes"), loader,
-		cfg.TwitchEmoteCacheDuration,
+		cfg.TwitchemotesEmoteCacheDuration,
 	)
 
 	router.Get("/twitchemotes/set/{setID}", func(w http.ResponseWriter, r *http.Request) {

@@ -67,7 +67,7 @@ func init() {
 	pflag.Bool("enable-animated-thumbnails", true, "When enabled, will attempt to use libvips library to build animated thumbnails. Can increase CPU usage and cache storage by a lot. Enabled by default")
 	pflag.Uint("max-thumbnail-size", 300, "Maximum width/height pixel size count of the thumbnails sent to the clients.")
 	pflag.Duration("twitch-username-cache-duration", 1*time.Hour, "Cache timeout for twitch usernames")
-	pflag.Duration("twitch-emote-cache-duration", 30*time.Minute, "Cache timeout for twitch emotes")
+	pflag.Duration("twitchemotes-emote-cache-duration", 30*time.Minute, "Cache timeout for twitch emotes")
 	pflag.Duration("bttv-emote-cache-duration", 1*time.Hour, "Cache timeout for bttv emotes")
 	pflag.Duration("thumbnail-cache-duration", 10*time.Minute, "Cache timeout for default thumbnails")
 	pflag.Duration("default-link-cache-duration", 10*time.Minute, "Cache timeout for default links")

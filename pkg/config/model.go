@@ -12,7 +12,7 @@ type APIConfig struct {
 	MaxThumbnailSize         uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
 
 	TwitchUsernameCacheDuration      time.Duration `mapstructure:"twitch-username-cache-duration" json:"twitch-username-cache-duration"`
-	TwitchEmoteCacheDuration         time.Duration `mapstructure:"twitch-emote-cache-duration" json:"twitch-emote-cache-duration"`
+	TwitchemotesEmoteCacheDuration   time.Duration `mapstructure:"twitchemotes-emote-cache-duration" json:"twitchemotes-emote-cache-duration"`
 	BttvEmoteCacheDuration           time.Duration `mapstructure:"bttv-emote-cache-duration" json:"bttv-emote-cache-duration"`
 	ThumbnailCacheDuration           time.Duration `mapstructure:"thumbnail-cache-duration" json:"thumbnail-cache-duration"`
 	DefaultLinkCacheDuration         time.Duration `mapstructure:"default-link-cache-duration" json:"default-link-cache-duration"`
