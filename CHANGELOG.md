@@ -32,7 +32,7 @@
 - Dev: Don't use `stampede` for link resolver links. (#394)
 - Dev: Update to Twitter's v2 API. (#414)
 - Dev: Add HTTP Caching headers. (#417)
-- Dev: Add prometheus metric for total amount of requests. (#420)
+- Dev: Add prometheus middleware for chi. (#420)
 
 ## 1.2.3
 
