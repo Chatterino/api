@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -47,7 +46,7 @@ func NewInviteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) 
 	r := &InviteResolver{
 		inviteCache: cache.NewPostgreSQLCache(
 			ctx, cfg, pool, cache.NewPrefixKeyProvider("discord:invite"),
-			resolver.NewResponseMarshaller(inviteLoader), 6*time.Hour),
+			resolver.NewResponseMarshaller(inviteLoader), cfg.DiscordInviteCacheDuration),
 	}
 
 	return r

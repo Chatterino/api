@@ -8,7 +8,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -61,7 +60,7 @@ func NewResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, imgurC
 	r := &Resolver{
 		imgurCache: cache.NewPostgreSQLCache(
 			ctx, cfg, pool, cache.NewPrefixKeyProvider("imgur"),
-			resolver.NewResponseMarshaller(loader), 1*time.Hour),
+			resolver.NewResponseMarshaller(loader), cfg.ImgurCacheDuration),
 	}
 
 	return r
