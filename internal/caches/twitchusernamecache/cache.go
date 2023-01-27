@@ -2,7 +2,6 @@ package twitchusernamecache
 
 import (
 	"context"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -20,6 +19,6 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 	}
 
 	return cache.NewPostgreSQLCache(
-		ctx, cfg, pool, cache.NewPrefixKeyProvider("twitch:username"), usernameLoader, 1*time.Hour,
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("twitch:username"), usernameLoader, cfg.TwitchUsernameCacheDuration,
 	)
 }

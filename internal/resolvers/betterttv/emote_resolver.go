@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -51,7 +50,7 @@ func NewEmoteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, e
 	r := &EmoteResolver{
 		emoteCache: cache.NewPostgreSQLCache(
 			ctx, cfg, pool, cache.NewPrefixKeyProvider("betterttv:emote"),
-			resolver.NewResponseMarshaller(emoteLoader), 1*time.Hour),
+			resolver.NewResponseMarshaller(emoteLoader), cfg.BttvEmoteCacheDuration),
 	}
 
 	return r

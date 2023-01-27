@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -97,13 +96,13 @@ func NewTwitterResolver(
 
 	tweetCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, tweetCacheKeyProvider, resolver.NewResponseMarshaller(tweetLoader),
-		24*time.Hour,
+		cfg.TwitterTweetCacheDuration,
 	)
 	tweetCache.RegisterDependent(ctx, collageCache)
 
 	userCache := cache.NewPostgreSQLCache(
 		ctx, cfg, pool, userCacheKeyProvider, resolver.NewResponseMarshaller(userLoader),
-		24*time.Hour,
+		cfg.TwitterUserCacheDuration,
 	)
 
 	r := &TwitterResolver{

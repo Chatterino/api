@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
@@ -61,7 +60,7 @@ func NewYouTubeChannelResolver(ctx context.Context, cfg config.APIConfig, pool d
 
 	r := &YouTubeChannelResolver{
 		channelCache: cache.NewPostgreSQLCache(
-			ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:channel"), loader, 48*time.Hour,
+			ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:channel"), loader, cfg.YoutubeChannelCacheDuration,
 		),
 	}
 
