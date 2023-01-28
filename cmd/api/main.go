@@ -21,7 +21,6 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 )
 
@@ -122,7 +121,7 @@ func main() {
 	router.Use(prometheusMiddleware)
 
 	// Strip trailing slashes from API requests
-	router.Use(middleware.StripSlashes)
+	router.Use(StripSlashes)
 
 	var helixUsernameCache cache.Cache
 
@@ -147,4 +146,19 @@ func main() {
 	defaultresolver.Initialize(ctx, cfg, pool, router, helixClient)
 
 	listen(ctx, cfg.BindAddress, mountRouter(router, cfg, log), log)
+}
+
+// StripSlashes strips slashes at the end of a request.
+// The StripSlashes middleware provided in chi has a bug, so a custom solution has to be used
+// TODO: can be switched to chi middleware,
+// if bug described in https://github.com/Chatterino/api/pull/422 is fixed
+func StripSlashes(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		if len(path) > 1 && path[len(path)-1] == '/' {
+			r.URL.Path = path[:len(path)-1]
+		}
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
 }
