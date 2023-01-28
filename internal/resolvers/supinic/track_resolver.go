@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -50,7 +49,7 @@ func NewTrackResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *
 	r := &TrackResolver{
 		trackCache: cache.NewPostgreSQLCache(
 			ctx, cfg, pool, cache.NewPrefixKeyProvider("supinic:track"),
-			resolver.NewResponseMarshaller(trackLoader), 1*time.Hour),
+			resolver.NewResponseMarshaller(trackLoader), cfg.SupinicTrackCacheDuration),
 	}
 
 	return r

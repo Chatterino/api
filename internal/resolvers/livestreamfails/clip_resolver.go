@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/pkg/cache"
@@ -53,7 +52,7 @@ func NewClipResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, ap
 	r := &ClipResolver{
 		clipCache: cache.NewPostgreSQLCache(
 			ctx, cfg, pool, cache.NewPrefixKeyProvider("livestreamfails:clip"),
-			resolver.NewResponseMarshaller(clipLoader), 1*time.Hour),
+			resolver.NewResponseMarshaller(clipLoader), cfg.LivestreamfailsClipCacheDuration),
 	}
 
 	return r

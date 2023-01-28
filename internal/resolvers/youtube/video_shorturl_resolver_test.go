@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-	"time"
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/cache"
@@ -56,7 +55,7 @@ func TestVideoShortURLResolver(t *testing.T) {
 
 	loader := NewVideoLoader(youtubeClient)
 	videoCache := cache.NewPostgreSQLCache(
-		ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:video"), loader, 24*time.Hour,
+		ctx, cfg, pool, cache.NewPrefixKeyProvider("youtube:video"), loader, cfg.YoutubeVideoCacheDuration,
 	)
 
 	resolver := NewYouTubeVideoShortURLResolver(videoCache)

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -65,6 +66,24 @@ func init() {
 	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size in bytes - requests with body bigger than this value will be skipped")
 	pflag.Bool("enable-animated-thumbnails", true, "When enabled, will attempt to use libvips library to build animated thumbnails. Can increase CPU usage and cache storage by a lot. Enabled by default")
 	pflag.Uint("max-thumbnail-size", 300, "Maximum width/height pixel size count of the thumbnails sent to the clients.")
+	pflag.Duration("twitch-username-cache-duration", 1*time.Hour, "Cache timeout for twitch usernames")
+	pflag.Duration("twitchemotes-emote-cache-duration", 30*time.Minute, "Cache timeout for twitch emotes")
+	pflag.Duration("bttv-emote-cache-duration", 1*time.Hour, "Cache timeout for bttv emotes")
+	pflag.Duration("thumbnail-cache-duration", 10*time.Minute, "Cache timeout for default thumbnails")
+	pflag.Duration("default-link-cache-duration", 10*time.Minute, "Cache timeout for default links")
+	pflag.Duration("discord-invite-cache-duration", 6*time.Hour, "Cache timeout for discord invite")
+	pflag.Duration("ffz-emote-cache-duration", 1*time.Hour, "Cache timeout for ffz emotes")
+	pflag.Duration("imgur-cache-duration", 1*time.Hour, "Cache timeout for imgur")
+	pflag.Duration("livestreamfails-clip-cache-duration", 1*time.Hour, "Cache timeout for livestreamfails clips")
+	pflag.Duration("oembed-cache-duration", 1*time.Hour, "Cache timeout for oembed")
+	pflag.Duration("seventv-emote-cache-duration", 1*time.Hour, "Cache timeout for seventv emotes")
+	pflag.Duration("supinic-track-cache-duration", 1*time.Hour, "Cache timeout for supinic tracks")
+	pflag.Duration("twitch-clip-cache-duration", 1*time.Hour, "Cache timeout for twitch clips")
+	pflag.Duration("twitter-tweet-cache-duration", 24*time.Hour, "Cache timeout for twitter tweets")
+	pflag.Duration("twitter-user-cache-duration", 24*time.Hour, "Cache timeout for twitter users")
+	pflag.Duration("wikipedia-article-cache-duration", 1*time.Hour, "Cache timeout for wikipedia articles")
+	pflag.Duration("youtube-channel-cache-duration", 48*time.Hour, "Cache timeout for youtube channels")
+	pflag.Duration("youtube-video-cache-duration", 48*time.Hour, "Cache timeout for youtube videos")
 	pflag.String("log-level", "info", "Log level")
 	pflag.Bool("log-development", false, "Enable development logging for warnings and above, this includes stack traces")
 	pflag.String("discord-token", "", "Discord token")
