@@ -16,10 +16,11 @@ type ContentTypeResolver interface {
 }
 
 type tooltipData struct {
-	URL         string
-	Title       string
-	Description string
-	ImageSrc    string
+	URL             string
+	Title           string
+	Description     string
+	ImageSrc        string
+	InstantDownload bool
 }
 
 func (d *tooltipData) Truncate() {

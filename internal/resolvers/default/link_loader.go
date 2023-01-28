@@ -133,6 +133,11 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 	// Sanitize potential html values
 	data.Sanitize()
 
+	// Add instant download warning
+	if resp.Header.Get("Content-Type") == "application/octet-stream" || strings.Contains(resp.Header.Get("Content-Disposition"), "attachment") {
+		data.InstantDownload = true
+	}
+
 	var tooltip bytes.Buffer
 	if err := defaultTooltip.Execute(&tooltip, data); err != nil {
 		return utils.MarshalNoDur(&resolver.Response{

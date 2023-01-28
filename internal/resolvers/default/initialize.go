@@ -19,9 +19,12 @@ const (
 <b>{{.Title}}</b><hr>
 {{end}}
 {{if .Description}}
-<span>{{.Description}}</span><hr>
+<span>{{.Description}}</span>
 {{end}}
-<b>URL:</b> {{.URL}}</div>`
+<b>URL:</b> {{.URL}}</div>
+{{ if .InstantDownload }}
+<br><b><span style="color: red;">MIGHT DOWNLOAD INSTANTLY</span></b>
+{{end}}`
 )
 
 var defaultTooltip = template.Must(template.New("default_tooltip").Parse(defaultTooltipString))
