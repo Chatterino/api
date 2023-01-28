@@ -145,7 +145,8 @@ func main() {
 	listen(ctx, cfg.BindAddress, mountRouter(router, cfg, log), log)
 }
 
-// the middleware provided in chi has a bug, so a custom solution has to be used
+// StripSlashes strips slashes at the end of a request.
+// The StripSlashes middleware provided in chi has a bug, so a custom solution has to be used
 // TODO: can be switched to chi middleware,
 // if bug described in https://github.com/Chatterino/api/pull/422 is fixed
 func StripSlashes(next http.Handler) http.Handler {
