@@ -19,7 +19,7 @@ const (
 <b>{{.Title}}</b><hr>
 {{end}}
 {{if .Description}}
-<span>{{.Description}}</span>
+<span>{{.Description}}</span><hr>
 {{end}}
 <b>URL:</b> {{.URL}}</div>
 {{ if .InstantDownload }}
