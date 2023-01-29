@@ -20,7 +20,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
-	chiprometheus "github.com/ppaanngggg/chi-prometheus"
+	chiprometheus "github.com/nathan-jones/chi-prometheus"
 	"go.uber.org/zap"
 )
 

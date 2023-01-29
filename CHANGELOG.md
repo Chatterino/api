@@ -34,8 +34,7 @@
 - Dev: Add HTTP Caching headers. (#417)
 - Dev: Add custom middleware to strip trailing slashes. (#422)
 - Dev: Make cache timeout durations configurable. (#419)
-- Dev: Add prometheus middleware for chi. (#420)
-- Dev: Only create prometheus metrics for router patterns. (#425)
+- Dev: Add prometheus middleware for chi. (#425)
 
 
 ## 1.2.3
