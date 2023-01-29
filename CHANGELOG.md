@@ -36,7 +36,6 @@
 - Dev: Make cache timeout durations configurable. (#419)
 - Dev: Add prometheus middleware for chi. (#425)
 
-
 ## 1.2.3
 
 - Dev: Automatically publish docker image to the GitHub Container Registry. (#279)
