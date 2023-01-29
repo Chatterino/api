@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"time"
 
-	chiprometheus "github.com/766b/chi-prometheus"
 	"github.com/Chatterino/api/internal/caches/twitchusernamecache"
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
@@ -21,6 +20,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
+	chiprometheus "github.com/ppaanngggg/chi-prometheus"
 	"go.uber.org/zap"
 )
 
@@ -117,7 +117,8 @@ func main() {
 	defer thumbnail.Shutdown()
 
 	router := chi.NewRouter()
-	prometheusMiddleware := chiprometheus.NewMiddleware("c2api")
+
+	prometheusMiddleware := chiprometheus.NewPatternMiddleware("c2api")
 	router.Use(prometheusMiddleware)
 
 	// Strip trailing slashes from API requests
