@@ -37,6 +37,7 @@
 - Dev: Add prometheus middleware for chi. (#420)
 - Dev: Only create prometheus metrics for router patterns. (#425)
 
+
 ## 1.2.3
 
 - Dev: Automatically publish docker image to the GitHub Container Registry. (#279)
