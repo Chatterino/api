@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"time"
 
-	chiprometheus "github.com/766b/chi-prometheus"
 	"github.com/Chatterino/api/internal/caches/twitchusernamecache"
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
@@ -117,8 +116,6 @@ func main() {
 	defer thumbnail.Shutdown()
 
 	router := chi.NewRouter()
-	prometheusMiddleware := chiprometheus.NewMiddleware("c2api")
-	router.Use(prometheusMiddleware)
 
 	// Strip trailing slashes from API requests
 	router.Use(StripSlashes)
