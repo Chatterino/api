@@ -22,7 +22,7 @@ require (
 	github.com/spf13/viper v1.15.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/text v0.6.0
-	google.golang.org/api v0.108.0
+	google.golang.org/api v0.109.0
 	honnef.co/go/tools v0.3.3
 )
 
