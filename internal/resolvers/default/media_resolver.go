@@ -11,6 +11,8 @@ import (
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const mediaTooltipTemplateString = `<div style="text-align: left;">
@@ -53,7 +55,7 @@ func (r *MediaResolver) Run(ctx context.Context, req *http.Request, resp *http.R
 	}
 
 	ttData := mediaTooltipData{
-		MediaType: strings.Title(spl[0]),
+		MediaType: cases.Title(language.English).String(spl[0]),
 		Extension: extensionFromMime(mimeType),
 		Size:      size,
 	}
