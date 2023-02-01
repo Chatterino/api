@@ -43,8 +43,6 @@ func (r *MediaResolver) Check(ctx context.Context, contentType string) bool {
 }
 
 func (r *MediaResolver) Run(ctx context.Context, req *http.Request, resp *http.Response) (*resolver.Response, error) {
-	// log := logger.FromContext(ctx)
-
 	mimeType := resp.Header.Get("Content-Type")
 	spl := strings.Split(mimeType, "/")
 
