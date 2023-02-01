@@ -9,6 +9,7 @@
 - PDF: Generate customized tooltips for PDF files. (#374, #377)
 - Twitter: Generate thumbnails with all images of a tweet. (#373)
 - YouTube: Added support for 'YouTube shorts' URLs. (#299)
+- Media files: Generate tooltips for Video and Audio files. (#427)
 - Minor: Add ability to opt out hostnames from the API. (#405)
 - Fix: SevenTV emotes now resolve correctly. (#281, #288, #307)
 - Fix: YouTube videos are no longer resolved as channels. (#284)
