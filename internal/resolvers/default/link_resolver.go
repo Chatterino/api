@@ -248,8 +248,10 @@ func New(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixClient *h
 	youtube.Initialize(ctx, cfg, pool, &customResolvers)
 	seventv.Initialize(ctx, cfg, pool, &customResolvers)
 
-	contentTypeResolvers := []ContentTypeResolver{}
-	contentTypeResolvers = append(contentTypeResolvers, NewPDFResolver(cfg.BaseURL, cfg.MaxContentLength))
+	contentTypeResolvers := []ContentTypeResolver{
+		NewPDFResolver(cfg.BaseURL, cfg.MaxContentLength),
+		NewMediaResolver(cfg.BaseURL),
+	}
 
 	linkLoader := &LinkLoader{
 		baseURL:              cfg.BaseURL,
