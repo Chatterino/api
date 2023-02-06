@@ -7,12 +7,10 @@ import (
 	"html/template"
 	"mime"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/Chatterino/api/pkg/utils"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -69,10 +67,9 @@ func (r *MediaResolver) Run(ctx context.Context, req *http.Request, resp *http.R
 
 	targetURL := resp.Request.URL.String()
 	response := &resolver.Response{
-		Status:    http.StatusOK,
-		Link:      targetURL,
-		Tooltip:   url.PathEscape(tooltip.String()),
-		Thumbnail: utils.FormatThumbnailURL(r.baseURL, req, targetURL),
+		Status:  http.StatusOK,
+		Link:    targetURL,
+		Tooltip: tooltip.String(),
 	}
 
 	return response, nil
@@ -101,6 +98,10 @@ func extensionFromMime(mimeType string) string {
 			return "wav"
 		case "mpeg":
 			return "mp3"
+		case "mp4":
+			return "mp4"
+		case "ogg":
+			return "ogg"
 		}
 	case "video":
 		switch s2 {
@@ -108,6 +109,10 @@ func extensionFromMime(mimeType string) string {
 			return "avi"
 		case "mp4":
 			return "mp4"
+		case "mpeg":
+			return "MPEG"
+		case "ogg":
+			return "OGG"
 		case "quicktime":
 			return "mov"
 		}
