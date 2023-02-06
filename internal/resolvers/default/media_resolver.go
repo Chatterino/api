@@ -110,9 +110,9 @@ func extensionFromMime(mimeType string) string {
 		case "mp4":
 			return "mp4"
 		case "mpeg":
-			return "MPEG"
+			return "mpeg"
 		case "ogg":
-			return "OGG"
+			return "ogg"
 		case "quicktime":
 			return "mov"
 		}
