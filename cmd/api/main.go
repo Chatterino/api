@@ -20,6 +20,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
 	"github.com/go-chi/chi/v5"
+	chiprometheus "github.com/nathan-jones/chi-prometheus"
 	"go.uber.org/zap"
 )
 
@@ -116,6 +117,9 @@ func main() {
 	defer thumbnail.Shutdown()
 
 	router := chi.NewRouter()
+
+	prometheusMiddleware := chiprometheus.NewPatternMiddleware("c2api")
+	router.Use(prometheusMiddleware)
 
 	// Strip trailing slashes from API requests
 	router.Use(StripSlashes)
