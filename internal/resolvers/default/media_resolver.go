@@ -3,7 +3,9 @@ package defaultresolver
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"html/template"
+	"mime"
 	"net/http"
 	"net/url"
 	"strings"
@@ -18,7 +20,6 @@ import (
 const mediaTooltipTemplateString = `<div style="text-align: left;">
 <b>Media File</b>
 {{if .MediaType}}<br><b>Type:</b> {{.MediaType}}{{end}}
-{{if .Extension}}<br><b>Extension:</b> {{.Extension}}{{end}}
 {{if .Size}}<br><b>Size:</b> {{.Size}}{{end}}
 </div>
 `
@@ -27,7 +28,6 @@ var mediaTooltipTemplate = template.Must(template.New("mediaTooltipTemplate").Pa
 
 type mediaTooltipData struct {
 	MediaType string
-	Extension string
 	Size      string
 }
 
@@ -38,7 +38,7 @@ type MediaResolver struct {
 func (r *MediaResolver) Check(ctx context.Context, contentType string) bool {
 	spl := strings.Split(contentType, "/")
 	switch spl[0] {
-	case "video", "audio", "application":
+	case "video", "audio":
 		return true
 	}
 	return false
@@ -55,9 +55,11 @@ func (r *MediaResolver) Run(ctx context.Context, req *http.Request, resp *http.R
 	}
 
 	ttData := mediaTooltipData{
-		MediaType: cases.Title(language.English).String(spl[0]),
-		Extension: extensionFromMime(mimeType),
-		Size:      size,
+		MediaType: fmt.Sprintf("%s (%s)",
+			cases.Title(language.English).String(spl[0]),
+			strings.ToUpper(extensionFromMime(mimeType)),
+		),
+		Size: size,
 	}
 
 	var tooltip bytes.Buffer
@@ -97,33 +99,30 @@ func extensionFromMime(mimeType string) string {
 		switch s2 {
 		case "wav", "x-wav":
 			return "wav"
-		default:
+		case "mpeg":
 			return "mp3"
 		}
 	case "video":
 		switch s2 {
-		case "avi":
+		case "avi", "x-msvideo":
 			return "avi"
+		case "mp4":
+			return "mp4"
 		case "quicktime":
 			return "mov"
-		default:
-			return "mp4"
-		}
-	case "application":
-		switch s2 {
-		case "json":
-			return "json"
-		case "x-gzip":
-			return "gz"
-		case "javascript", "x-javascript", "ecmascript":
-			return "js"
-		case "pdf":
-			return "pdf"
-		case "xml":
-			return "xml"
-		case "x-compressed", "x-zip-compressed", "zip":
-			return "zip"
 		}
 	}
-	return "Unknown"
+
+	// this returns weird extensions for some mime types
+	// so it's only used as a backup.
+	// video/mp4 returns f4v for example.
+	types, _ := mime.ExtensionsByType(mimeType)
+	if len(types) > 0 {
+		ext := types[0]
+		if len(ext) > 1 {
+			ext = ext[1:]
+		}
+		return ext
+	}
+	return "unknown"
 }
