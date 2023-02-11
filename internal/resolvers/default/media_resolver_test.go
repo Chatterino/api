@@ -52,6 +52,10 @@ func runMRTest(t *testing.T, contentType string, size int64, expectedType string
 	}
 
 	resUnescaped, err := url.PathUnescape(res.Tooltip)
+	if err != nil {
+		t.Errorf("PathUnescape should never fail: %v", err)
+		return
+	}
 
 	if !strings.Contains(resUnescaped, expectedType) {
 		t.Errorf("Expected: %s, Got: %s", expectedType, res.Tooltip)
