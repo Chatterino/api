@@ -51,12 +51,14 @@ func runMRTest(t *testing.T, contentType string, size int64, expectedType string
 		return
 	}
 
-	if !strings.Contains(res.Tooltip, expectedType) {
+	resUnescaped, err := url.PathUnescape(res.Tooltip)
+
+	if !strings.Contains(resUnescaped, expectedType) {
 		t.Errorf("Expected: %s, Got: %s", expectedType, res.Tooltip)
 	}
 
 	expectedSize := humanize.Bytes(uint64(size))
-	if size > 0 && !strings.Contains(res.Tooltip, expectedSize) {
+	if size > 0 && !strings.Contains(resUnescaped, expectedSize) {
 		t.Errorf("Expected: %s, Got: %s", expectedSize, res.Tooltip)
 	}
 }

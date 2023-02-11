@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"mime"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/Chatterino/api/pkg/humanize"
@@ -69,7 +70,7 @@ func (r *MediaResolver) Run(ctx context.Context, req *http.Request, resp *http.R
 	response := &resolver.Response{
 		Status:  http.StatusOK,
 		Link:    targetURL,
-		Tooltip: tooltip.String(),
+		Tooltip: url.PathEscape(tooltip.String()),
 	}
 
 	return response, nil
