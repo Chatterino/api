@@ -24,7 +24,7 @@ require (
 	go.uber.org/zap v1.24.0
 	golang.org/x/text v0.8.0
 	google.golang.org/api v0.113.0
-	honnef.co/go/tools v0.4.2
+	honnef.co/go/tools v0.4.3
 )
 
 require (
