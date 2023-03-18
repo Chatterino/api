@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0
+
 - Breaking: Go version 1.19 is now the minimum required version to build this. (#430)
 - Breaking: `enable-lilliput` config renamed to `enable-animated-thumbnails`. (#312)
 - Breaking: Thumbnail generation now requires libvips. See [docs/build.md](./docs/build.md) for prerequisite instructions. (#366, #369, #312)
