@@ -45,9 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
-
       - name: Log into GitHub Container Registry
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
