@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dev: Only upload Ubuntu binaries to releases. (#454)
+
 ## 2.0.0
 
 - Breaking: Go version 1.19 is now the minimum required version to build this. (#430)
