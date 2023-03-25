@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Dev: Only upload Ubuntu binaries to releases. (#454)
+- Added support for FrankerFaceZ animated emote links. (#455)
 
 ## 2.0.0
 

@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	thumbnailFormat = "https://cdn.frankerfacez.com/emoticon/%s/4"
+	thumbnailFormat         = "https://cdn.frankerfacez.com/emoticon/%s/4"
+	animatedThumbnailFormat = "https://cdn.frankerfacez.com/emoticon/%s/animated/4"
 
 	tooltipTemplate = `<div style="text-align: left;">
 <b>{{.Code}}</b><br>
