@@ -9,6 +9,6 @@ import (
 var (
 	emoteNotFoundResponse = &resolver.Response{
 		Status:  http.StatusNotFound,
-		Message: "No SevenTV emote with this id found",
+		Message: "No 7TV emote with this id found",
 	}
 )

@@ -2,7 +2,6 @@ package seventv
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 
@@ -10,95 +9,95 @@ import (
 )
 
 var (
-	emotes = map[string]EmoteAPIResponse{}
+	emotes = map[string]EmoteModel{}
 )
 
 func init() {
 	// Private emote: Pajawalk
-	emotes["604281c81ae70f000d47ffd9"] = EmoteAPIResponse{
-		Data: EmoteAPIResponseData{
-			Emote: &EmoteAPIEmote{
-				ID:         "604281c81ae70f000d47ffd9",
-				Name:       "Pajawalk",
-				Visibility: EmoteVisibilityPrivate,
-				Owner: EmoteAPIUser{
-					ID:          "603d10e496832ffa787ca53c",
-					DisplayName: "durado_",
-				},
-			},
+	emotes["604281c81ae70f000d47ffd9"] = EmoteModel{
+		ID:     "604281c81ae70f000d47ffd9",
+		Name:   "Pajawalk",
+		Flags:  EmoteFlagsPrivate,
+		Listed: true,
+		Host: ImageHost{
+			URL:   "//cdn.7tv.app/emote/604281c81ae70f000d47ffd9",
+			Files: []ImageFile{{Name: "best.avif", Width: 100, Height: 30, Format: ImageFormatAVIF}, {Name: "best.webp", Width: 90, Height: 28, Format: ImageFormatWEBP}},
+		},
+		Owner: UserPartialModel{
+			ID:          "603d10e496832ffa787ca53c",
+			DisplayName: "durado_",
 		},
 	}
 
-	// Hidden emote: Bedge
-	emotes["60ae8d9ff39a7552b658b60d"] = EmoteAPIResponse{
-		Data: EmoteAPIResponseData{
-			Emote: &EmoteAPIEmote{
-				ID:         "60ae8d9ff39a7552b658b60d",
-				Name:       "Bedge",
-				Visibility: EmoteVisibilityPrivate | EmoteVisibilityHidden,
-				Owner: EmoteAPIUser{
-					ID:          "605394d9b4d31e459ff05f40",
-					DisplayName: "Paruna",
-				},
-			},
+	// Unlisted emote: Bedge
+	emotes["60ae8d9ff39a7552b658b60d"] = EmoteModel{
+		ID:     "60ae8d9ff39a7552b658b60d",
+		Name:   "Bedge",
+		Flags:  0,
+		Listed: false,
+		Host: ImageHost{
+			URL:   "//cdn.7tv.app/emote/60ae8d9ff39a7552b658b60d",
+			Files: []ImageFile{{Name: "best.webp", Width: 90, Height: 28, Format: ImageFormatWEBP}},
+		},
+		Owner: UserPartialModel{
+			ID:          "605394d9b4d31e459ff05f40",
+			DisplayName: "Paruna",
 		},
 	}
 
-	// Global emote: FeelsOkayMan
-	emotes["6042998c1d4963000d9dae34"] = EmoteAPIResponse{
-		Data: EmoteAPIResponseData{
-			Emote: &EmoteAPIEmote{
-				ID:         "6042998c1d4963000d9dae34",
-				Name:       "FeelsOkayMan",
-				Visibility: EmoteVisibilityGlobal,
-				Owner: EmoteAPIUser{
-					ID:          "603bb6a596832ffa78e7b27b",
-					DisplayName: "MegaKill3",
-				},
-			},
+	// Regular emote: monkaS
+	emotes["603cb219c20d020014423c34"] = EmoteModel{
+		ID:     "603cb219c20d020014423c34",
+		Name:   "monkaS",
+		Flags:  0,
+		Listed: true,
+		Host: ImageHost{
+			URL:   "https://cdn.7tv.app/emote/603cb219c20d020014423c34",
+			Files: []ImageFile{{Name: "1x.webp", Width: 28, Height: 28, Format: ImageFormatWEBP}, {Name: "best.webp", Width: 128, Height: 128, Format: ImageFormatWEBP}},
+		},
+		Owner: UserPartialModel{
+			ID:          "6042058896832ffa785800fe",
+			DisplayName: "Zhark",
 		},
 	}
 
-	// No visiblity tag emote: monkaE
-	emotes["603cb219c20d020014423c34"] = EmoteAPIResponse{
-		Data: EmoteAPIResponseData{
-			Emote: &EmoteAPIEmote{
-				ID:   "603cb219c20d020014423c34",
-				Name: "monkaE",
-				// No visibility, should default to shared
-				Owner: EmoteAPIUser{
-					ID:          "6042058896832ffa785800fe",
-					DisplayName: "Zhark",
-				},
-			},
+	// Regular emote, no webp images: Hmm
+	emotes["60ae3e54259ac5a73e56a426"] = EmoteModel{
+		ID:     "60ae3e54259ac5a73e56a426",
+		Name:   "Hmm",
+		Flags:  0,
+		Listed: true,
+		Host: ImageHost{
+			URL:   "https://cdn.7tv.app/emote/60ae3e54259ac5a73e56a426",
+			Files: []ImageFile{{Name: "jebaited.webp", Width: 128, Height: 128, Format: ImageFormatAVIF}},
+		},
+		Owner: UserPartialModel{
+			ID:          "60772a85a807bed00612d1ee",
+			DisplayName: "lnsc",
 		},
 	}
 
-	// No emote
-	emotes["f0f0f0"] = EmoteAPIResponse{
-		Data: EmoteAPIResponseData{
-			Emote: nil,
+	// Private, unlisted emote: Okayge
+	emotes["60bcb44f7229037ee386d1ab"] = EmoteModel{
+		ID:     "60bcb44f7229037ee386d1ab",
+		Name:   "Okayge",
+		Flags:  EmoteFlagsPrivate,
+		Listed: false,
+		Host: ImageHost{
+			URL:   "//cdn.7tv.app/emote/60bcb44f7229037ee386d1ab",
+			Files: []ImageFile{{Name: "1x.webp", Width: 28, Height: 28, Format: ImageFormatWEBP}, {Name: "best.webp", Width: 128, Height: 128, Format: ImageFormatWEBP}, {Name: "2x.webp", Width: 42, Height: 42, Format: ImageFormatWEBP}},
+		},
+		Owner: UserPartialModel{
+			ID:          "60aeabfff6a2c3b332dd6a35",
+			DisplayName: "joonwi",
 		},
 	}
 }
 
 func testServer() *httptest.Server {
 	r := chi.NewRouter()
-	r.Post("/v2/gql", func(w http.ResponseWriter, r *http.Request) {
-		type gqlQuery struct {
-			Query     string            `json:"string"`
-			Variables map[string]string `json:"variables"`
-		}
-
-		var q gqlQuery
-
-		xd, _ := io.ReadAll(r.Body)
-		err := json.Unmarshal(xd, &q)
-		if err != nil {
-			panic(err)
-		}
-
-		emoteID := q.Variables["id"]
+	r.Get("/v3/emotes/{id}", func(w http.ResponseWriter, r *http.Request) {
+		emoteID := chi.URLParam(r, "id")
 
 		if emoteID == "bad" {
 			w.Header().Set("Content-Type", "application/json")
