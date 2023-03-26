@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Minor: Added support for FrankerFaceZ animated emote links. (#455)
+- Fix: 7TV emote images now resolve correctly. (#456)
 - Dev: Only upload Ubuntu binaries to releases. (#454)
 
 ## 2.0.0
