@@ -27,8 +27,10 @@ type EmoteFlagsModel int32
 const (
 	// The emote is private and can only be accessed by its owner, editors and moderators
 	EmoteFlagsPrivate EmoteFlagsModel = 1 << 0
+
 	// The emote was verified to be an original creation by the uploader
 	EmoteFlagsAuthentic EmoteFlagsModel = 1 << 1
+
 	// The emote is recommended to be enabled as Zero-Width
 	EmoteFlagsZeroWidth EmoteFlagsModel = 1 << 8
 
@@ -36,10 +38,13 @@ const (
 
 	// Sexually Suggesive
 	EmoteFlagsContentSexual EmoteFlagsModel = 1 << 16
+
 	// Rapid flashing
 	EmoteFlagsContentEpilepsy EmoteFlagsModel = 1 << 17
+
 	// Edgy or distasteful, may be offensive to some users
 	EmoteFlagsContentEdgy EmoteFlagsModel = 1 << 18
+	
 	// Not allowed specifically on the Twitch platform
 	EmoteFlagsContentTwitchDisallowed EmoteFlagsModel = 1 << 24
 )
