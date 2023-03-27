@@ -25,16 +25,23 @@ type EmoteModel struct {
 type EmoteFlagsModel int32
 
 const (
-	EmoteFlagsPrivate   EmoteFlagsModel = 1 << 0 // The emote is private and can only be accessed by its owner, editors and moderators
-	EmoteFlagsAuthentic EmoteFlagsModel = 1 << 1 // The emote was verified to be an original creation by the uploader
-	EmoteFlagsZeroWidth EmoteFlagsModel = 1 << 8 // The emote is recommended to be enabled as Zero-Width
+	// The emote is private and can only be accessed by its owner, editors and moderators
+	EmoteFlagsPrivate EmoteFlagsModel = 1 << 0
+	// The emote was verified to be an original creation by the uploader
+	EmoteFlagsAuthentic EmoteFlagsModel = 1 << 1
+	// The emote is recommended to be enabled as Zero-Width
+	EmoteFlagsZeroWidth EmoteFlagsModel = 1 << 8
 
 	// Content Flags
 
-	EmoteFlagsContentSexual           EmoteFlagsModel = 1 << 16 // Sexually Suggesive
-	EmoteFlagsContentEpilepsy         EmoteFlagsModel = 1 << 17 // Rapid flashing
-	EmoteFlagsContentEdgy             EmoteFlagsModel = 1 << 18 // Edgy or distasteful, may be offensive to some users
-	EmoteFlagsContentTwitchDisallowed EmoteFlagsModel = 1 << 24 // Not allowed specifically on the Twitch platform
+	// Sexually Suggesive
+	EmoteFlagsContentSexual EmoteFlagsModel = 1 << 16
+	// Rapid flashing
+	EmoteFlagsContentEpilepsy EmoteFlagsModel = 1 << 17
+	// Edgy or distasteful, may be offensive to some users
+	EmoteFlagsContentEdgy EmoteFlagsModel = 1 << 18
+	// Not allowed specifically on the Twitch platform
+	EmoteFlagsContentTwitchDisallowed EmoteFlagsModel = 1 << 24
 )
 
 type ImageHost struct {
