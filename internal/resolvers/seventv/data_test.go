@@ -45,10 +45,10 @@ func init() {
 		},
 	}
 
-	// Regular emote: monkaS
+	// Regular emote: monkaE
 	emotes["603cb219c20d020014423c34"] = EmoteModel{
 		ID:     "603cb219c20d020014423c34",
-		Name:   "monkaS",
+		Name:   "monkaE",
 		Flags:  0,
 		Listed: true,
 		Host: ImageHost{
@@ -58,6 +58,22 @@ func init() {
 		Owner: UserPartialModel{
 			ID:          "6042058896832ffa785800fe",
 			DisplayName: "Zhark",
+		},
+	}
+
+	// Regular emote (in global set): FeelsDankMan
+	emotes["63071bb9464de28875c52531"] = EmoteModel{
+		ID:     "63071bb9464de28875c52531",
+		Name:   "FeelsDankMan",
+		Flags:  0,
+		Listed: true,
+		Host: ImageHost{
+			URL:   "https://cdn.7tv.app/emote/63071bb9464de28875c52531",
+			Files: []ImageFile{{Name: "1x.webp", Width: 28, Height: 28, Format: ImageFormatWEBP}, {Name: "best.webp", Width: 128, Height: 128, Format: ImageFormatWEBP}},
+		},
+		Owner: UserPartialModel{
+			ID:          "603cb1c696832ffa78cc3bc2",
+			DisplayName: "clyverE",
 		},
 	}
 
