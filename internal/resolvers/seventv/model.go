@@ -18,7 +18,7 @@ type EmoteModel struct {
 	Name   string           `json:"name"`
 	Flags  EmoteFlagsModel  `json:"flags"`
 	Listed bool             `json:"listed"`
-	Owner  UserPartialModel `json:"owner,omitempty" extensions:"x-omitempty"`
+	Owner  UserPartialModel `json:"owner"`
 	Host   ImageHost        `json:"host"`
 }
 
