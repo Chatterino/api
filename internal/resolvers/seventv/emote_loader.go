@@ -29,33 +29,10 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 		"emoteHash", emoteHash,
 	)
 
-	queryMap := map[string]interface{}{
-		"query": `
-query fetchEmote($id: String!) {
-	emote(id: $id) {
-		visibility
-		id
-		name
-		owner {
-			id
-			display_name
-		}
-	}
-}`,
-		"variables": map[string]string{
-			"id": emoteHash,
-		},
-	}
-
-	queryBytes, err := json.Marshal(queryMap)
-	if err != nil {
-		return resolver.Errorf("SevenTV API request marshal error: %s", err)
-	}
-
 	// Execute SevenTV API request
-	resp, err := resolver.RequestPOST(l.apiURL, string(queryBytes))
+	resp, err := resolver.RequestGET(ctx, fmt.Sprintf("%s/%s", l.apiURL, emoteHash))
 	if err != nil {
-		return resolver.Errorf("SevenTV API request error: %s", err)
+		return resolver.Errorf("7TV API request error: %s", err)
 	}
 	defer resp.Body.Close()
 
@@ -64,58 +41,57 @@ query fetchEmote($id: String!) {
 		return emoteNotFoundResponse, cache.NoSpecialDur, nil
 	}
 
-	var jsonResponse EmoteAPIResponse
+	var jsonResponse EmoteModel
 	if err := json.NewDecoder(resp.Body).Decode(&jsonResponse); err != nil {
-		return resolver.Errorf("SevenTV API response decode error: %s", err)
+		return resolver.Errorf("7TV API response decode error: %s", err)
 	}
 
-	// API returns Data.Emote as null if the emote wasn't found
-	if jsonResponse.Data.Emote == nil {
-		return emoteNotFoundResponse, cache.NoSpecialDur, nil
-	}
-
-	// Determine type of the emote based on visibility flags
-	visibility := jsonResponse.Data.Emote.Visibility
-	var emoteType []string
-
-	if utils.HasBits(visibility, EmoteVisibilityGlobal) {
-		emoteType = append(emoteType, "Global")
-	}
-
-	if utils.HasBits(visibility, EmoteVisibilityPrivate) {
-		emoteType = append(emoteType, "Private")
-	}
-
-	// Default to Shared emote
-	if len(emoteType) == 0 {
-		emoteType = append(emoteType, "Shared")
+	var emoteType string
+	if utils.HasBits(int32(jsonResponse.Flags), int32(EmoteFlagsPrivate)) {
+		emoteType = "Private"
+	} else {
+		emoteType = "Shared"
 	}
 
 	// Build tooltip data from the API response
 	data := TooltipData{
-		Code:     jsonResponse.Data.Emote.Name,
-		Type:     strings.Join(emoteType, " "),
-		Uploader: jsonResponse.Data.Emote.Owner.DisplayName,
-		Unlisted: utils.HasBits(visibility, EmoteVisibilityHidden),
+		Code:     jsonResponse.Name,
+		Type:     emoteType,
+		Uploader: jsonResponse.Owner.DisplayName,
+		Unlisted: !jsonResponse.Listed,
 	}
 
 	// Build a tooltip using the tooltip template (see tooltipTemplate) with the data we massaged above
 	var tooltip bytes.Buffer
 	if err := seventvEmoteTemplate.Execute(&tooltip, data); err != nil {
-		return resolver.Errorf("SevenTV emote template error: %s", err)
+		return resolver.Errorf("7TV emote template error: %s", err)
+	}
+
+	var bestFile *ImageFile
+	var bestWidth int32
+	for _, file := range jsonResponse.Host.Files {
+		if file.Format == ImageFormatWEBP && file.Width > bestWidth {
+			bestFile = &file
+			bestWidth = file.Width
+		}
+	}
+	var thumbnail string
+	// Hide thumbnail for unlisted or hidden emotes pajaS
+	if !data.Unlisted && bestFile != nil {
+		if strings.HasPrefix(jsonResponse.Host.URL, "//") {
+			thumbnail = fmt.Sprintf("https:%s/%s", jsonResponse.Host.URL, bestFile.Name)
+		} else {
+			thumbnail = fmt.Sprintf("%s/%s", jsonResponse.Host.URL, bestFile.Name)
+		}
+		thumbnail = utils.FormatThumbnailURL(l.baseURL, r, thumbnail)
 	}
 
 	// Success
 	successTooltip := &resolver.Response{
 		Status:    http.StatusOK,
 		Tooltip:   url.PathEscape(tooltip.String()),
-		Thumbnail: utils.FormatThumbnailURL(l.baseURL, r, fmt.Sprintf(thumbnailFormat, emoteHash)),
+		Thumbnail: thumbnail,
 		Link:      fmt.Sprintf("https://7tv.app/emotes/%s", emoteHash),
-	}
-
-	// Hide thumbnail for unlisted or hidden emotes pajaS
-	if data.Unlisted {
-		successTooltip.Thumbnail = ""
 	}
 
 	return successTooltip, cache.NoSpecialDur, nil
