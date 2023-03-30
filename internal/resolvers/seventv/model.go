@@ -44,7 +44,7 @@ const (
 
 	// Edgy or distasteful, may be offensive to some users
 	EmoteFlagsContentEdgy EmoteFlagsModel = 1 << 18
-	
+
 	// Not allowed specifically on the Twitch platform
 	EmoteFlagsContentTwitchDisallowed EmoteFlagsModel = 1 << 24
 )
