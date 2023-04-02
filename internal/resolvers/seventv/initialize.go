@@ -13,11 +13,9 @@ import (
 )
 
 const (
-	thumbnailFormat = "https://cdn.7tv.app/emote/%s/4x"
-
 	tooltipTemplate = `<div style="text-align: left;">
 <b>{{.Code}}</b><br>
-<b>{{.Type}} SevenTV Emote</b><br>
+<b>{{.Type}} 7TV Emote</b><br>
 <b>By:</b> {{.Uploader}}` +
 		`{{ if .Unlisted }}` + `
 <li><b><span style="color: red;">UNLISTED</span></b></li>{{ end }}
@@ -37,7 +35,7 @@ var (
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
-	apiURL := utils.MustParseURL("https://api.7tv.app/v2/gql")
+	apiURL := utils.MustParseURL("https://7tv.io/v3/emotes")
 
 	*resolvers = append(*resolvers, NewEmoteResolver(ctx, cfg, pool, apiURL))
 }

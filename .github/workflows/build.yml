@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-22.04]
 
     steps:
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go }}
 
@@ -78,11 +78,6 @@ jobs:
           name: chatterino-api-1.19-ubuntu-22.04
           path: bins/ubuntu/
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: chatterino-api-1.19-macos-latest
-          path: bins/macos/
-
       - name: display structure
         run: ls -lR
 
@@ -90,7 +85,6 @@ jobs:
         run: |
             mkdir final-bins
             mv bins/ubuntu/chatterino-api final-bins/chatterino-api-ubuntu-x86_64
-            mv bins/macos/chatterino-api final-bins/chatterino-api-macos-x86_64
 
       - name: build-changelog
         run: sed "0,/## $(echo "$GITHUB_REF_VALUE" | cut -d '/' -f 3 | cut -c2-)/d" project-git-repo/CHANGELOG.md | sed '/^## /,+999999999999999999 d' | tail -n+2 | head -n-1 > release-body
@@ -103,6 +97,5 @@ jobs:
           body_path: release-body
           files: |
             final-bins/chatterino-api-ubuntu-x86_64
-            final-bins/chatterino-api-macos-x86_64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

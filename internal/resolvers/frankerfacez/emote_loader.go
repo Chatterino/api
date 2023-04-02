@@ -21,33 +21,40 @@ var (
 	}
 )
 
-/* Example JSON data generated from https://api.frankerfacez.com/v1/emote/131001 2020-11-18
+/* Example JSON data generated from https://api.frankerfacez.com/v1/emote/720810 2023-3-25
 {
   "emote": {
-    "created_at": "2016-09-25T12:30:30.313Z",
-    "css": null,
-    "height": 21,
-    "hidden": false,
-    "id": 131001,
-    "last_updated": "2016-09-25T14:25:01.408Z",
-    "margins": null,
-    "modifier": false,
-    "name": "pajaE",
-    "offset": null,
-    "owner": {
-      "_id": 63119,
-      "display_name": "pajaSWA",
-      "name": "pajaswa"
-    },
+    "id": 720810,
+    "name": "miniDink",
+    "height": 19,
+    "width": 23,
     "public": true,
-    "status": 1,
-    "urls": {
-      "1": "//cdn.frankerfacez.com/emote/131001/1",
-      "2": "//cdn.frankerfacez.com/emote/131001/2",
-      "4": "//cdn.frankerfacez.com/emote/131001/4"
+    "hidden": false,
+    "modifier": false,
+    "modifier_flags": 0,
+    "offset": null,
+    "margins": null,
+    "css": null,
+    "owner": {
+      "_id": 578242,
+      "name": "soda_",
+      "display_name": "soda_"
     },
-    "usage_count": 9,
-    "width": 32
+    "artist": null,
+    "urls": {
+      "1": "https://cdn.frankerfacez.com/emote/720810/1",
+      "2": "https://cdn.frankerfacez.com/emote/720810/2",
+      "4": "https://cdn.frankerfacez.com/emote/720810/4"
+    },
+    "animated": {
+      "1": "https://cdn.frankerfacez.com/emote/720810/animated/1",
+      "2": "https://cdn.frankerfacez.com/emote/720810/animated/2",
+      "4": "https://cdn.frankerfacez.com/emote/720810/animated/4"
+    },
+    "status": 1,
+    "usage_count": 3,
+    "created_at": "2023-03-05T13:13:42.963Z",
+    "last_updated": "2023-03-05T13:52:07.225Z"
   }
 }
 */
@@ -76,6 +83,12 @@ type EmoteAPIResponse struct {
 		Size2 string `json:"2"`
 		Size4 string `json:"4"`
 	} `json:"urls"`
+
+	AnimatedURLs *struct {
+		Size1 string `json:"1"`
+		Size2 string `json:"2"`
+		Size4 string `json:"4"`
+	} `json:"animated,omitempty"`
 }
 
 type TooltipData struct {
@@ -102,7 +115,6 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request)
 		"emoteID", emoteID,
 	)
 	apiURL := l.buildURL(emoteID)
-	thumbnailURL := fmt.Sprintf(thumbnailFormat, emoteID)
 
 	// Create FrankerFaceZ API request
 	resp, err := resolver.RequestGET(ctx, apiURL)
@@ -125,6 +137,13 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteID string, r *http.Request)
 		return resolver.Errorf("FrankerFaceZ API response decode error: %s", err)
 	}
 	jsonResponse := temp.Emote
+
+	var thumbnailURL string
+	if jsonResponse.AnimatedURLs == nil {
+		thumbnailURL = fmt.Sprintf(thumbnailFormat, emoteID)
+	} else {
+		thumbnailURL = fmt.Sprintf(animatedThumbnailFormat, emoteID)
+	}
 
 	// Build tooltip data from the API response
 	data := TooltipData{
