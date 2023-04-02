@@ -14,7 +14,8 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/validate"
 )
 
@@ -59,7 +60,7 @@ func (r *PDFResolver) Run(ctx context.Context, req *http.Request, resp *http.Res
 
 	readSeeker := bytes.NewReader(buffer)
 
-	pdfCtx, err := api.ReadContext(readSeeker, pdfcpu.NewDefaultConfiguration())
+	pdfCtx, err := api.ReadContext(readSeeker, model.NewDefaultConfiguration())
 	if err != nil {
 		log.Errorw("error reading pdf context", "err", err)
 		return nil, err
@@ -71,7 +72,7 @@ func (r *PDFResolver) Run(ctx context.Context, req *http.Request, resp *http.Res
 	}
 
 	dtString := ""
-	if creationDt, ok := pdfcpu.DateTime(pdfCtx.CreationDate, true); ok {
+	if creationDt, ok := types.DateTime(pdfCtx.CreationDate, true); ok {
 		dtString = humanize.CreationDate(creationDt)
 	}
 
