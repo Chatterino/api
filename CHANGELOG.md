@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+
 - Dev: Set version in User-Agent. (#459)
 
 ## 2.0.1
