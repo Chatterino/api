@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Minor: Our User-Agent now properly reflects the version of the API. (#459)
+
 ## 2.0.1
 
 - Minor: Added support for FrankerFaceZ animated emote links. (#455)
