@@ -29,10 +29,6 @@ jobs:
         if: matrix.os == 'ubuntu-22.04'
         run: sudo apt update && sudo apt -y install build-essential libvips-dev
 
-      - name: Get external dependencies (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install vips
-
       - name: Get Go dependencies
         run: |
           go get -v -t -d ./...
