@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.2
+
 - Minor: Our User-Agent now properly reflects the version of the API. (#459)
 
 ## 2.0.1
