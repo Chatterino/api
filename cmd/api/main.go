@@ -8,12 +8,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Chatterino/api/internal/caches/twitchusernamecache"
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/migration"
 	defaultresolver "github.com/Chatterino/api/internal/resolvers/default"
-	"github.com/Chatterino/api/internal/routes/twitchemotes"
 	"github.com/Chatterino/api/internal/twitchapiclient"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
@@ -124,15 +122,11 @@ func main() {
 	// Strip trailing slashes from API requests
 	router.Use(StripSlashes)
 
-	var helixUsernameCache cache.Cache
-
 	helixClient, err := twitchapiclient.New(ctx, cfg)
 	if err != nil {
 		log.Warnw("Error initializing Twitch API client",
 			"error", err,
 		)
-	} else {
-		helixUsernameCache = twitchusernamecache.New(ctx, cfg, pool, helixClient)
 	}
 
 	if cfg.EnablePrometheus {
@@ -140,7 +134,6 @@ func main() {
 		listenPrometheus(cfg)
 	}
 
-	twitchemotes.Initialize(ctx, cfg, pool, router, helixClient, helixUsernameCache)
 	handleRoot(router)
 	handleHealth(router)
 	handleLegal(router)
