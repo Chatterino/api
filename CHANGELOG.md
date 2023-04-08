@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Breaking: Remove the `/twitchemotes/` endpoints. See [issue 332](https://github.com/Chatterino/api/issues/332) for more information. (#465)
+
 ## 2.0.2
 
 - Minor: Our User-Agent now properly reflects the version of the API. (#459)
