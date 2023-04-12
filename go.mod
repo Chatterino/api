@@ -6,7 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/davidbyttow/govips/v2 v2.11.0
 	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
-	github.com/frankban/quicktest v1.14.4
+	github.com/frankban/quicktest v1.14.5
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-chi/stampede v0.5.1
 	github.com/golang/mock v1.6.0
