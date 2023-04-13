@@ -178,7 +178,7 @@ func TestLinkResolver(t *testing.T) {
 				c.Assert(err, qt.IsNil)
 
 				if test.expected.Tooltip != "" {
-					c.Assert(unescapedTooltip, MatchesRegexp, regexp.MustCompile(test.expected.Tooltip), qt.Commentf("%s does not match %s", unescapedTooltip, test.expected.Tooltip))
+					c.Assert(unescapedTooltip, qt.Matches, regexp.MustCompile(test.expected.Tooltip), qt.Commentf("%s does not match %s", unescapedTooltip, test.expected.Tooltip))
 				}
 				if test.expected.Message != "" {
 					c.Assert(response.Message, qt.Matches, test.expected.Message, qt.Commentf("%s does not match %s", response.Message, test.expected.Message))
@@ -242,7 +242,7 @@ func TestLinkResolver(t *testing.T) {
 				c.Assert(err, qt.IsNil)
 
 				if test.expected.Tooltip != "" {
-					c.Assert(unescapedTooltip, MatchesRegexp, regexp.MustCompile(test.expected.Tooltip), qt.Commentf("%s does not match %s", unescapedTooltip, test.expected.Tooltip))
+					c.Assert(unescapedTooltip, qt.Matches, regexp.MustCompile(test.expected.Tooltip), qt.Commentf("%s does not match %s", unescapedTooltip, test.expected.Tooltip))
 				}
 				if test.expected.Message != "" {
 					c.Assert(response.Message, qt.Matches, test.expected.Message, qt.Commentf("%s does not match %s", response.Message, test.expected.Message))
