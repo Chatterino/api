@@ -68,48 +68,72 @@ func TestVideoResolver(t *testing.T) {
 
 	c.Run("Check", func(c *qt.C) {
 		type checkTest struct {
-			label    string
-			input    *url.URL
-			expected bool
+			label           string
+			input           *url.URL
+			expected        bool
+			expectedVideoID string
 		}
 
 		tests := []checkTest{
 			{
-				label:    "Correct domain, correct path",
-				input:    utils.MustParseURL("https://youtube.com/watch?v=foobar"),
-				expected: true,
+				label:           "Correct domain, correct path",
+				input:           utils.MustParseURL("https://youtube.com/watch?v=foobar"),
+				expected:        true,
+				expectedVideoID: "foobar",
 			},
 			{
-				label:    "Correct domain, embed path",
-				input:    utils.MustParseURL("https://youtube.com/embed/foobar"),
-				expected: true,
+				label:           "Correct domain, embed path",
+				input:           utils.MustParseURL("https://youtube.com/embed/foobar"),
+				expected:        true,
+				expectedVideoID: "foobar",
 			},
 			{
-				label:    "Correct domain, shorts path",
-				input:    utils.MustParseURL("https://youtube.com/shorts/foobar"),
-				expected: true,
+				label:           "Correct domain, shorts path",
+				input:           utils.MustParseURL("https://youtube.com/shorts/foobar"),
+				expected:        true,
+				expectedVideoID: "foobar",
 			},
 			{
-				label:    "Correct (sub)domain, correct path",
-				input:    utils.MustParseURL("https://www.youtube.com/watch?v=foobar"),
-				expected: true,
+				label:           "Correct (sub)domain, correct path",
+				input:           utils.MustParseURL("https://www.youtube.com/watch?v=foobar"),
+				expected:        true,
+				expectedVideoID: "foobar",
 			},
 			{
-				label:    "Correct domain, no path",
-				input:    utils.MustParseURL("https://youtube.com"),
-				expected: false,
+				label:           "Correct (sub)domain, correct path, broken link that we fix",
+				input:           utils.MustParseURL("https://www.youtube.com/watch?v=foobar?feature=share"),
+				expected:        true,
+				expectedVideoID: "foobar",
 			},
 			{
-				label:    "Incorrect domain",
-				input:    utils.MustParseURL("https://example.com/watch?v=foobar"),
-				expected: false,
+				label:           "Correct (sub)domain, correct path, broken link that we fix 2",
+				input:           utils.MustParseURL("https://www.youtube.com/watch?v=foobar&feature=share"),
+				expected:        true,
+				expectedVideoID: "foobar",
+			},
+			{
+				label:           "Correct domain, no path",
+				input:           utils.MustParseURL("https://youtube.com"),
+				expected:        false,
+				expectedVideoID: "",
+			},
+			{
+				label:           "Incorrect domain",
+				input:           utils.MustParseURL("https://example.com/watch?v=foobar"),
+				expected:        false,
+				expectedVideoID: "",
 			},
 		}
 
 		for _, test := range tests {
 			c.Run(test.label, func(c *qt.C) {
-				_, output := resolver.Check(ctx, test.input)
+				ctx, output := resolver.Check(ctx, test.input)
 				c.Assert(output, qt.Equals, test.expected)
+				if test.expected {
+					videoID, err := videoIDFromContext(ctx)
+					c.Assert(err, qt.IsNil)
+					c.Assert(videoID, qt.Equals, test.expectedVideoID)
+				}
 			})
 		}
 	})

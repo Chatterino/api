@@ -14,12 +14,33 @@ type YouTubeVideoResolver struct {
 	videoCache cache.Cache
 }
 
+type contextKey string
+
+var (
+	contextVideoID = contextKey("videoID")
+
+	errMissingVideoIDValue = errors.New("missing video ID in context")
+)
+
+func videoIDFromContext(ctx context.Context) (string, error) {
+	videoID, ok := ctx.Value(contextVideoID).(string)
+	if !ok {
+		return "", errMissingVideoIDValue
+	}
+
+	return videoID, nil
+}
+
 func (r *YouTubeVideoResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsSubdomainOf(url, "youtube.com") {
 		return ctx, false
 	}
 
-	return ctx, getYoutubeVideoIDFromURL(url) != ""
+	videoID := getYoutubeVideoIDFromURL(url)
+
+	ctx = context.WithValue(ctx, contextVideoID, videoID)
+
+	return ctx, videoID != ""
 }
 
 var (
