@@ -84,7 +84,7 @@ func init() {
 	pflag.Duration("youtube-channel-cache-duration", 48*time.Hour, "Cache timeout for youtube channels")
 	pflag.Duration("youtube-video-cache-duration", 48*time.Hour, "Cache timeout for youtube videos")
 	pflag.String("log-level", "info", "Log level")
-	pflag.Bool("log-development", false, "Enable development logging for warnings and above, this includes stack traces")
+	pflag.Bool("log-development", false, "Enables much more verbose logging, useful for debugging. This makes all log messages include a stack trace to see where they were called from.")
 	pflag.String("discord-token", "", "Discord token")
 	pflag.String("twitch-client-id", "", "Twitch client ID")
 	pflag.String("twitch-client-secret", "", "Twitch client secret")
