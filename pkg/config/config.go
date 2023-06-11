@@ -83,7 +83,7 @@ func init() {
 	pflag.Duration("wikipedia-article-cache-duration", 1*time.Hour, "Cache timeout for wikipedia articles")
 	pflag.Duration("youtube-channel-cache-duration", 48*time.Hour, "Cache timeout for youtube channels")
 	pflag.Duration("youtube-video-cache-duration", 48*time.Hour, "Cache timeout for youtube videos")
-	pflag.String("log-level", "info", "Log level")
+	pflag.String("log-level", "info", "Minimum level of log message importance required for the log message to not be filtered out. Available levels: debug, info, warn, error")
 	pflag.Bool("log-development", false, "Enables much more verbose logging, useful for debugging. This makes all log messages include a stack trace to see where they were called from.")
 	pflag.String("discord-token", "", "Discord token")
 	pflag.String("twitch-client-id", "", "Twitch client ID")
