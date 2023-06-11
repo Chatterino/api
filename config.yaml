@@ -97,3 +97,7 @@
 
 # Cache duration for Wikipedia article links
 #wikipedia-article-cache-duration: 1h
+
+# Enables much more verbose logging, useful for debugging.
+# This makes all log messages include a stack trace to see where they were called from.
+#log-development: false
