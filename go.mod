@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/stampede v0.5.1
 	github.com/golang/mock v1.6.0
-	github.com/jackc/pgconn v1.14.0
+	github.com/jackc/pgconn v1.14.1
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/koffeinsource/go-imgur v0.4.1
 	github.com/nathan-jones/chi-prometheus v1.0.0
