@@ -12,6 +12,7 @@ import (
 var (
 	users  = map[string]*TwitterUserApiResponse{}
 	tweets = map[string]*TweetApiResponse{}
+	embeds = map[string]*EmbedApiResponse{}
 )
 
 func init() {
@@ -101,6 +102,52 @@ func init() {
 			},
 		},
 	}
+
+	// Embed with one photo
+	embeds["1541102101782216706"] = &EmbedApiResponse{
+		Text:      "Since I switched to rifle and 4:3 its been pretty easy. People calling me bad when they were already playing on the easiest difficulty🤣🤣🤣😎 https://t.co/jfbLdsPTwZ",
+		ID:        "1541102101782216706",
+		CreatedAt: time.Date(2022, time.June, 26, 16, 52, 28, 0, time.UTC),
+		User: EmbedUser{
+			Name:       "Sebastian Fors",
+			ScreenName: "Forsen",
+		},
+		FavoriteCount:     4966,
+		ConversationCount: 242,
+		MediaDetails: []EmbedMediaDetail{
+			{
+				MediaUrl: "https://pbs.twimg.com/media/FWMYHYSWYAAyWMp.jpg",
+			},
+		},
+	}
+
+	// Embed without media
+	embeds["1662863815787126787"] = &EmbedApiResponse{
+		Text:      "Playing some more warlander today on stream! Free to play and join! Get it here https://t.co/rh3IBOvymE ! @PlayWarlander #Warlander",
+		ID:        "1662863815787126787",
+		CreatedAt: time.Date(2023, time.May, 28, 16, 50, 2, 0, time.UTC),
+		User: EmbedUser{
+			Name:       "Sebastian Fors",
+			ScreenName: "Forsen",
+		},
+		FavoriteCount:     437,
+		ConversationCount: 87,
+		MediaDetails:      []EmbedMediaDetail{},
+	}
+
+	// Embed without id
+	embeds["1662863815787126788"] = &EmbedApiResponse{
+		Text:      "",
+		ID:        "",
+		CreatedAt: time.Date(2023, time.May, 28, 16, 50, 2, 0, time.UTC),
+		User: EmbedUser{
+			Name:       "Sebastian Fors",
+			ScreenName: "Forsen",
+		},
+		FavoriteCount:     437,
+		ConversationCount: 87,
+		MediaDetails:      []EmbedMediaDetail{},
+	}
 }
 
 func testServer() *httptest.Server {
@@ -141,6 +188,33 @@ func testServer() *httptest.Server {
 			http.Error(w, http.StatusText(500), 500)
 			return
 		} else if response, ok = tweets[tweetID]; !ok {
+			http.Error(w, http.StatusText(404), 404)
+			return
+		}
+
+		b, _ := json.Marshal(&response)
+
+		w.Write(b)
+	})
+	return httptest.NewServer(r)
+}
+
+func testEmbedServer() *httptest.Server {
+	r := chi.NewRouter()
+	r.Get("/tweet-result", func(w http.ResponseWriter, r *http.Request) {
+		tweetID := r.URL.Query().Get("id")
+
+		var response *EmbedApiResponse
+		var ok bool
+
+		w.Header().Set("Content-Type", "application/json")
+
+		if tweetID == "bad" {
+			w.Write([]byte("xD"))
+		} else if tweetID == "500" {
+			http.Error(w, http.StatusText(500), 500)
+			return
+		} else if response, ok = embeds[tweetID]; !ok {
 			http.Error(w, http.StatusText(404), 404)
 			return
 		}

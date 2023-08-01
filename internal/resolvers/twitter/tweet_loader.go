@@ -21,6 +21,10 @@ import (
 	"github.com/davidbyttow/govips/v2/vips"
 )
 
+type embeddableMedia interface {
+	Url() string
+}
+
 type TweetApiResponse struct {
 	Data     Data     `json:"data"`
 	Includes Includes `json:"includes"`
@@ -43,6 +47,13 @@ type Media struct {
 	URL  string `json:"url"`
 	// used for videos
 	PreviewImageUrl string `json:"preview_image_url"`
+}
+
+func (m Media) Url() string {
+	if m.Type == "video" {
+		return m.PreviewImageUrl
+	}
+	return m.URL
 }
 
 type Users struct {
@@ -212,7 +223,7 @@ func (l *TweetLoader) buildThumbnailURL(
 	}
 
 	// More than one media item, need to compose a thumbnail
-	thumb, err := l.composeThumbnail(ctx, tweet.Includes.Media)
+	thumb, err := composeThumbnail(ctx, tweet.Includes.Media, int(l.maxThumbnailSize))
 	if err != nil {
 		log.Errorw("Couldn't compose Twitter collage",
 			"err", err,
@@ -243,9 +254,10 @@ func (l *TweetLoader) buildThumbnailURL(
 	return utils.FormatGeneratedThumbnailURL(l.baseURL, r, collageKey)
 }
 
-func (l *TweetLoader) composeThumbnail(
+func composeThumbnail[S ~[]E, E embeddableMedia](
 	ctx context.Context,
-	mediaEntities []Media,
+	mediaEntities S,
+	maxThumbnailSize int,
 ) (*vips.ImageRef, error) {
 	log := logger.FromContext(ctx)
 
@@ -260,10 +272,7 @@ func (l *TweetLoader) composeThumbnail(
 		idx := idx
 		media := media
 
-		url := media.URL
-		if media.Type == "video" {
-			url = media.PreviewImageUrl
-		}
+		url := media.Url()
 
 		go func() {
 			defer wg.Done()
@@ -340,7 +349,6 @@ func (l *TweetLoader) composeThumbnail(
 		return nil, err
 	}
 
-	maxThumbnailSize := int(l.maxThumbnailSize)
 	err = stem.ThumbnailWithSize(
 		maxThumbnailSize, maxThumbnailSize, vips.InterestingNone, vips.SizeDown,
 	)

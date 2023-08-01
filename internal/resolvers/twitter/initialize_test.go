@@ -26,7 +26,7 @@ func TestInitialize(t *testing.T) {
 		collageCache := cache.NewPostgreSQLDependentCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("test"))
 		c.Assert(customResolvers, qt.HasLen, 0)
 		Initialize(ctx, cfg, pool, &customResolvers, collageCache)
-		c.Assert(customResolvers, qt.HasLen, 0)
+		c.Assert(customResolvers, qt.HasLen, 1)
 	})
 
 	c.Run("Credentials", func(c *qt.C) {

@@ -18,6 +18,10 @@ type TwitterResolver struct {
 	userCache  cache.Cache
 }
 
+type EmbedResolver struct {
+	tweetCache cache.Cache
+}
+
 func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsSubdomainOf(url, "twitter.com") {
 		return ctx, false
@@ -108,6 +112,64 @@ func NewTwitterResolver(
 	r := &TwitterResolver{
 		tweetCache: tweetCache,
 		userCache:  userCache,
+	}
+
+	return r
+}
+
+func (r *EmbedResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
+	if !utils.IsSubdomainOf(url, "twitter.com") {
+		return ctx, false
+	}
+
+	tweetMatch := tweetRegexp.FindStringSubmatch(url.Path)
+	if len(tweetMatch) == 2 && len(tweetMatch[1]) > 0 {
+		return ctx, true
+	}
+
+	return ctx, false
+}
+
+func (r *EmbedResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
+	tweetMatch := tweetRegexp.FindStringSubmatch(url.Path)
+	if len(tweetMatch) == 2 && len(tweetMatch[1]) > 0 {
+		tweetID := tweetMatch[1]
+
+		return r.tweetCache.Get(ctx, tweetID, req)
+	}
+
+	return nil, resolver.ErrDontHandle
+}
+
+func (r *EmbedResolver) Name() string {
+	return "twitter-embed"
+}
+
+func NewEmbedResolver(
+	ctx context.Context,
+	cfg config.APIConfig,
+	pool db.Pool,
+	tweetEndpointURLFormat string,
+	collageCache cache.DependentCache,
+) *EmbedResolver {
+	tweetCacheKeyProvider := cache.NewPrefixKeyProvider("twitter-embed:tweet")
+
+	tweetLoader := NewEmbedLoader(
+		cfg.BaseURL,
+		tweetEndpointURLFormat,
+		tweetCacheKeyProvider,
+		collageCache,
+		cfg.MaxThumbnailSize,
+	)
+
+	tweetCache := cache.NewPostgreSQLCache(
+		ctx, cfg, pool, tweetCacheKeyProvider, resolver.NewResponseMarshaller(tweetLoader),
+		cfg.TwitterTweetCacheDuration,
+	)
+	tweetCache.RegisterDependent(ctx, collageCache)
+
+	r := &EmbedResolver{
+		tweetCache: tweetCache,
 	}
 
 	return r
