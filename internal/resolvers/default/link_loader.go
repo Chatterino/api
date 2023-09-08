@@ -13,7 +13,9 @@ import (
 	"time"
 
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/internal/resolvers/twitter"
 	"github.com/Chatterino/api/internal/staticresponse"
+	"github.com/Chatterino/api/internal/version"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/thumbnail"
@@ -48,7 +50,13 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 		return resolver.ReturnInvalidURL()
 	}
 
-	resp, err := resolver.RequestGET(ctx, requestUrl.String())
+	extraHeaders := make(map[string]string)
+	ctx, isTwitterRequest := twitter.Check(ctx, requestUrl)
+	if isTwitterRequest {
+		extraHeaders["User-Agent"] = fmt.Sprintf("chatterino-api-cache/%s link-resolver (bot)", version.Version)
+	}
+
+	resp, err := resolver.RequestGETWithHeaders(requestUrl.String(), extraHeaders)
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
 			return staticresponse.SNoLinkInfoFound.
