@@ -18,7 +18,7 @@ type TwitterResolver struct {
 	userCache  cache.Cache
 }
 
-func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
+func Check(ctx context.Context, url *url.URL) (context.Context, bool) {
 	if !utils.IsSubdomainOf(url, "twitter.com") {
 		return ctx, false
 	}
@@ -43,6 +43,10 @@ func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Cont
 	isTwitterUser := !notAUser
 
 	return ctx, isTwitterUser
+}
+
+func (r *TwitterResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
+	return Check(ctx, url)
 }
 
 func (r *TwitterResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
