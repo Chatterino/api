@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- Minor: Use Twitter OG tags if no Twitter credentials are configured. (#522)
 - Breaking: Remove the `/twitchemotes/` endpoints. See [issue 332](https://github.com/Chatterino/api/issues/332) for more information. (#465)
+- Minor: Use Twitter OG tags if no Twitter credentials are configured. (#522)
 - Fix: We do some more YouTube video ID parsing to ensure broken links (such as `youtube.com/watch?v=foobar?feature=share`) still return the actual video ID, since this is how the browser operates. (#488)
 - Dev: Document the `log-development` setting. (#491)
 - Dev: Document the `log-level` setting. (#490)
