@@ -19,7 +19,7 @@ type TwitterResolver struct {
 }
 
 func Check(ctx context.Context, url *url.URL) (context.Context, bool) {
-	if !utils.IsSubdomainOf(url, "twitter.com") {
+	if !utils.IsSubdomainOf(url, "twitter.com", "x.com") {
 		return ctx, false
 	}
 
