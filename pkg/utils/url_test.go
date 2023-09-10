@@ -20,26 +20,26 @@ func TestIsSubdomainOf(t *testing.T) {
 	type tTest struct {
 		u *url.URL
 
-		parent   string
+		parents  []string
 		expected bool
 	}
 
 	tests := []tTest{
 		{
 			u:        makeUrl("https://www.youtube.com/watch?v=aTts9CnsAv8"),
-			parent:   "youtube.com",
+			parents:  []string{"youtube.com"},
 			expected: true,
 		},
 		{
 			u:        makeUrl("https://www.twitter.com/forsen"),
-			parent:   "youtube.com",
+			parents:  []string{"youtube.com"},
 			expected: false,
 		},
 	}
 
 	for _, test := range tests {
 		c.Run(test.u.String(), func(c *qt.C) {
-			actual := IsSubdomainOf(test.u, test.parent)
+			actual := IsSubdomainOf(test.u, test.parents...)
 			c.Assert(actual, qt.Equals, test.expected)
 		})
 	}
