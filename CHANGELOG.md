@@ -8,6 +8,7 @@
 - Dev: Document the `log-development` setting. (#491)
 - Dev: Document the `log-level` setting. (#490)
 - Dev: Add some `pkg/utils/url.go` tests. (#525)
+- Dev: Make `IsSubdomainOf` variadic, making it easier for users of it to support multiple top level domains. (#526)
 
 ## 2.0.2
 
