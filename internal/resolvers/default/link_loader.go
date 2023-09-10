@@ -3,6 +3,7 @@ package defaultresolver
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -51,9 +52,12 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 	}
 
 	extraHeaders := make(map[string]string)
+	cacheDur := cache.NoSpecialDur
 	ctx, isTwitterRequest := twitter.Check(ctx, requestUrl)
 	if isTwitterRequest {
 		extraHeaders["User-Agent"] = fmt.Sprintf("chatterino-api-cache/%s link-resolver (bot)", version.Version)
+		// TODO: Use twitter-tweet-cache-duration?
+		cacheDur = time.Hour * 24
 	}
 
 	resp, err := resolver.RequestGETWithHeaders(requestUrl.String(), extraHeaders)
@@ -160,5 +164,6 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 		response.Thumbnail = utils.FormatThumbnailURL(l.baseURL, r, resp.Request.URL.String())
 	}
 
-	return utils.MarshalNoDur(response)
+	finalData, finalErr := json.Marshal(response)
+	return finalData, nil, nil, cacheDur, finalErr
 }
