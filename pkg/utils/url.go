@@ -62,14 +62,20 @@ func UnescapeURLArgument(r *http.Request, key string) (string, error) {
 }
 
 // IsSubdomainOf checks whether `url` is a subdomain of `parent`
-func IsSubdomainOf(url *url.URL, parent string) bool {
+func IsSubdomainOf(url *url.URL, parents ...string) bool {
 	// We use Hostname() as that strips possible port numbers (relevant for the suffix check)
 	hostname := url.Hostname()
 
-	same := (hostname == parent)
-	trueSub := strings.HasSuffix(hostname, "."+parent)
+	for _, parent := range parents {
+		same := (hostname == parent)
+		trueSub := strings.HasSuffix(hostname, "."+parent)
 
-	return same || trueSub
+		if same || trueSub {
+			return true
+		}
+	}
+
+	return false
 }
 
 // IsDomains checks whether `url`s domain matches any of the given domains exactly (non-case sensitive)
