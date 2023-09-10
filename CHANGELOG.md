@@ -7,6 +7,7 @@
 - Fix: We do some more YouTube video ID parsing to ensure broken links (such as `youtube.com/watch?v=foobar?feature=share`) still return the actual video ID, since this is how the browser operates. (#488)
 - Dev: Document the `log-development` setting. (#491)
 - Dev: Document the `log-level` setting. (#490)
+- Dev: Add some `pkg/utils/url.go` tests. (#525)
 
 ## 2.0.2
 
