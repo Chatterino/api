@@ -35,6 +35,16 @@ func TestIsSubdomainOf(t *testing.T) {
 			parents:  []string{"youtube.com"},
 			expected: false,
 		},
+		{
+			u:        makeUrl("https://www.twitter.com/forsen"),
+			parents:  []string{"youtube.com", "twitter.com"},
+			expected: true,
+		},
+		{
+			u:        makeUrl("https://www.twitter.com/forsen"),
+			parents:  []string{"twitter.com", "youtube.com"},
+			expected: true,
+		},
 	}
 
 	for _, test := range tests {
