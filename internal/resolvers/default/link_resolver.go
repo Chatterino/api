@@ -3,6 +3,7 @@ package defaultresolver
 import (
 	"context"
 	"errors"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -41,6 +42,11 @@ type LinkResolver struct {
 func (r *LinkResolver) shouldIgnore(u *url.URL) bool {
 	if _, ok := r.ignoredHosts[strings.ToLower(u.Hostname())]; ok {
 		// Ignoring url because host is ignored
+		return true
+	}
+
+	ip := net.ParseIP(u.Host)
+	if ip != nil && ip.IsPrivate() {
 		return true
 	}
 
