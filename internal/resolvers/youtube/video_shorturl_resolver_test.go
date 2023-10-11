@@ -150,6 +150,17 @@ func TestVideoShortURLResolver(t *testing.T) {
 					},
 				},
 				{
+					label:        "Video with path semi-broken that we can fix",
+					inputURL:     utils.MustParseURL("https://youtu.be/foobar&t=123"),
+					inputVideoID: "foobar",
+					inputReq:     nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EVideo%20Title%3C%2Fb%3E%0A%3Cbr%3E%3Cb%3EChannel:%3C%2Fb%3E%20Channel%20Title%0A%3Cbr%3E%3Cb%3EDuration:%3C%2Fb%3E%2000:00:00%0A%3Cbr%3E%3Cb%3EPublished:%3C%2Fb%3E%2012%20Oct%202019%0A%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%2050%0A%3Cbr%3E%3Cb%3E%3Cspan%20style=%22color:%20red%3B%22%3EAGE%20RESTRICTED%3C%2Fspan%3E%3C%2Fb%3E%0A%3Cbr%3E%3Cspan%20style=%22color:%20%232ecc71%3B%22%3E10%20likes%3C%2Fspan%3E\u0026nbsp%3B%E2%80%A2\u0026nbsp%3B%3Cspan%20style=%22color:%20%23808892%3B%22%3E5%20comments%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+				},
+				{
 					label:        "404",
 					inputURL:     utils.MustParseURL("https://youtu.be/404"),
 					inputVideoID: "404",

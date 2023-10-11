@@ -44,5 +44,10 @@ func getYoutubeVideoIDFromURL(url *url.URL) string {
 }
 
 func getYoutubeVideoIDFromURL2(url *url.URL) string {
-	return path.Base(url.Path)
+	v := path.Base(url.Path)
+	fields := strings.FieldsFunc(v, func(r rune) bool {
+		return r == '?' || r == '&'
+	})
+
+	return fields[0]
 }
