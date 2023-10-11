@@ -7,7 +7,7 @@
 - Minor: Use Twitter OG tags if no Twitter credentials are configured. (#522)
 - Minor: Support `x.com` for tweets. (#527)
 - Minor: Increase tweet cache duration for non-credentialed requests to 24h. Currently not configurable. (#528)
-- Fix: We do some more YouTube video ID parsing to ensure broken links (such as `youtube.com/watch?v=foobar?feature=share`) still return the actual video ID, since this is how the browser operates. (#488)
+- Fix: We do some more YouTube video ID parsing to ensure broken links (such as `youtube.com/watch?v=foobar?feature=share`) still return the actual video ID, since this is how the browser operates. (#488, #545)
 - Dev: Document the `log-development` setting. (#491)
 - Dev: Document the `log-level` setting. (#490)
 - Dev: Add some `pkg/utils/url.go` tests. (#525)
