@@ -64,7 +64,7 @@ func (l *ThumbnailLoader) Load(ctx context.Context, urlString string, r *http.Re
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-		log.Infow("Skipping url %s because status code is $d", resp.Request.URL, resp.StatusCode)
+		log.Infow("Skipping url %s because status code is %d", resp.Request.URL, resp.StatusCode)
 		return staticresponse.SNoThumbnailFound.Return()
 	}
 
