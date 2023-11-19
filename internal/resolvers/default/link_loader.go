@@ -103,7 +103,7 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusMultipleChoices {
-		fmt.Println("Skipping url", resp.Request.URL, "because status code is", resp.StatusCode)
+		log.Infow("Skipping url because of status code", "url", resp.Request.URL, "status", resp.StatusCode)
 		return staticresponse.SNoLinkInfoFound.Return()
 	}
 
