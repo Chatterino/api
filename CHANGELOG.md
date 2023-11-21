@@ -13,6 +13,7 @@
 - Dev: Add some `pkg/utils/url.go` tests. (#525)
 - Dev: Make `IsSubdomainOf` variadic, making it easier for users of it to support multiple top level domains. (#526)
 - Dev: Use logger for skipping url message instead of fmt. (#554)
+- Dev: Don't initialize youtube resolver if youtube-api-key is empty. (#556)
 
 ## 2.0.2
 
