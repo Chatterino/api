@@ -2,6 +2,7 @@ package youtube
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/Chatterino/api/internal/logger"
@@ -16,6 +17,11 @@ func TestInitialize(t *testing.T) {
 	c := qt.New(t)
 
 	pool, err := pgxmock.NewPool()
+	c.Assert(err, qt.IsNil)
+
+	// google.golang.org/api/youtube/v3 automatically
+	// uses this environment variable to initialize clients
+	err = os.Unsetenv("GOOGLE_APPLICATION_CREDENTIALS")
 	c.Assert(err, qt.IsNil)
 
 	c.Run("No YouTube API key", func(c *qt.C) {
