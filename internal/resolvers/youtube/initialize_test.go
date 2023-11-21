@@ -18,6 +18,10 @@ func TestInitialize(t *testing.T) {
 	pool, err := pgxmock.NewPool()
 	c.Assert(err, qt.IsNil)
 
+	// google.golang.org/api/youtube/v3 automatically
+	// uses this environment variable to initialize clients
+	c.Unsetenv("GOOGLE_APPLICATION_CREDENTIALS")
+
 	c.Run("No YouTube API key", func(c *qt.C) {
 		cfg := config.APIConfig{
 			YoutubeApiKey: "",
