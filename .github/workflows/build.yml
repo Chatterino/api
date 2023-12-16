@@ -54,7 +54,7 @@ jobs:
           fail_ci_if_error: true
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: chatterino-api-${{ matrix.go }}-${{ matrix.os }}
           path: build/chatterino-api
