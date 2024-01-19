@@ -23,7 +23,7 @@ require (
 	github.com/spf13/viper v1.18.2
 	go.uber.org/zap v1.26.0
 	golang.org/x/text v0.14.0
-	google.golang.org/api v0.156.0
+	google.golang.org/api v0.157.0
 	honnef.co/go/tools v0.4.6
 )
 
@@ -94,7 +94,7 @@ require (
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240102182953-50ed04b92917 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240116215550-a9fa1716bcac // indirect
 	google.golang.org/grpc v1.60.1 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
