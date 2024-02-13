@@ -37,22 +37,6 @@ jobs:
         run: go build -ldflags="-s -w" -v -o ../../build/chatterino-api
         working-directory: cmd/api
 
-      - name: Test
-        run: go test -v -tags test ./...
-
-      - name: Migration test
-        run: go test -v -tags migrationtest ./...
-
-      - name: Generate code coverage
-        if: matrix.os == 'ubuntu-22.04' && matrix.go == '1.19'
-        run: go test -race -v -count=1 -coverprofile=coverage.out -tags test ./...
-
-      - name: Upload Test Coverage
-        if: matrix.os == 'ubuntu-22.04' && matrix.go == '1.19'
-        uses: codecov/codecov-action@v3
-        with:
-          fail_ci_if_error: true
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

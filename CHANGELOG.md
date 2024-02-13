@@ -14,6 +14,7 @@
 - Dev: Make `IsSubdomainOf` variadic, making it easier for users of it to support multiple top level domains. (#526)
 - Dev: Use logger for skipping url message instead of fmt. (#554)
 - Dev: Improve YoutTube resolver initialization logging. (#556)
+- Dev: Moved tests & coverage uploads to its own workflow file. (#585)
 
 ## 2.0.2
 
