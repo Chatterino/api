@@ -6,7 +6,7 @@ on:
     branches:
       - master
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: 'project-git-repo'
+          path: "project-git-repo"
 
       - uses: actions/download-artifact@v4
         with:
@@ -63,8 +63,8 @@ jobs:
 
       - name: rename files
         run: |
-            mkdir final-bins
-            mv bins/ubuntu/chatterino-api final-bins/chatterino-api-ubuntu-x86_64
+          mkdir final-bins
+          mv bins/ubuntu/chatterino-api final-bins/chatterino-api-ubuntu-x86_64
 
       - name: build-changelog
         run: sed "0,/## $(echo "$GITHUB_REF_VALUE" | cut -d '/' -f 3 | cut -c2-)/d" project-git-repo/CHANGELOG.md | sed '/^## /,+999999999999999999 d' | tail -n+2 | head -n-1 > release-body
