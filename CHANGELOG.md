@@ -2,9 +2,11 @@
 
 ## Unreleased
 
+## 2.0.3
+
 - Breaking: Go version 1.20 is now the minimum required version to build this project. (#586)
-- Minor: Block direct requests to private IPs. (#529)
 - Breaking: Remove the `/twitchemotes/` endpoints. See [issue 332](https://github.com/Chatterino/api/issues/332) for more information. (#465)
+- Minor: Block direct requests to private IPs. (#529)
 - Minor: Use Twitter OG tags if no Twitter credentials are configured. (#522)
 - Minor: Support `x.com` for tweets. (#527)
 - Minor: Increase tweet cache duration for non-credentialed requests to 24h. Currently not configurable. (#528)
