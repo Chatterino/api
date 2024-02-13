@@ -23,7 +23,7 @@ jobs:
       - name: Migration test
         run: go test -v -tags migrationtest ./...
       - name: Run coverage
-        run: go test -race -coverprofile=coverage.txt -covermode=atomic -tags test
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic -tags test ./...
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
