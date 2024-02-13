@@ -12,12 +12,14 @@ on:
 jobs:
   test:
     name: "Test & upload coverage"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
           go-version: "stable"
+      - name: Get external dependencies (Ubuntu)
+        run: sudo apt update && sudo apt -y install build-essential libvips-dev
       - name: Migration test
         run: go test -v -tags migrationtest ./...
       - name: Run coverage
