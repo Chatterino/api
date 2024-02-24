@@ -3,7 +3,7 @@ module github.com/Chatterino/api
 go 1.20
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.1
+	github.com/PuerkitoBio/goquery v1.9.0
 	github.com/davidbyttow/govips/v2 v2.13.0
 	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
 	github.com/frankban/quicktest v1.14.6
@@ -32,7 +32,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/Jeffail/gabs v1.4.0 // indirect
-	github.com/andybalholm/cascadia v1.3.1 // indirect
+	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
