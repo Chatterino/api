@@ -99,7 +99,7 @@ func getPlaylistFromCacheKey(cacheKey string) (string, error) {
 	splitKey := strings.Split(cacheKey, ":")
 
 	if len(splitKey) < 2 {
-		return "", errors.New("Invalid playlist")
+		return "", errors.New("invalid playlist")
 	}
 
 	return splitKey[1], nil

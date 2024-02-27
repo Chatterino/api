@@ -42,7 +42,7 @@ func (r *YouTubePlaylistResolver) Run(ctx context.Context, url *url.URL, req *ht
 		log.Warnw("[YouTube] Failed to get playlist ID from url",
 			"url", url,
 		)
-		return nil, errors.New("No YouTube playlist id found")
+		return nil, errors.New("no YouTube playlist id found")
 	}
 
 	return r.playlistCache.Get(ctx, fmt.Sprintf("playlist:%s", playlistId), req)
@@ -55,7 +55,7 @@ func (r *YouTubePlaylistResolver) Name() string {
 func getPlaylistFromPath(path string) (string, error) {
 	match := youtubePlaylistRegex.FindStringSubmatch(path)
 	if match == nil || len(match) != 3 {
-		return "", errors.New("Invalid playlist")
+		return "", errors.New("invalid playlist")
 	}
 
 	return match[2], nil
