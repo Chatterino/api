@@ -52,15 +52,6 @@ func (r *YouTubePlaylistResolver) Name() string {
 	return "youtube:playlist"
 }
 
-func getPlaylistFromPath(path string) (string, error) {
-	match := youtubePlaylistRegex.FindStringSubmatch(path)
-	if match == nil || len(match) != 3 {
-		return "", errors.New("invalid playlist")
-	}
-
-	return match[2], nil
-}
-
 func NewYouTubePlaylistResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, youtubeClient *youtubeAPI.Service) *YouTubePlaylistResolver {
 	loader := NewYouTubePlaylistLoader(youtubeClient)
 
