@@ -35,7 +35,6 @@ func (r *YouTubePlaylistResolver) Run(ctx context.Context, url *url.URL, req *ht
 	log := logger.FromContext(ctx)
 
 	q := url.Query()
-	log.Infow("TEST", "q", q)
 
 	playlistId := q.Get("list")
 	if playlistId == "" {

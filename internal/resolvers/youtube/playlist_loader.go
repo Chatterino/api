@@ -38,6 +38,7 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 		return resolver.InternalServerErrorf("YouTube API playlist is invalid for key: %s", playlistCacheKey)
 	}
 
+	// TODO: which of these are needed?
 	youtubePlaylistParts := []string{
 		"contentDetails",
 		"id",
@@ -47,9 +48,7 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 		"status",
 	}
 
-	builtRequest := r.youtubeClient.Playlists.List(youtubePlaylistParts).Id(playlistId)
-
-	youtubeResponse, err := builtRequest.Do()
+	youtubeResponse, err := r.youtubeClient.Playlists.List(youtubePlaylistParts).Id(playlistId).Do()
 	if err != nil {
 		return resolver.InternalServerErrorf("YouTube API error: %s", err)
 	}
@@ -78,15 +77,15 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 		return resolver.InternalServerErrorf("YouTube template error: %s", err.Error())
 	}
 
-	thumbnail := youtubePlaylist.Snippet.Thumbnails.Maxres.Url
 	statusCode := http.StatusOK
 	contentType := "application/json"
 
 	response := &resolver.Response{
-		Status:    http.StatusOK,
+		Status:    statusCode,
 		Tooltip:   tooltip.String(),
-		Thumbnail: thumbnail,
+		Thumbnail: youtubePlaylist.Snippet.Thumbnails.Maxres.Url,
 	}
+
 	payload, err := json.Marshal(response)
 	if err != nil {
 		return resolver.InternalServerErrorf("YouTube marshaling error: %s", err.Error())

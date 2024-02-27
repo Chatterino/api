@@ -38,6 +38,6 @@ func TestInitialize(t *testing.T) {
 		customResolvers := []resolver.Resolver{}
 		c.Assert(customResolvers, qt.HasLen, 0)
 		Initialize(ctx, cfg, pool, &customResolvers)
-		c.Assert(customResolvers, qt.HasLen, 3)
+		c.Assert(customResolvers, qt.HasLen, 4)
 	})
 }
