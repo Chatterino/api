@@ -166,7 +166,7 @@ func TestPlaylistResolver(t *testing.T) {
 					inputPlaylistID: "playlist:warframe",
 					inputReq:        nil,
 					expectedResponse: &cache.Response{
-						Payload:     []byte(`{"status":200,"thumbnail":"maxres-url","tooltip":"\u003cdiv style=\"text-align: left;\"\u003e\n\u003cb\u003eCool Warframe playlist\u003c/b\u003e\n\u003cbr\u003e\u003cb\u003eDescription:\u003c/b\u003e Very cool videos about Warframe\n\u003cbr\u003e\u003cb\u003eChannel:\u003c/b\u003e Warframe Highlights\n\u003cbr\u003e\u003cb\u003ePublishing Date:\u003c/b\u003e 2020-10-12T07:20:50.52Z\n\u003c/div\u003e\n"}`),
+						Payload:     []byte(`{"status":200,"thumbnail":"maxres-url","tooltip":"\u003cdiv style=\"text-align: left;\"\u003e\n\u003cb\u003eCool Warframe playlist\u003c/b\u003e\n\u003cbr\u003e\u003cb\u003eDescription:\u003c/b\u003e Very cool videos about Warframe\n\u003cbr\u003e\u003cb\u003eChannel:\u003c/b\u003e Warframe Highlights\n\u003cbr\u003e\u003cb\u003eVideos:\u003c/b\u003e 123\n\u003cbr\u003e\u003cb\u003ePublished:\u003c/b\u003e 2020-10-12T07:20:50.52Z\n\u003c/div\u003e\n"}`),
 						StatusCode:  http.StatusOK,
 						ContentType: "application/json",
 					},

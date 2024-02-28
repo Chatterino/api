@@ -202,6 +202,9 @@ func init() {
 						},
 					},
 				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
 			},
 		},
 	}
@@ -220,6 +223,9 @@ func init() {
 						},
 					},
 				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
 			},
 			{
 				Snippet: &youtubeAPI.PlaylistSnippet{
@@ -232,6 +238,9 @@ func init() {
 							Url: "maxres-url",
 						},
 					},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
 				},
 			},
 		},
