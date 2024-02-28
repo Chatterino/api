@@ -38,7 +38,8 @@ const (
 <b>{{.Title}}</b>
 <br><b>Description:</b> {{.Description}}
 <br><b>Channel:</b> {{.Channel}}
-<br><b>Publishing Date:</b> {{.PublishedAt}}
+<br><b>Videos:</b> {{.VideoCount}}
+<br><b>Published:</b> {{.PublishedAt}}
 </div>
 `
 )

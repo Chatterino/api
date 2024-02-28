@@ -19,8 +19,9 @@ import (
 type youtubePlaylistTooltipData struct {
 	Title       string
 	Description string
-	PublishedAt string
 	Channel     string
+	VideoCount  int64
+	PublishedAt string
 }
 
 type YouTubePlaylistLoader struct {
@@ -41,6 +42,7 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 	// TODO: which of these are needed?
 	youtubePlaylistParts := []string{
 		"snippet",
+		"contentDetails",
 	}
 
 	youtubeResponse, err := r.youtubeClient.Playlists.List(youtubePlaylistParts).Id(playlistId).Do()
@@ -64,6 +66,7 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 		Title:       youtubePlaylist.Snippet.Title,
 		Description: youtubePlaylist.Snippet.Description,
 		Channel:     youtubePlaylist.Snippet.ChannelTitle,
+		VideoCount:  youtubePlaylist.ContentDetails.ItemCount,
 		PublishedAt: youtubePlaylist.Snippet.PublishedAt,
 	}
 
