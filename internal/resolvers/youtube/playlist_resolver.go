@@ -2,7 +2,6 @@ package youtube
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/Chatterino/api/internal/db"
 	"github.com/Chatterino/api/internal/logger"
+	"github.com/Chatterino/api/internal/staticresponse"
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
@@ -27,6 +27,11 @@ func (r *YouTubePlaylistResolver) Check(ctx context.Context, url *url.URL) (cont
 		return ctx, false
 	}
 
+	q := url.Query()
+	if !q.Has("list") {
+		return ctx, false
+	}
+
 	matches := youtubePlaylistRegex.MatchString(url.Path)
 	return ctx, matches
 }
@@ -41,7 +46,8 @@ func (r *YouTubePlaylistResolver) Run(ctx context.Context, url *url.URL, req *ht
 		log.Warnw("[YouTube] Failed to get playlist ID from url",
 			"url", url,
 		)
-		return nil, errors.New("no YouTube playlist id found")
+
+		return &staticresponse.RNoLinkInfoFound, nil
 	}
 
 	return r.playlistCache.Get(ctx, fmt.Sprintf("playlist:%s", playlistId), req)
