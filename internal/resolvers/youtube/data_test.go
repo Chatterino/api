@@ -205,4 +205,35 @@ func init() {
 			},
 		},
 	}
+
+	playlists["warframeMultiple"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails: &youtubeAPI.ThumbnailDetails{
+						Maxres: &youtubeAPI.Thumbnail{
+							Url: "maxres-url",
+						},
+					},
+				},
+			},
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails: &youtubeAPI.ThumbnailDetails{
+						Maxres: &youtubeAPI.Thumbnail{
+							Url: "maxres-url",
+						},
+					},
+				},
+			},
+		},
+	}
 }

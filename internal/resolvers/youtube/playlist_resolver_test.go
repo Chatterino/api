@@ -171,6 +171,17 @@ func TestPlaylistResolver(t *testing.T) {
 						ContentType: "application/json",
 					},
 				},
+				{
+					label:           "Multiple Warframe playlists",
+					inputURL:        utils.MustParseURL("https://youtube.com/playlist?list=warframeMultiple"),
+					inputPlaylistID: "playlist:warframeMultiple",
+					inputReq:        nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"YouTube playlist response contained 2 items"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+				},
 			}
 
 			for _, test := range tests {
