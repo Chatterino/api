@@ -39,7 +39,6 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 		return resolver.InternalServerErrorf("YouTube API playlist is invalid for key: %s", playlistCacheKey)
 	}
 
-	// TODO: which of these are needed?
 	youtubePlaylistParts := []string{
 		"snippet",
 		"contentDetails",
