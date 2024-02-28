@@ -40,12 +40,7 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 
 	// TODO: which of these are needed?
 	youtubePlaylistParts := []string{
-		"contentDetails",
-		"id",
-		"localizations",
-		"player",
 		"snippet",
-		"status",
 	}
 
 	youtubeResponse, err := r.youtubeClient.Playlists.List(youtubePlaylistParts).Id(playlistId).Do()
