@@ -200,7 +200,48 @@ func init() {
 						Maxres: &youtubeAPI.Thumbnail{
 							Url: "maxres-url",
 						},
+						Default: &youtubeAPI.Thumbnail{
+							Url: "default-url",
+						},
 					},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
+			},
+		},
+	}
+
+	playlists["warframeDefaultThumbnail"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails: &youtubeAPI.ThumbnailDetails{
+						Default: &youtubeAPI.Thumbnail{
+							Url: "default-url",
+						},
+					},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
+			},
+		},
+	}
+
+	playlists["warframeNoThumbnail"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails:   &youtubeAPI.ThumbnailDetails{},
 				},
 				ContentDetails: &youtubeAPI.PlaylistContentDetails{
 					ItemCount: 123,

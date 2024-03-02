@@ -174,6 +174,29 @@ func TestPlaylistResolver(t *testing.T) {
 					},
 				},
 				{
+					label:           "Warframe playlist with default thumbnail",
+					inputURL:        utils.MustParseURL("https://youtube.com/playlist?list=warframeDefaultThumbnail"),
+					inputPlaylistID: "playlist:warframeDefaultThumbnail",
+					inputReq:        nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"default-url","tooltip":"\u003cdiv style=\"text-align: left;\"\u003e\n\u003cb\u003eCool Warframe playlist\u003c/b\u003e\n\u003cbr\u003e\u003cb\u003eDescription:\u003c/b\u003e Very cool videos about Warframe\n\u003cbr\u003e\u003cb\u003eChannel:\u003c/b\u003e Warframe Highlights\n\u003cbr\u003e\u003cb\u003eVideos:\u003c/b\u003e 123\n\u003cbr\u003e\u003cb\u003ePublished:\u003c/b\u003e 12 Oct 2020\n\u003c/div\u003e\n"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+				},
+
+				{
+					label:           "Warframe playlist with no thumbnail",
+					inputURL:        utils.MustParseURL("https://youtube.com/playlist?list=warframeNoThumbnail"),
+					inputPlaylistID: "playlist:warframeNoThumbnail",
+					inputReq:        nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"tooltip":"\u003cdiv style=\"text-align: left;\"\u003e\n\u003cb\u003eCool Warframe playlist\u003c/b\u003e\n\u003cbr\u003e\u003cb\u003eDescription:\u003c/b\u003e Very cool videos about Warframe\n\u003cbr\u003e\u003cb\u003eChannel:\u003c/b\u003e Warframe Highlights\n\u003cbr\u003e\u003cb\u003eVideos:\u003c/b\u003e 123\n\u003cbr\u003e\u003cb\u003ePublished:\u003c/b\u003e 12 Oct 2020\n\u003c/div\u003e\n"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+				},
+				{
 					label:           "Multiple Warframe playlists",
 					inputURL:        utils.MustParseURL("https://youtube.com/playlist?list=warframeMultiple"),
 					inputPlaylistID: "playlist:warframeMultiple",
