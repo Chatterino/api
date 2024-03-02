@@ -12,6 +12,7 @@ import (
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/staticresponse"
 	"github.com/Chatterino/api/pkg/cache"
+	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
 	youtubeAPI "google.golang.org/api/youtube/v3"
 )
@@ -20,12 +21,22 @@ type youtubePlaylistTooltipData struct {
 	Title       string
 	Description string
 	Channel     string
-	VideoCount  int64
+	VideoCount  string
 	PublishedAt string
 }
 
 type YouTubePlaylistLoader struct {
 	youtubeClient *youtubeAPI.Service
+}
+
+func getThumbnailUrl(thumbnailDetails *youtubeAPI.ThumbnailDetails) string {
+	if thumbnailDetails.Maxres != nil {
+		return thumbnailDetails.Maxres.Url
+	}
+	if thumbnailDetails.Default != nil {
+		return thumbnailDetails.Default.Url
+	}
+	return ""
 }
 
 func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey string, req *http.Request) ([]byte, *int, *string, time.Duration, error) {
@@ -65,8 +76,8 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 		Title:       youtubePlaylist.Snippet.Title,
 		Description: youtubePlaylist.Snippet.Description,
 		Channel:     youtubePlaylist.Snippet.ChannelTitle,
-		VideoCount:  youtubePlaylist.ContentDetails.ItemCount,
-		PublishedAt: youtubePlaylist.Snippet.PublishedAt,
+		VideoCount:  humanize.NumberInt64(youtubePlaylist.ContentDetails.ItemCount),
+		PublishedAt: humanize.CreationDateRFC3339(youtubePlaylist.Snippet.PublishedAt),
 	}
 
 	var tooltip bytes.Buffer
@@ -80,7 +91,7 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 	response := &resolver.Response{
 		Status:    statusCode,
 		Tooltip:   tooltip.String(),
-		Thumbnail: youtubePlaylist.Snippet.Thumbnails.Maxres.Url,
+		Thumbnail: getThumbnailUrl(youtubePlaylist.Snippet.Thumbnails),
 	}
 
 	payload, err := json.Marshal(response)
