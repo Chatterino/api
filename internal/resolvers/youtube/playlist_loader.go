@@ -14,6 +14,7 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 	youtubeAPI "google.golang.org/api/youtube/v3"
 )
 
@@ -40,6 +41,8 @@ func getThumbnailUrl(thumbnailDetails *youtubeAPI.ThumbnailDetails) string {
 }
 
 func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey string, req *http.Request) ([]byte, *int, *string, time.Duration, error) {
+	const MaxDescriptionLength = 400
+
 	log := logger.FromContext(ctx)
 	log.Debugw("[YouTube] GET playlist",
 		"cacheKey", playlistCacheKey,
@@ -74,7 +77,7 @@ func (r *YouTubePlaylistLoader) Load(ctx context.Context, playlistCacheKey strin
 
 	data := youtubePlaylistTooltipData{
 		Title:       youtubePlaylist.Snippet.Title,
-		Description: youtubePlaylist.Snippet.Description,
+		Description: utils.TruncateString(youtubePlaylist.Snippet.Description, MaxDescriptionLength),
 		Channel:     youtubePlaylist.Snippet.ChannelTitle,
 		VideoCount:  humanize.NumberInt64(youtubePlaylist.ContentDetails.ItemCount),
 		PublishedAt: humanize.CreationDateRFC3339(youtubePlaylist.Snippet.PublishedAt),
