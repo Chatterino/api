@@ -27,3 +27,12 @@ func Number(number uint64) string {
 	inMillions := float64(number) / 1_000_000
 	return fmt.Sprintf("%.1fM", inMillions)
 }
+
+func NumberInt64(number int64) string {
+	if number < 1_000_000 {
+		return insertCommas(strconv.FormatInt(number, 10), 3)
+	}
+
+	inMillions := float64(number) / 1_000_000
+	return fmt.Sprintf("%.1fM", inMillions)
+}

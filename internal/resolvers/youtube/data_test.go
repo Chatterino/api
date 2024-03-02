@@ -6,6 +6,7 @@ var (
 	videos          = map[string]*youtubeAPI.VideoListResponse{}
 	channels        = map[string]*youtubeAPI.ChannelListResponse{}
 	channelSearches = map[string]*youtubeAPI.SearchListResponse{}
+	playlists       = map[string]*youtubeAPI.PlaylistListResponse{}
 )
 
 func init() {
@@ -178,6 +179,109 @@ func init() {
 				Statistics: &youtubeAPI.ChannelStatistics{
 					SubscriberCount: 69,
 					ViewCount:       420,
+				},
+			},
+		},
+	}
+
+	playlists["404"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{},
+	}
+
+	playlists["warframe"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails: &youtubeAPI.ThumbnailDetails{
+						Maxres: &youtubeAPI.Thumbnail{
+							Url: "maxres-url",
+						},
+						Default: &youtubeAPI.Thumbnail{
+							Url: "default-url",
+						},
+					},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
+			},
+		},
+	}
+
+	playlists["warframeDefaultThumbnail"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails: &youtubeAPI.ThumbnailDetails{
+						Default: &youtubeAPI.Thumbnail{
+							Url: "default-url",
+						},
+					},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
+			},
+		},
+	}
+
+	playlists["warframeNoThumbnail"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails:   &youtubeAPI.ThumbnailDetails{},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
+			},
+		},
+	}
+
+	playlists["warframeMultiple"] = &youtubeAPI.PlaylistListResponse{
+		Items: []*youtubeAPI.Playlist{
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails: &youtubeAPI.ThumbnailDetails{
+						Maxres: &youtubeAPI.Thumbnail{
+							Url: "maxres-url",
+						},
+					},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
+				},
+			},
+			{
+				Snippet: &youtubeAPI.PlaylistSnippet{
+					Title:        "Cool Warframe playlist",
+					Description:  "Very cool videos about Warframe",
+					ChannelTitle: "Warframe Highlights",
+					PublishedAt:  "2020-10-12T07:20:50.52Z",
+					Thumbnails: &youtubeAPI.ThumbnailDetails{
+						Maxres: &youtubeAPI.Thumbnail{
+							Url: "maxres-url",
+						},
+					},
+				},
+				ContentDetails: &youtubeAPI.PlaylistContentDetails{
+					ItemCount: 123,
 				},
 			},
 		},

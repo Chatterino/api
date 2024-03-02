@@ -33,11 +33,21 @@ const (
 <br><b>Views:</b> {{.Views}}
 </div>
 `
+
+	youtubePlaylistTooltip = `<div style="text-align: left;">
+<b>{{.Title}}</b>
+<br><b>Description:</b> {{.Description}}
+<br><b>Channel:</b> {{.Channel}}
+<br><b>Videos:</b> {{.VideoCount}}
+<br><b>Published:</b> {{.PublishedAt}}
+</div>
+`
 )
 
 var (
-	youtubeVideoTooltipTemplate   = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
-	youtubeChannelTooltipTemplate = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
+	youtubeVideoTooltipTemplate    = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
+	youtubeChannelTooltipTemplate  = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
+	youtubePlaylistTooltipTemplate = template.Must(template.New("youtubePlaylistTooltip").Parse(youtubePlaylistTooltip))
 )
 
 func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, pool db.Pool, youtubeClient *youtubeAPI.Service) (resolver.Resolver, resolver.Resolver) {
@@ -68,6 +78,11 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolve
 		)
 		return
 	}
+
+	playlistResolver := NewYouTubePlaylistResolver(ctx, cfg, pool, youtubeClient)
+
+	// Handle YouTube playlists
+	*resolvers = append(*resolvers, playlistResolver)
 
 	// Handle YouTube channels (youtube.com/c/chan, youtube.com/chan, youtube.com/user/chan)
 	*resolvers = append(*resolvers, NewYouTubeChannelResolver(ctx, cfg, pool, youtubeClient))
