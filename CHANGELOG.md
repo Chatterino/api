@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Minor: Add playlist support to YouTube resolver. (#597)
+- Minor: Add playlist support to YouTube resolver. (#597, #601)
 
 ## 2.0.3
 
