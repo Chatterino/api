@@ -57,6 +57,8 @@ func TestPlaylistResolver(t *testing.T) {
 
 	resolver := NewYouTubePlaylistResolver(ctx, cfg, pool, youtubeClient)
 
+	c.Assert(resolver.Name(), qt.Equals, "youtube:playlist")
+
 	c.Run("Check", func(c *qt.C) {
 		type checkTest struct {
 			label    string
