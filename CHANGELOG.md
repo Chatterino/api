@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Minor: Add playlist support to YouTube resolver. (#597, #601)
+- Fix: Do not resolve /results using YouTube channel resolver (#616)
 
 ## 2.0.3
 
