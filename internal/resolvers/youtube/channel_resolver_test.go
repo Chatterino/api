@@ -141,6 +141,11 @@ func TestChannelResolver(t *testing.T) {
 				expected: false,
 			},
 			{
+				label:    "Correct domain, results path",
+				input:    utils.MustParseURL("https://youtube.com/results?search_query=test"),
+				expected: false,
+			},
+			{
 				label:    "Incorrect domain",
 				input:    utils.MustParseURL("https://example.com/watch?v=foobar"),
 				expected: false,
