@@ -22,7 +22,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/text v0.16.0
+	golang.org/x/text v0.17.0
 	google.golang.org/api v0.191.0
 	honnef.co/go/tools v0.4.7
 )
