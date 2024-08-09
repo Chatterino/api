@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Go version 1.21 is now the minimum required version to build this project. (#667)
 - Minor: Add playlist support to YouTube resolver. (#597, #601)
 - Fix: Do not resolve /results using YouTube channel resolver (#616)
 
