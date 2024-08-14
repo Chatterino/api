@@ -23,12 +23,12 @@ require (
 	github.com/spf13/viper v1.19.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.17.0
-	google.golang.org/api v0.191.0
+	google.golang.org/api v0.192.0
 	honnef.co/go/tools v0.4.7
 )
 
 require (
-	cloud.google.com/go/auth v0.7.3 // indirect
+	cloud.google.com/go/auth v0.8.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
