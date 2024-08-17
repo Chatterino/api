@@ -1,6 +1,8 @@
 module github.com/Chatterino/api
 
-go 1.20
+go 1.22.1
+
+toolchain go1.23.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
@@ -24,14 +26,14 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.17.0
 	google.golang.org/api v0.192.0
-	honnef.co/go/tools v0.4.7
+	honnef.co/go/tools v0.5.1
 )
 
 require (
 	cloud.google.com/go/auth v0.8.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	github.com/BurntSushi/toml v1.4.0 // indirect
+	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
 	github.com/Jeffail/gabs v1.4.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -88,7 +90,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
+	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
 	golang.org/x/exp/typeparams v0.0.0-20240613232115-7f521ea00fb8 // indirect
 	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/mod v0.18.0 // indirect
