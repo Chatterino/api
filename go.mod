@@ -1,6 +1,8 @@
 module github.com/Chatterino/api
 
-go 1.20
+go 1.22.1
+
+toolchain go1.23.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
