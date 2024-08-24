@@ -68,13 +68,13 @@ func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Reques
 
 	video := youtubeResponse.Items[0]
 
-	if video.ContentDetails == nil {
-		return resolver.InternalServerErrorf("YouTube video unavailable")
-	}
-
 	var tooltip bytes.Buffer
 
 	if video.Snippet.LiveBroadcastContent == "live" {
+		if video.LiveStreamingDetails == nil {
+			return resolver.InternalServerErrorf("YouTube livestream unavailable")
+		}
+
 		startTime, err := time.Parse(time.RFC3339, video.LiveStreamingDetails.ActualStartTime)
 		if err != nil {
 			return resolver.InternalServerErrorf("YouTube time parse error: %s", err)
@@ -92,6 +92,10 @@ func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Reques
 			return resolver.InternalServerErrorf("YouTube template error: %s", err)
 		}
 	} else {
+		if video.ContentDetails == nil {
+			return resolver.InternalServerErrorf("YouTube video unavailable")
+		}
+
 		// Check if a video is age resricted: https://stackoverflow.com/a/33750307
 		var ageRestricted = false
 		if video.ContentDetails.ContentRating != nil {
