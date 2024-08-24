@@ -42,12 +42,22 @@ const (
 <br><b>Published:</b> {{.PublishedAt}}
 </div>
 `
+
+	youtubeStreamTooltip = `<div style="text-align: left;">
+<b>{{.Title}}</b>
+<br><b>Channel:</b> {{.ChannelTitle}}
+<br><b>Uptime:</b> {{.Uptime}}
+<br><b>Viewers:</b> {{.Viewers}}
+<br><b><span style="color: #ff0000;">Live</span></b>&nbsp;•&nbsp;<span style="color: #2ecc71;">{{.LikeCount}} likes</span>
+</div>
+`
 )
 
 var (
 	youtubeVideoTooltipTemplate    = template.Must(template.New("youtubeVideoTooltip").Parse(youtubeVideoTooltip))
 	youtubeChannelTooltipTemplate  = template.Must(template.New("youtubeChannelTooltip").Parse(youtubeChannelTooltip))
 	youtubePlaylistTooltipTemplate = template.Must(template.New("youtubePlaylistTooltip").Parse(youtubePlaylistTooltip))
+	youtubeStreamTooltipTemplate   = template.Must(template.New("youtubeStreamTooltip").Parse(youtubeStreamTooltip))
 )
 
 func NewYouTubeVideoResolvers(ctx context.Context, cfg config.APIConfig, pool db.Pool, youtubeClient *youtubeAPI.Service) (resolver.Resolver, resolver.Resolver) {
