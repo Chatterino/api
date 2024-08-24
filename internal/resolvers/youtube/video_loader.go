@@ -68,6 +68,10 @@ func (r *VideoLoader) Load(ctx context.Context, videoID string, req *http.Reques
 
 	video := youtubeResponse.Items[0]
 
+	if video.Snippet == nil {
+		return resolver.InternalServerErrorf("YouTube video unavailable")
+	}
+
 	var tooltip bytes.Buffer
 
 	if video.Snippet.LiveBroadcastContent == "live" {
