@@ -43,8 +43,23 @@ func (m *MockTwitchAPIClient) GetClips(arg0 *helix.ClipsParams) (*helix.ClipsRes
 	return ret0, ret1
 }
 
+// Get Users mocks base method.
+func (m *MockTwitchAPIClient) GetUsers(arg0 *helix.UsersParams) (*helix.UsersResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUsers", arg0)
+	ret0, _ := ret[0].(*helix.UsersResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
 // GetClips indicates an expected call of GetClips.
 func (mr *MockTwitchAPIClientMockRecorder) GetClips(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClips", reflect.TypeOf((*MockTwitchAPIClient)(nil).GetClips), arg0)
+}
+
+// GetUsers indicates an expected call of GetUsers.
+func (mr *MockTwitchAPIClientMockRecorder) GetUsers(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockTwitchAPIClient)(nil).GetUsers), arg0)
 }

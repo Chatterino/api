@@ -11,7 +11,6 @@ type APIConfig struct {
 	EnableAnimatedThumbnails bool   `mapstructure:"enable-animated-thumbnails" json:"enable-animated-thumbnails"`
 	MaxThumbnailSize         uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
 
-	TwitchUsernameCacheDuration      time.Duration `mapstructure:"twitch-username-cache-duration" json:"twitch-username-cache-duration"`
 	BttvEmoteCacheDuration           time.Duration `mapstructure:"bttv-emote-cache-duration" json:"bttv-emote-cache-duration"`
 	ThumbnailCacheDuration           time.Duration `mapstructure:"thumbnail-cache-duration" json:"thumbnail-cache-duration"`
 	DefaultLinkCacheDuration         time.Duration `mapstructure:"default-link-cache-duration" json:"default-link-cache-duration"`
@@ -23,6 +22,7 @@ type APIConfig struct {
 	SeventvEmoteCacheDuration        time.Duration `mapstructure:"seventv-emote-cache-duration" json:"seventv-emote-cache-duration"`
 	SupinicTrackCacheDuration        time.Duration `mapstructure:"supinic-track-cache-duration" json:"supinic-track-cache-duration"`
 	TwitchClipCacheDuration          time.Duration `mapstructure:"twitch-clip-cache-duration" json:"twitch-clip-cache-duration"`
+	TwitchUserCacheDuration          time.Duration `mapstructure:"twitch-user-cache-duration" json:"twitch-user-cache-duration"`
 	TwitterTweetCacheDuration        time.Duration `mapstructure:"twitter-tweet-cache-duration" json:"twitter-tweet-cache-duration"`
 	TwitterUserCacheDuration         time.Duration `mapstructure:"twitter-user-cache-duration" json:"twitter-user-cache-duration"`
 	WikipediaArticleCacheDuration    time.Duration `mapstructure:"wikipedia-article-cache-duration" json:"wikipedia-article-cache-duration"`

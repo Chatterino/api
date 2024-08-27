@@ -93,8 +93,6 @@ func TestClipResolver(t *testing.T) {
 				},
 			}
 
-			const q = `SELECT value FROM cache WHERE key=$1`
-
 			for _, test := range tests {
 				c.Run(test.label, func(c *qt.C) {
 					outputBytes, outputError := resolver.Run(ctx, test.inputURL, test.inputReq)
@@ -169,8 +167,6 @@ func TestClipResolver(t *testing.T) {
 				// 	expectedError: nil,
 				// },
 			}
-
-			const q = `SELECT value FROM cache WHERE key=$1`
 
 			for _, test := range tests {
 				c.Run(test.label, func(c *qt.C) {
