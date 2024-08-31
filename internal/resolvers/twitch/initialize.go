@@ -31,7 +31,7 @@ const (
 		`</div>`
 
 	twitchUserTooltipString = `<div style="text-align: left;">` +
-		`<b>{{.DisplayName}} ({{.Login}})</b><br>` +
+		`<b>{{.Name}}</b><br>` +
 		`{{.Description}}<br>` +
 		`<b>Created:</b> {{.CreatedAt}}` +
 		`</div>`

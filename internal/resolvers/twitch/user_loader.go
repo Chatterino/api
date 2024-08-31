@@ -3,8 +3,10 @@ package twitch
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Chatterino/api/internal/logger"
@@ -15,8 +17,7 @@ import (
 )
 
 type twitchUserTooltipData struct {
-	Login       string
-	DisplayName string
+	Name        string
 	CreatedAt   string
 	Description string
 }
@@ -48,9 +49,15 @@ func (l *UserLoader) Load(ctx context.Context, login string, r *http.Request) (*
 
 	var user = response.Data.Users[0]
 
+	var name string
+	if strings.ToLower(user.DisplayName) == login {
+		name = user.DisplayName
+	} else {
+		name = fmt.Sprintf("%s (%s)", user.DisplayName, user.Login)
+	}
+
 	data := twitchUserTooltipData{
-		Login:       user.Login,
-		DisplayName: user.DisplayName,
+		Name:        name,
 		CreatedAt:   humanize.CreationDate(user.CreatedAt.Time),
 		Description: user.Description,
 	}
