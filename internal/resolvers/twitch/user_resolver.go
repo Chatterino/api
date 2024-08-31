@@ -34,7 +34,7 @@ func (r *UserResolver) Check(ctx context.Context, url *url.URL) (context.Context
 }
 
 func (r *UserResolver) Run(ctx context.Context, url *url.URL, req *http.Request) (*cache.Response, error) {
-	return r.userCache.Get(ctx, strings.TrimLeft(url.Path, "/"), req)
+	return r.userCache.Get(ctx, strings.ToLower(strings.TrimLeft(url.Path, "/")), req)
 }
 
 func (r *UserResolver) Name() string {
