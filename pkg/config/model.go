@@ -22,12 +22,12 @@ type APIConfig struct {
 	SeventvEmoteCacheDuration        time.Duration `mapstructure:"seventv-emote-cache-duration" json:"seventv-emote-cache-duration"`
 	SupinicTrackCacheDuration        time.Duration `mapstructure:"supinic-track-cache-duration" json:"supinic-track-cache-duration"`
 	TwitchClipCacheDuration          time.Duration `mapstructure:"twitch-clip-cache-duration" json:"twitch-clip-cache-duration"`
-	TwitchUserCacheDuration          time.Duration `mapstructure:"twitch-user-cache-duration" json:"twitch-user-cache-duration"`
 	TwitterTweetCacheDuration        time.Duration `mapstructure:"twitter-tweet-cache-duration" json:"twitter-tweet-cache-duration"`
 	TwitterUserCacheDuration         time.Duration `mapstructure:"twitter-user-cache-duration" json:"twitter-user-cache-duration"`
 	WikipediaArticleCacheDuration    time.Duration `mapstructure:"wikipedia-article-cache-duration" json:"wikipedia-article-cache-duration"`
 	YoutubeChannelCacheDuration      time.Duration `mapstructure:"youtube-channel-cache-duration" json:"youtube-channel-cache-duration"`
 	YoutubeVideoCacheDuration        time.Duration `mapstructure:"youtube-video-cache-duration" json:"youtube-video-cache-duration"`
+	TwitchUsernameCacheDuration      time.Duration `mapstructure:"twitch-username-cache-duration" json:"twitch-user-cache-duration"`
 
 	LogLevel       string `mapstructure:"log-level" json:"log-level"`
 	LogDevelopment bool   `mapstructure:"log-development" json:"log-development"`

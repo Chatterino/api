@@ -46,7 +46,7 @@ func NewUserResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, he
 
 	r := &UserResolver{
 		userCache: cache.NewPostgreSQLCache(ctx, cfg, pool, cache.NewPrefixKeyProvider("twitch:user"),
-			resolver.NewResponseMarshaller(userLoader), cfg.TwitchUserCacheDuration),
+			resolver.NewResponseMarshaller(userLoader), cfg.TwitchUsernameCacheDuration),
 	}
 
 	return r
