@@ -20,6 +20,7 @@ type twitchUserTooltipData struct {
 	Name        string
 	CreatedAt   string
 	Description string
+	URL         string
 }
 
 type UserLoader struct {
@@ -60,6 +61,7 @@ func (l *UserLoader) Load(ctx context.Context, login string, r *http.Request) (*
 		Name:        name,
 		CreatedAt:   humanize.CreationDate(user.CreatedAt.Time),
 		Description: user.Description,
+		URL:         fmt.Sprintf("https://twitch.tv/%s", user.Login),
 	}
 
 	var tooltip bytes.Buffer

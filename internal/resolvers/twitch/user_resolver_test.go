@@ -99,7 +99,7 @@ func TestUserResolver(t *testing.T) {
 					},
 					expectedUserError: nil,
 					expectedResponse: &cache.Response{
-						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETwitch%3C%2Fb%3E%3Cbr%3ETwitch%20is%20where%20thousands%20of%20communities%20come%20together%20for%20whatever%2C%20every%20day.%20%3Cbr%3E%3Cb%3ECreated:%3C%2Fb%3E%2022%20May%202007%3C%2Fdiv%3E"}`),
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETwitch%20-%20Twitch%3C%2Fb%3E%3Cbr%3ETwitch%20is%20where%20thousands%20of%20communities%20come%20together%20for%20whatever%2C%20every%20day.%20%3Cbr%3E%3Cb%3ECreated:%3C%2Fb%3E%2022%20May%202007%3Cbr%3E%3Cb%3EURL:%3C%2Fb%3E%20https:%2F%2Ftwitch.tv%2Ftwitch%3C%2Fdiv%3E"}`),
 						StatusCode:  http.StatusOK,
 						ContentType: "application/json",
 					},
