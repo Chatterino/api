@@ -1,11 +1,10 @@
 module github.com/Chatterino/api
 
 go 1.22.1
-
 toolchain go1.23.0
 
 require (
-	github.com/PuerkitoBio/goquery v1.9.2
+	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/davidbyttow/govips/v2 v2.15.0
 	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
 	github.com/frankban/quicktest v1.14.6
@@ -89,15 +88,15 @@ require (
 	go.opentelemetry.io/otel/metric v1.29.0 // indirect
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	golang.org/x/crypto v0.26.0 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
 	golang.org/x/exp/typeparams v0.0.0-20240613232115-7f521ea00fb8 // indirect
 	golang.org/x/image v0.19.0 // indirect
 	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240827150818-7e3bb234dfed // indirect
