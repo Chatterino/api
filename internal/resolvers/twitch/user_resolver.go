@@ -15,6 +15,7 @@ import (
 )
 
 var userRegex = regexp.MustCompile(`^\/([a-zA-Z0-9_]+)$`)
+var ignoredUsers = []string{"inventory", "popout", "subscriptions", "videos", "following", "directory"}
 
 type UserResolver struct {
 	userCache cache.Cache
@@ -28,6 +29,12 @@ func (r *UserResolver) Check(ctx context.Context, url *url.URL) (context.Context
 	userMatch := userRegex.FindStringSubmatch(url.Path)
 	if len(userMatch) != 2 {
 		return ctx, false
+	}
+
+	for _, ignoredUser := range ignoredUsers {
+		if ignoredUser == strings.ToLower(userMatch[1]) {
+			return ctx, false
+		}
 	}
 
 	return ctx, true

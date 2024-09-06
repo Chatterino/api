@@ -54,6 +54,14 @@ func TestUserResolver(t *testing.T) {
 			})
 		}
 
+		for _, b := range invalidUsers {
+			tests = append(tests, checkTest{
+				label:    "invalid",
+				input:    utils.MustParseURL(b),
+				expected: false,
+			})
+		}
+
 		for _, test := range tests {
 			c.Run(test.label, func(c *qt.C) {
 				_, output := resolver.Check(ctx, test.input)
