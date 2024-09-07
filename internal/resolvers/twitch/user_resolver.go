@@ -22,6 +22,7 @@ var ignoredUsers = []string{
 	"videos",
 	"following",
 	"directory",
+	"moderator",
 }
 
 type UserResolver struct {
