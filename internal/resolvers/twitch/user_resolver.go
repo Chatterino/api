@@ -15,7 +15,14 @@ import (
 )
 
 var userRegex = regexp.MustCompile(`^\/([a-zA-Z0-9_]+)$`)
-var ignoredUsers = []string{"inventory", "popout", "subscriptions", "videos", "following", "directory"}
+var ignoredUsers = []string{
+	"inventory",
+	"popout",
+	"subscriptions",
+	"videos",
+	"following",
+	"directory",
+}
 
 type UserResolver struct {
 	userCache cache.Cache
