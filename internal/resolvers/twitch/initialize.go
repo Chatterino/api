@@ -17,6 +17,7 @@ import (
 
 type TwitchAPIClient interface {
 	GetClips(params *helix.ClipsParams) (clip *helix.ClipsResponse, err error)
+	GetUsers(params *helix.UsersParams) (clip *helix.UsersResponse, err error)
 }
 
 const (
@@ -28,12 +29,20 @@ const (
 		`<b>Created:</b> {{.CreationDate}}<br>` +
 		`<b>Views:</b> {{.Views}}` +
 		`</div>`
+
+	twitchUserTooltipString = `<div style="text-align: left;">` +
+		`<b>{{.Name}} - Twitch</b><br>` +
+		`{{.Description}}<br>` +
+		`<b>Created:</b> {{.CreatedAt}}<br>` +
+		`<b>URL:</b> {{.URL}}` +
+		`</div>`
 )
 
 var (
 	errInvalidTwitchClip = errors.New("invalid Twitch clip link")
 
 	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
+	twitchUserTooltip  = template.Must(template.New("twitchUserTooltip").Parse(twitchUserTooltipString))
 
 	domains = map[string]struct{}{
 		"twitch.tv":       {},
@@ -51,5 +60,6 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, helixCl
 		return
 	}
 
+	*resolvers = append(*resolvers, NewUserResolver(ctx, cfg, pool, helixClient))
 	*resolvers = append(*resolvers, NewClipResolver(ctx, cfg, pool, helixClient))
 }

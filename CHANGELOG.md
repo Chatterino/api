@@ -5,6 +5,7 @@
 - Breaking: Go version 1.22.1 is now the minimum required version to build this project. (#667, #671)
 - Minor: Add playlist support to YouTube resolver. (#597, #601)
 - Minor: Add YouTube livestream support. (#678)
+- Minor: Add Twitch user resolver (e.g. `https://twitch.tv/forsen`). (#680)
 - Fix: Do not resolve /results using YouTube channel resolver (#616)
 
 ## 2.0.3

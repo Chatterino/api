@@ -11,7 +11,6 @@ type APIConfig struct {
 	EnableAnimatedThumbnails bool   `mapstructure:"enable-animated-thumbnails" json:"enable-animated-thumbnails"`
 	MaxThumbnailSize         uint   `mapstructure:"max-thumbnail-size" json:"max-thumbnail-size"`
 
-	TwitchUsernameCacheDuration      time.Duration `mapstructure:"twitch-username-cache-duration" json:"twitch-username-cache-duration"`
 	BttvEmoteCacheDuration           time.Duration `mapstructure:"bttv-emote-cache-duration" json:"bttv-emote-cache-duration"`
 	ThumbnailCacheDuration           time.Duration `mapstructure:"thumbnail-cache-duration" json:"thumbnail-cache-duration"`
 	DefaultLinkCacheDuration         time.Duration `mapstructure:"default-link-cache-duration" json:"default-link-cache-duration"`
@@ -28,6 +27,7 @@ type APIConfig struct {
 	WikipediaArticleCacheDuration    time.Duration `mapstructure:"wikipedia-article-cache-duration" json:"wikipedia-article-cache-duration"`
 	YoutubeChannelCacheDuration      time.Duration `mapstructure:"youtube-channel-cache-duration" json:"youtube-channel-cache-duration"`
 	YoutubeVideoCacheDuration        time.Duration `mapstructure:"youtube-video-cache-duration" json:"youtube-video-cache-duration"`
+	TwitchUsernameCacheDuration      time.Duration `mapstructure:"twitch-username-cache-duration" json:"twitch-user-cache-duration"`
 
 	LogLevel       string `mapstructure:"log-level" json:"log-level"`
 	LogDevelopment bool   `mapstructure:"log-development" json:"log-development"`

@@ -38,3 +38,19 @@ var invalidClipSlugs = []string{
 	"https://twitch.tv/zneix/clip/ImpossibleOilyAlpacaTF2John-jIlgtnSAQ52BThHhifyouseethisvivon",
 	"https://m.twitch.tv/username/notclip/slug",
 }
+
+var validUsers = []string{
+	"https://twitch.tv/pajlada",
+	"https://twitch.tv/matthewde",
+}
+
+var invalidUsers = []string{
+	"https://twitch.tv/inventory",
+	"https://twitch.tv/popout",
+	"https://twitch.tv/subscriptions",
+	"https://twitch.tv/videos",
+	"https://twitch.tv/following",
+	"https://twitch.tv/directory",
+	"https://twitch.tv/DIRECTORY",
+	"https://twitch.tv/moderator",
+}
