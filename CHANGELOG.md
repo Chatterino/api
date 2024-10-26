@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: Release script not working. (#704)
+
 ## 2.0.4
 
 - Minor: Made 7TV path regex compatible with new UIDs. (#699)
