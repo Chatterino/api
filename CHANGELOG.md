@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 2.0.5
+
+- Fix: Release script not working. (#704)
+
+## 2.0.4
+
+- Minor: Made 7TV path regex compatible with new UIDs. (#699)
 - Breaking: Go version 1.22.1 is now the minimum required version to build this project. (#667, #671)
 - Minor: Add playlist support to YouTube resolver. (#597, #601)
 - Minor: Add YouTube livestream support. (#678)
