@@ -29,7 +29,7 @@ var (
 		"7tv.app": {},
 	}
 
-	emotePathRegex = regexp.MustCompile(`/emotes/([a-f0-9]+)`)
+	emotePathRegex = regexp.MustCompile(`/emotes/([a-f\d]{24}|[0-7][\dA-HJKMNP-TV-Z]{25})`)
 
 	seventvEmoteTemplate = template.Must(template.New("seventvEmoteTooltip").Parse(tooltipTemplate))
 )
