@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.5
+
 - Fix: Release script not working. (#704)
 
 ## 2.0.4
