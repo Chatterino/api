@@ -55,7 +55,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: chatterino-api-1.22-ubuntu-22.04
+          name: chatterino-api-stable-ubuntu-22.04
           path: bins/ubuntu/
 
       - name: display structure
