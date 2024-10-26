@@ -182,18 +182,18 @@ func TestEmoteResolver(t *testing.T) {
 			}
 
 			tests := []runTest{
-				// {
-				// 	label:          "Regular (ulid)",
-				// 	inputURL:       utils.MustParseURL("https://7tv.app/emotes/01EZPHFCD8000C438200A44F1M"),
-				// 	inputEmoteHash: "01EZPHFCD8000C438200A44F1M",
-				// 	inputReq:       nil,
-				// 	expectedResponse: &cache.Response{
-				// 		Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/chatterino/thumbnail/https%3A%2F%2Fcdn.7tv.app%2Femote%2F01EZPHFCD8000C438200A44F1M%2Fbest.webp","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EmonkaE%3C%2Fb%3E%3Cbr%3E%0A%3Cb%3EShared%207TV%20Emote%3C%2Fb%3E%3Cbr%3E%0A%3Cb%3EBy:%3C%2Fb%3E%20Zhark%0A%3C%2Fdiv%3E","link":"https://7tv.app/emotes/01EZPHFCD8000C438200A44F1M"}`),
-				// 		StatusCode:  http.StatusOK,
-				// 		ContentType: "application/json",
-				// 	},
-				// 	expectedError: nil,
-				// },
+				{
+					label:          "Regular (ulid)",
+					inputURL:       utils.MustParseURL("https://7tv.app/emotes/01EZPHFCD8000C438200A44F1M"),
+					inputEmoteHash: "01EZPHFCD8000C438200A44F1M",
+					inputReq:       nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/chatterino/thumbnail/https%3A%2F%2Fcdn.7tv.app%2Femote%2F01EZPHFCD8000C438200A44F1M%2Fbest.webp","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EmonkaE%3C%2Fb%3E%3Cbr%3E%0A%3Cb%3EShared%207TV%20Emote%3C%2Fb%3E%3Cbr%3E%0A%3Cb%3EBy:%3C%2Fb%3E%20Zhark%0A%3C%2Fdiv%3E","link":"https://7tv.app/emotes/01EZPHFCD8000C438200A44F1M"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+					expectedError: nil,
+				},
 				{
 					label:          "Private",
 					inputURL:       utils.MustParseURL("https://7tv.app/emotes/604281c81ae70f000d47ffd9"),
