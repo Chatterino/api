@@ -13,6 +13,7 @@ var (
 )
 
 func init() {
+	// 404: 604281c81ae70f000d47ffdf
 	// Private emote: Pajawalk
 	emotes["604281c81ae70f000d47ffd9"] = EmoteModel{
 		ID:     "604281c81ae70f000d47ffd9",
