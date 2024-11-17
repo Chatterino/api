@@ -54,4 +54,5 @@ var invalidUsers = []string{
 	"https://twitch.tv/directory",
 	"https://twitch.tv/DIRECTORY",
 	"https://twitch.tv/moderator",
+	"https://twitch.com/matthewde",
 }
