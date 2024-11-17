@@ -9,9 +9,9 @@ import (
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
 	qt "github.com/frankban/quicktest"
-	"github.com/golang/mock/gomock"
 	"github.com/nicklaw5/helix"
 	"github.com/pashagolub/pgxmock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestInitialize(t *testing.T) {
