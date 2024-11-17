@@ -2,6 +2,7 @@ package twitch
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"testing"
@@ -122,7 +123,37 @@ func TestUserResolver(t *testing.T) {
 					expectedError: nil,
 				},
 				{
-					label:    "twitch",
+					label:    "twitch stream error",
+					inputURL: utils.MustParseURL("https://twitch.tv/twitch"),
+					login:    "twitch",
+					inputReq: nil,
+					expectedUsersResponse: &helix.UsersResponse{
+						Data: helix.ManyUsers{
+							Users: []helix.User{
+								helix.User{
+									Login:       "twitch",
+									DisplayName: "Twitch",
+									CreatedAt: helix.Time{
+										Time: time.Date(2007, 5, 22, 0, 0, 0, 0, time.UTC),
+									},
+									Description:     "Twitch is where thousands of communities come together for whatever, every day. ",
+									ProfileImageURL: "https://example.com/thumbnail.png",
+								},
+							},
+						},
+					},
+					expectedUserError:       nil,
+					expectedStreamsResponse: nil,
+					expectedStreamsError:    errors.New("error"),
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":500,"message":"Twitch user load error: error"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+					expectedError: nil,
+				},
+				{
+					label:    "twitch live",
 					inputURL: utils.MustParseURL("https://twitch.tv/twitch"),
 					login:    "twitch",
 					inputReq: nil,
