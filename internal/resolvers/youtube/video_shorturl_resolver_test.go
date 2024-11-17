@@ -13,9 +13,9 @@ import (
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
-	"github.com/golang/mock/gomock"
 	"github.com/jackc/pgx/v4"
 	"github.com/pashagolub/pgxmock"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/api/option"
 	youtubeAPI "google.golang.org/api/youtube/v3"
 )

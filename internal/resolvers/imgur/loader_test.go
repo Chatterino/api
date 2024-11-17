@@ -11,8 +11,8 @@ import (
 	"github.com/Chatterino/api/internal/mocks"
 	"github.com/Chatterino/api/pkg/config"
 	qt "github.com/frankban/quicktest"
-	"github.com/golang/mock/gomock"
 	"github.com/koffeinsource/go-imgur"
+	"go.uber.org/mock/gomock"
 )
 
 func testLoadAndUnescape(ctx context.Context, loader *Loader, c *qt.C, urlString string) (cleanTooltip string) {

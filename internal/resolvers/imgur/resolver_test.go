@@ -15,10 +15,10 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 	"github.com/Chatterino/api/pkg/utils"
 	qt "github.com/frankban/quicktest"
-	"github.com/golang/mock/gomock"
 	"github.com/jackc/pgx/v4"
 	"github.com/koffeinsource/go-imgur"
 	"github.com/pashagolub/pgxmock"
+	"go.uber.org/mock/gomock"
 )
 
 func testCheck(ctx context.Context, resolver resolver.Resolver, c *qt.C, urlString string) bool {

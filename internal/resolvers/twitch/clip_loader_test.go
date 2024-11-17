@@ -8,8 +8,8 @@ import (
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/internal/mocks"
 	qt "github.com/frankban/quicktest"
-	"github.com/golang/mock/gomock"
 	"github.com/nicklaw5/helix"
+	"go.uber.org/mock/gomock"
 )
 
 func testLoadAndUnescape(ctx context.Context, loader *ClipLoader, c *qt.C, clipSlug string) (string, int, string) {
