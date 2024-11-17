@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -121,6 +122,9 @@ func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Requ
 	// An example of a server that has pretty much all the perks: https://discord.com/api/invites/test
 	parsedPerks := ""
 	accpetedPerks := []string{"PARTNERED", "PUBLIC", "ANIMATED_ICON", "BANNER", "INVITE_SPLASH", "VIP_REGIONS", "VANITY_URL", "COMMUNITY"}
+	slices.SortStableFunc(jsonResponse.Guild.Features, func(a, b string) int {
+		return strings.Compare(a, b)
+	})
 	for _, elem := range jsonResponse.Guild.Features {
 		if utils.Contains(accpetedPerks, elem) {
 			if parsedPerks != "" {
