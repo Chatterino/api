@@ -19,7 +19,7 @@ require (
 	github.com/nicklaw5/helix v1.25.0
 	github.com/pashagolub/pgxmock v1.8.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/pdfcpu/pdfcpu v0.8.1
+	github.com/pdfcpu/pdfcpu v0.9.1
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
@@ -92,7 +92,7 @@ require (
 	golang.org/x/crypto v0.29.0 // indirect
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
 	golang.org/x/exp/typeparams v0.0.0-20240613232115-7f521ea00fb8 // indirect
-	golang.org/x/image v0.19.0 // indirect
+	golang.org/x/image v0.21.0 // indirect
 	golang.org/x/mod v0.18.0 // indirect
 	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect

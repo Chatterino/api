@@ -66,13 +66,13 @@ func (r *PDFResolver) Run(ctx context.Context, req *http.Request, resp *http.Res
 		return nil, err
 	}
 
-	if err = validate.XRefTable(pdfCtx.XRefTable); err != nil {
+	if err = validate.XRefTable(pdfCtx); err != nil {
 		log.Errorw("error validating XRefTable", "err", err)
 		return nil, err
 	}
 
 	dtString := ""
-	if creationDt, ok := types.DateTime(pdfCtx.CreationDate, true); ok {
+	if creationDt, ok := types.DateTime(pdfCtx.XRefTable.CreationDate, true); ok {
 		dtString = humanize.CreationDate(creationDt)
 	}
 
