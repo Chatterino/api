@@ -50,7 +50,28 @@ type DiscordInviteData struct {
 }
 
 type InviteLoader struct {
+	baseURL *url.URL
+
 	token string
+}
+
+func NewInviteLoader(baseURL *url.URL, token string) *InviteLoader {
+	l := &InviteLoader{
+		baseURL: baseURL,
+
+		token: token,
+	}
+
+	return l
+}
+
+func (l *InviteLoader) buildURL(inviteCode string) *url.URL {
+	relativeURL := &url.URL{
+		Path: inviteCode,
+	}
+	finalURL := l.baseURL.ResolveReference(relativeURL)
+
+	return finalURL
 }
 
 func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Request) (*resolver.Response, time.Duration, error) {
@@ -59,7 +80,7 @@ func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Requ
 		"inviteCode", inviteCode,
 	)
 
-	apiURL, _ := url.Parse(fmt.Sprintf(discordInviteAPIURL, inviteCode))
+	apiURL := l.buildURL(inviteCode)
 	apiURLVariables := url.Values{}
 	apiURLVariables.Set("with_counts", "true")
 	apiURL.RawQuery = apiURLVariables.Encode()

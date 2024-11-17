@@ -36,10 +36,8 @@ func (r *InviteResolver) Name() string {
 	return "discord:invite"
 }
 
-func NewInviteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool) *InviteResolver {
-	inviteLoader := &InviteLoader{
-		token: cfg.DiscordToken,
-	}
+func NewInviteResolver(ctx context.Context, cfg config.APIConfig, pool db.Pool, baseURL *url.URL) *InviteResolver {
+	inviteLoader := NewInviteLoader(baseURL, cfg.DiscordToken)
 
 	// We cache invites longer on purpose as the API is pretty strict with its rate limiting, and the information changes very seldomly anyway
 	// TODO: Log 429 errors from the loader
