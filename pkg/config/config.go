@@ -66,7 +66,7 @@ func init() {
 	pflag.Uint64("max-content-length", 5*1024*1024, "Max content size in bytes - requests with body bigger than this value will be skipped")
 	pflag.Bool("enable-animated-thumbnails", true, "When enabled, will attempt to use libvips library to build animated thumbnails. Can increase CPU usage and cache storage by a lot. Enabled by default")
 	pflag.Uint("max-thumbnail-size", 300, "Maximum width/height pixel size count of the thumbnails sent to the clients.")
-	pflag.Duration("twitch-username-cache-duration", 1*time.Hour, "Cache timeout for twitch usernames")
+	pflag.Duration("twitch-username-cache-duration", 10*time.Minute, "Cache timeout for twitch usernames")
 	pflag.Duration("bttv-emote-cache-duration", 1*time.Hour, "Cache timeout for bttv emotes")
 	pflag.Duration("thumbnail-cache-duration", 10*time.Minute, "Cache timeout for default thumbnails")
 	pflag.Duration("default-link-cache-duration", 10*time.Minute, "Cache timeout for default links")

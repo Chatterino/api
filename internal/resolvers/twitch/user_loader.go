@@ -23,6 +23,17 @@ type twitchUserTooltipData struct {
 	URL         string
 }
 
+type twitchUserLiveTooltipData struct {
+	Name        string
+	CreatedAt   string
+	Description string
+	URL         string
+	Title       string
+	Game        string
+	Viewercount string
+	Uptime      string
+}
+
 type UserLoader struct {
 	helixAPI TwitchAPIClient
 }
@@ -48,17 +59,36 @@ func (l *UserLoader) Load(ctx context.Context, login string, r *http.Request) (*
 		return nil, cache.NoSpecialDur, resolver.ErrDontHandle
 	}
 
-	var user = response.Data.Users[0]
+	streamResponse, err := l.helixAPI.GetStreams(&helix.StreamsParams{UserLogins: []string{login}})
+	if err != nil {
+		log.Errorw("[Twitch] Error getting stream",
+			"login", login,
+			"error", err,
+		)
 
-	var name string
-	if strings.ToLower(user.DisplayName) == login {
-		name = user.DisplayName
-	} else {
-		name = fmt.Sprintf("%s (%s)", user.DisplayName, user.Login)
+		return resolver.Errorf("Twitch user load error: %s", err)
 	}
 
+	var user = response.Data.Users[0]
+
+	if len(streamResponse.Data.Streams) != 1 {
+		return userResponse(login, user)
+	}
+
+	return userLiveResponse(login, user, streamResponse.Data.Streams[0])
+}
+
+func buildName(login string, user helix.User) string {
+	if strings.ToLower(user.DisplayName) == login {
+		return user.DisplayName
+	} else {
+		return fmt.Sprintf("%s (%s)", user.DisplayName, user.Login)
+	}
+}
+
+func userResponse(login string, user helix.User) (*resolver.Response, time.Duration, error) {
 	data := twitchUserTooltipData{
-		Name:        name,
+		Name:        buildName(login, user),
 		CreatedAt:   humanize.CreationDate(user.CreatedAt.Time),
 		Description: user.Description,
 		URL:         fmt.Sprintf("https://twitch.tv/%s", user.Login),
@@ -73,5 +103,32 @@ func (l *UserLoader) Load(ctx context.Context, login string, r *http.Request) (*
 		Status:    200,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: user.ProfileImageURL,
+	}, cache.NoSpecialDur, nil
+}
+
+func userLiveResponse(login string, user helix.User, stream helix.Stream) (*resolver.Response, time.Duration, error) {
+	data := twitchUserLiveTooltipData{
+		Name:        buildName(login, user),
+		CreatedAt:   humanize.CreationDate(user.CreatedAt.Time),
+		Description: user.Description,
+		URL:         fmt.Sprintf("https://twitch.tv/%s", user.Login),
+		Title:       stream.Title,
+		Game:        stream.GameName,
+		Viewercount: humanize.Number(uint64(stream.ViewerCount)),
+		Uptime:      humanize.Duration(time.Since(stream.StartedAt)),
+	}
+
+	var tooltip bytes.Buffer
+	if err := twitchUserLiveTooltip.Execute(&tooltip, data); err != nil {
+		return resolver.Errorf("Twitch user template error: %s", err)
+	}
+
+	thumbnail := strings.ReplaceAll(stream.ThumbnailURL, "{width}", "1280")
+	thumbnail = strings.ReplaceAll(thumbnail, "{height}", "720")
+
+	return &resolver.Response{
+		Status:    200,
+		Tooltip:   url.PathEscape(tooltip.String()),
+		Thumbnail: thumbnail,
 	}, cache.NoSpecialDur, nil
 }

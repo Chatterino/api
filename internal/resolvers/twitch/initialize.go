@@ -17,7 +17,8 @@ import (
 
 type TwitchAPIClient interface {
 	GetClips(params *helix.ClipsParams) (clip *helix.ClipsResponse, err error)
-	GetUsers(params *helix.UsersParams) (clip *helix.UsersResponse, err error)
+	GetUsers(params *helix.UsersParams) (user *helix.UsersResponse, err error)
+	GetStreams(params *helix.StreamsParams) (stream *helix.StreamsResponse, err error)
 }
 
 const (
@@ -36,13 +37,26 @@ const (
 		`<b>Created:</b> {{.CreatedAt}}<br>` +
 		`<b>URL:</b> {{.URL}}` +
 		`</div>`
+
+	twitchUserLiveTooltipString = `<div style="text-align: left;">` +
+		`<b>{{.Name}} - Twitch</b><br>` +
+		`{{.Description}}<br>` +
+		`<b>Created:</b> {{.CreatedAt}}<br>` +
+		`<b>URL:</b> {{.URL}}<br>` +
+		`<b><span style="color: #ff0000;">Live</span></b><br>` +
+		`<b>Title</b>: {{.Title}}<br>` +
+		`<b>Game</b>: {{.Game}}<br>` +
+		`<b>Viewercount</b>: {{.Viewercount}}<br>` +
+		`<b>Uptime</b>: {{.Uptime}}` +
+		`</div>`
 )
 
 var (
 	errInvalidTwitchClip = errors.New("invalid Twitch clip link")
 
-	twitchClipsTooltip = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
-	twitchUserTooltip  = template.Must(template.New("twitchUserTooltip").Parse(twitchUserTooltipString))
+	twitchClipsTooltip    = template.Must(template.New("twitchclipsTooltip").Parse(twitchClipsTooltipString))
+	twitchUserTooltip     = template.Must(template.New("twitchUserTooltip").Parse(twitchUserTooltipString))
+	twitchUserLiveTooltip = template.Must(template.New("twitchUserLiveTooltip").Parse(twitchUserLiveTooltipString))
 
 	domains = map[string]struct{}{
 		"twitch.tv":       {},
