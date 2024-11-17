@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Minor: Server perks are now sorted alphabetically. (#711)
+- Dev: Added unit tests for the Discord invite resolver. (#711)
+
 ## 2.0.5
 
 - Fix: Release script not working. (#704)

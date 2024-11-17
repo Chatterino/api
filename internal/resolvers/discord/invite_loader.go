@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -49,7 +50,28 @@ type DiscordInviteData struct {
 }
 
 type InviteLoader struct {
+	baseURL *url.URL
+
 	token string
+}
+
+func NewInviteLoader(baseURL *url.URL, token string) *InviteLoader {
+	l := &InviteLoader{
+		baseURL: baseURL,
+
+		token: token,
+	}
+
+	return l
+}
+
+func (l *InviteLoader) buildURL(inviteCode string) *url.URL {
+	relativeURL := &url.URL{
+		Path: inviteCode,
+	}
+	finalURL := l.baseURL.ResolveReference(relativeURL)
+
+	return finalURL
 }
 
 func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Request) (*resolver.Response, time.Duration, error) {
@@ -58,7 +80,7 @@ func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Requ
 		"inviteCode", inviteCode,
 	)
 
-	apiURL, _ := url.Parse(fmt.Sprintf(discordInviteAPIURL, inviteCode))
+	apiURL := l.buildURL(inviteCode)
 	apiURLVariables := url.Values{}
 	apiURLVariables.Set("with_counts", "true")
 	apiURL.RawQuery = apiURLVariables.Encode()
@@ -121,6 +143,9 @@ func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Requ
 	// An example of a server that has pretty much all the perks: https://discord.com/api/invites/test
 	parsedPerks := ""
 	accpetedPerks := []string{"PARTNERED", "PUBLIC", "ANIMATED_ICON", "BANNER", "INVITE_SPLASH", "VIP_REGIONS", "VANITY_URL", "COMMUNITY"}
+	slices.SortStableFunc(jsonResponse.Guild.Features, func(a, b string) int {
+		return strings.Compare(a, b)
+	})
 	for _, elem := range jsonResponse.Guild.Features {
 		if utils.Contains(accpetedPerks, elem) {
 			if parsedPerks != "" {

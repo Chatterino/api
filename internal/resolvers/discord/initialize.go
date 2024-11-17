@@ -11,11 +11,10 @@ import (
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/Chatterino/api/pkg/resolver"
+	"github.com/Chatterino/api/pkg/utils"
 )
 
 const (
-	discordInviteAPIURL = "https://discord.com/api/v9/invites/%s"
-
 	discordInviteTooltip = `<div style="text-align: left;">
 <b>{{.ServerName}}</b>
 <br>
@@ -48,5 +47,7 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolve
 		return
 	}
 
-	*resolvers = append(*resolvers, NewInviteResolver(ctx, cfg, pool))
+	apiURL := utils.MustParseURL("https://discord.com/api/v9/invites/")
+
+	*resolvers = append(*resolvers, NewInviteResolver(ctx, cfg, pool, apiURL))
 }
