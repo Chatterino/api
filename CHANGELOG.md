@@ -5,6 +5,7 @@
 - Minor: Server perks are now sorted alphabetically. (#711)
 - Dev: Added unit tests for the Discord invite resolver. (#711)
 - Dev: Replace github.com/golang/mock with go.uber.org/mock. (#712)
+- Dev: Ignore mock files when generating code coverage. (#713)
 
 ## 2.0.5
 
