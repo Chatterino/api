@@ -2,8 +2,10 @@
 
 ## Unreleased
 
+- Minor: Add stream information to twitch users. (#714)
 - Minor: Server perks are now sorted alphabetically. (#711)
 - Minor: Use correct domains for twitch user resolver. (#715)
+- Dev: Changed the default `twitch-username-cache-duration` from 1 hour to 10 minutes. (#714)
 - Dev: Added unit tests for the Discord invite resolver. (#711)
 - Dev: Replace github.com/golang/mock with go.uber.org/mock. (#712)
 - Dev: Ignore mock files when generating code coverage. (#713)
