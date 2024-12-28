@@ -41,6 +41,7 @@ var invalidClipSlugs = []string{
 
 var validUsers = []string{
 	"https://twitch.tv/pajlada",
+	"https://www.twitch.tv/pajlada",
 	"https://twitch.tv/matthewde",
 }
 
@@ -53,4 +54,5 @@ var invalidUsers = []string{
 	"https://twitch.tv/directory",
 	"https://twitch.tv/DIRECTORY",
 	"https://twitch.tv/moderator",
+	"https://twitch.com/matthewde",
 }
