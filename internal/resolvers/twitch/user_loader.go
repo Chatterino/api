@@ -59,19 +59,10 @@ func (l *UserLoader) Load(ctx context.Context, login string, r *http.Request) (*
 		return nil, cache.NoSpecialDur, resolver.ErrDontHandle
 	}
 
-	streamResponse, err := l.helixAPI.GetStreams(&helix.StreamsParams{UserLogins: []string{login}})
-	if err != nil {
-		log.Errorw("[Twitch] Error getting stream",
-			"login", login,
-			"error", err,
-		)
-
-		return resolver.Errorf("Twitch user load error: %s", err)
-	}
-
 	var user = response.Data.Users[0]
 
-	if len(streamResponse.Data.Streams) != 1 {
+	streamResponse, err := l.helixAPI.GetStreams(&helix.StreamsParams{UserLogins: []string{login}})
+	if err != nil || len(streamResponse.Data.Streams) == 0 {
 		return userResponse(login, user)
 	}
 

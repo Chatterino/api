@@ -99,7 +99,7 @@
 #wikipedia-article-cache-duration: 1h
 
 # Cache duration for Twitch username links
-#twitch-username-cache-duration: 1h
+#twitch-username-cache-duration: 10m
 
 # Minimum level of log message importance required for the log message to not be filtered out.
 # Available levels: debug, info, warn, error
