@@ -30,7 +30,7 @@ type twitchUserLiveTooltipData struct {
 	URL         string
 	Title       string
 	Game        string
-	Viewercount string
+	Viewers     string
 	Uptime      string
 }
 
@@ -105,7 +105,7 @@ func userLiveResponse(login string, user helix.User, stream helix.Stream) (*reso
 		URL:         fmt.Sprintf("https://twitch.tv/%s", user.Login),
 		Title:       stream.Title,
 		Game:        stream.GameName,
-		Viewercount: humanize.Number(uint64(stream.ViewerCount)),
+		Viewers:     humanize.Number(uint64(stream.ViewerCount)),
 		Uptime:      humanize.Duration(time.Since(stream.StartedAt)),
 	}
 

@@ -46,7 +46,7 @@ const (
 		`<b><span style="color: #ff0000;">Live</span></b><br>` +
 		`<b>Title</b>: {{.Title}}<br>` +
 		`<b>Game</b>: {{.Game}}<br>` +
-		`<b>Viewercount</b>: {{.Viewercount}}<br>` +
+		`<b>Viewers</b>: {{.Viewers}}<br>` +
 		`<b>Uptime</b>: {{.Uptime}}` +
 		`</div>`
 )
