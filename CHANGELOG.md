@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Breaking: Go version 1.23 is now the minimum required version to build this project. (#750)
 - Minor: Add stream information to twitch users. (#714)
 - Minor: Server perks are now sorted alphabetically. (#711)
 - Minor: Use correct domains for twitch user resolver. (#715)
