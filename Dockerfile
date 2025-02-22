@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine AS build
+FROM golang:1-alpine AS build
 ADD . /src
 RUN apk add --no-cache build-base pkgconfig vips-dev
 RUN cd /src/cmd/api && go build
