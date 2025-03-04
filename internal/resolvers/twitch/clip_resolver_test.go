@@ -57,6 +57,11 @@ func TestClipResolver(t *testing.T) {
 				input:    utils.MustParseURL(b + goodSlugV2),
 				expected: true,
 			})
+			tests = append(tests, checkTest{
+				label:    "valid",
+				input:    utils.MustParseURL(b + goodSlugV3),
+				expected: true,
+			})
 		}
 
 		for _, b := range invalidClips {
@@ -153,6 +158,34 @@ func TestClipResolver(t *testing.T) {
 					expectedClipError:    errors.New("error"),
 					expectedResponse: &cache.Response{
 						Payload:     []byte(`{"status":500,"message":"Twitch clip load error: error"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+					expectedError: nil,
+				},
+				{
+					label:     "TETYYS",
+					inputURL:  utils.MustParseURL("https://clips.twitch.tv/EndearingPhilanthropicLEDDAESuppy"),
+					inputSlug: "EndearingPhilanthropicLEDDAESuppy",
+					inputReq:  nil,
+					expectedClipResponse: &helix.ClipsResponse{
+						Data: helix.ManyClips{
+							Clips: []helix.Clip{
+								{
+									Title:           "Title",
+									CreatorName:     "CreatorName",
+									BroadcasterName: "BroadcasterName",
+									Duration:        5,
+									CreatedAt:       "202", // will fail
+									ViewCount:       420,
+									ThumbnailURL:    "https://example.com/thumbnail.png",
+								},
+							},
+						},
+					},
+					expectedClipError: nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/thumbnail.png","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%3Cb%3ETitle%3C%2Fb%3E%3Chr%3E%3Cb%3EClipped%20by:%3C%2Fb%3E%20CreatorName%3Cbr%3E%3Cb%3EChannel:%3C%2Fb%3E%20BroadcasterName%3Cbr%3E%3Cb%3EDuration:%3C%2Fb%3E%205s%3Cbr%3E%3Cb%3ECreated:%3C%2Fb%3E%20%3Cbr%3E%3Cb%3EViews:%3C%2Fb%3E%20420%3C%2Fdiv%3E"}`),
 						StatusCode:  http.StatusOK,
 						ContentType: "application/json",
 					},

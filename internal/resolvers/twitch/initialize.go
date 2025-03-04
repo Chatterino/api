@@ -58,11 +58,19 @@ var (
 	twitchUserTooltip     = template.Must(template.New("twitchUserTooltip").Parse(twitchUserTooltipString))
 	twitchUserLiveTooltip = template.Must(template.New("twitchUserLiveTooltip").Parse(twitchUserLiveTooltipString))
 
+	// Domains that can contain valid clips
 	domains = map[string]struct{}{
 		"twitch.tv":       {},
 		"www.twitch.tv":   {},
 		"m.twitch.tv":     {},
 		"clips.twitch.tv": {},
+	}
+
+	// Domains that con contain a valid user profile
+	userDomains = map[string]struct{}{
+		"twitch.tv":     {},
+		"www.twitch.tv": {},
+		"m.twitch.tv":   {},
 	}
 )
 

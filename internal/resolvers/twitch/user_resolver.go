@@ -30,7 +30,7 @@ type UserResolver struct {
 }
 
 func (r *UserResolver) Check(ctx context.Context, url *url.URL) (context.Context, bool) {
-	if !utils.IsDomains(url, domains) {
+	if !utils.IsDomains(url, userDomains) {
 		return ctx, false
 	}
 

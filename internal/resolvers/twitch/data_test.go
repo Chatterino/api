@@ -2,6 +2,7 @@ package twitch
 
 const goodSlugV1 = "GoodSlugV1"
 const goodSlugV2 = "GoodSlugV2-HVUvT7bYQnMn6nwp"
+const goodSlugV3 = "EndearingPhilanthropicLEDDAESuppy"
 
 var validClipBase = []string{
 	"https://clips.twitch.tv/",
@@ -55,4 +56,5 @@ var invalidUsers = []string{
 	"https://twitch.tv/DIRECTORY",
 	"https://twitch.tv/moderator",
 	"https://twitch.com/matthewde",
+	"https://clips.twitch.tv/EndearingPhilanthropicLEDDAESuppy",
 }
