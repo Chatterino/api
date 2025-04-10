@@ -2,6 +2,7 @@ package defaultresolver
 
 import (
 	"context"
+	"log/slog"
 	"text/template"
 	"time"
 
@@ -32,8 +33,8 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router 
 
 	defaultLinkResolver := New(ctx, cfg, pool, helixClient, ignoredHosts)
 
-	imageCached := stampede.Handler(256, 2*time.Second)
-	generatedValuesCached := stampede.Handler(256, 2*time.Second)
+	imageCached := stampede.Handler(slog.Default(), 256, 2*time.Second)
+	generatedValuesCached := stampede.Handler(slog.Default(), 256, 2*time.Second)
 
 	// TODO: Make the max age headers be applied based on the resolved link's configured cache timer
 	router.With(cache.MaxAgeHeaders(time.Minute*10)).Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
