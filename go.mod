@@ -16,7 +16,7 @@ require (
 	github.com/nicklaw5/helix v1.25.0
 	github.com/pashagolub/pgxmock v1.8.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/pdfcpu/pdfcpu v0.9.1
+	github.com/pdfcpu/pdfcpu v0.10.1
 	github.com/prometheus/client_golang v1.22.0
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.20.1
@@ -51,7 +51,8 @@ require (
 	github.com/goware/singleflight v0.3.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hhrutter/lzw v1.0.0 // indirect
-	github.com/hhrutter/tiff v1.0.1 // indirect
+	github.com/hhrutter/pkcs7 v0.2.0 // indirect
+	github.com/hhrutter/tiff v1.0.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -86,7 +87,7 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250218142911-aa4b98e5adaa // indirect
-	golang.org/x/image v0.21.0 // indirect
+	golang.org/x/image v0.26.0 // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/oauth2 v0.29.0 // indirect
