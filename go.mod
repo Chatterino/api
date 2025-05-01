@@ -16,7 +16,7 @@ require (
 	github.com/nicklaw5/helix v1.25.0
 	github.com/pashagolub/pgxmock v1.8.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/pdfcpu/pdfcpu v0.10.1
+	github.com/pdfcpu/pdfcpu v0.10.2
 	github.com/prometheus/client_golang v1.22.0
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.20.1
