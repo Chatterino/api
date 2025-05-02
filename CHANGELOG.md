@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Minor: Support `old.7tv.app` emote links. (#784)
+- Minor: Support `old.7tv.app` emote links. (#784, #785)
 
 ## 2.1.0
 
