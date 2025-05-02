@@ -55,6 +55,21 @@ func TestEmoteResolver(t *testing.T) {
 				expected: false,
 			},
 			{
+				label:    "Matching old.domain (ulid)",
+				input:    utils.MustParseURL("https://old.7tv.app/emotes/01F01WNXA00001NSRF006MFZYS"),
+				expected: true,
+			},
+			{
+				label:    "Matching old.domain, non-matching path (ulid)",
+				input:    utils.MustParseURL("https://old.7tv.app/users/01F7GF1ZV8000EFV6JZ29CKEDB"),
+				expected: false,
+			},
+			{
+				label:    "Non-matching subdomain",
+				input:    utils.MustParseURL("https://bad.7tv.app/emotes/604281c81ae70f000d47ffd9"),
+				expected: false,
+			},
+			{
 				label:    "Matching domain",
 				input:    utils.MustParseURL("https://7tv.app/emotes/604281c81ae70f000d47ffd9"),
 				expected: true,
@@ -132,6 +147,18 @@ func TestEmoteResolver(t *testing.T) {
 				{
 					label:          "Regular",
 					inputURL:       utils.MustParseURL("https://7tv.app/emotes/604281c81ae70f000d47ffd9"),
+					inputEmoteHash: "604281c81ae70f000d47ffd9",
+					inputReq:       nil,
+					expectedResponse: &cache.Response{
+						Payload:     []byte(`{"status":200,"thumbnail":"https://example.com/chatterino/thumbnail/https%3A%2F%2Fcdn.7tv.app%2Femote%2F604281c81ae70f000d47ffd9%2Fbest.webp","tooltip":"%3Cdiv%20style=%22text-align:%20left%3B%22%3E%0A%3Cb%3EPajawalk%3C%2Fb%3E%3Cbr%3E%0A%3Cb%3EPrivate%207TV%20Emote%3C%2Fb%3E%3Cbr%3E%0A%3Cb%3EBy:%3C%2Fb%3E%20durado_%0A%3C%2Fdiv%3E"}`),
+						StatusCode:  http.StatusOK,
+						ContentType: "application/json",
+					},
+					expectedError: nil,
+				},
+				{
+					label:          "Regular",
+					inputURL:       utils.MustParseURL("https://old.7tv.app/emotes/604281c81ae70f000d47ffd9"),
 					inputEmoteHash: "604281c81ae70f000d47ffd9",
 					inputReq:       nil,
 					expectedResponse: &cache.Response{
