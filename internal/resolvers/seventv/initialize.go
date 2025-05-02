@@ -26,7 +26,8 @@ var (
 	errInvalidSevenTVEmotePath = errors.New("invalid SevenTV emote path")
 
 	domains = map[string]struct{}{
-		"7tv.app": {},
+		"7tv.app":     {},
+		"old.7tv.app": {},
 	}
 
 	emotePathRegex = regexp.MustCompile(`/emotes/([a-f\d]{24}|[0-7][\dA-HJKMNP-TV-Z]{25})`)
