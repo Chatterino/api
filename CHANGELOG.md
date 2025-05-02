@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Minor: Support `old.7tv.app` emote links. (#784)
+
 ## 2.1.0
 
 - Breaking: Go version 1.23 is now the minimum required version to build this project. (#750)
