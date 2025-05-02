@@ -91,7 +91,8 @@ func (l *EmoteLoader) Load(ctx context.Context, emoteHash string, r *http.Reques
 		Status:    http.StatusOK,
 		Tooltip:   url.PathEscape(tooltip.String()),
 		Thumbnail: thumbnail,
-		Link:      fmt.Sprintf("https://7tv.app/emotes/%s", emoteHash),
+		// We don't include a Link here to prevent the resolved URL from changing
+		// It should really only be set when the URL is noticeably different (e.g. for short URLs)
 	}
 
 	return successTooltip, cache.NoSpecialDur, nil
