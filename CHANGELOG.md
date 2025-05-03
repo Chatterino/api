@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dev: Bump indirect deps. (#788)
+
 ## 2.1.1
 
 - Minor: Support `old.7tv.app` emote links. (#784, #785)
