@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Dev: Bump `go-chi/stampede` to v0.9.1. (#787)
 - Dev: Bump indirect deps. (#788)
 
 ## 2.1.1
