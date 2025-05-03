@@ -9,6 +9,7 @@ require (
 	github.com/frankban/quicktest v1.14.6
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/stampede v0.9.1
+	github.com/goware/cachestore-mem v0.2.2
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/koffeinsource/go-imgur v0.4.1
@@ -36,6 +37,7 @@ require (
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/elastic/go-freelru v0.16.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect

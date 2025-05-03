@@ -11,6 +11,7 @@ import (
 	"github.com/Chatterino/api/pkg/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/stampede"
+	memcache "github.com/goware/cachestore-mem"
 	"github.com/nicklaw5/helix"
 )
 
@@ -33,8 +34,18 @@ func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, router 
 
 	defaultLinkResolver := New(ctx, cfg, pool, helixClient, ignoredHosts)
 
-	imageCached := stampede.Handler(slog.Default(), 256, 2*time.Second)
-	generatedValuesCached := stampede.Handler(slog.Default(), 256, 2*time.Second)
+	imageCache, err := memcache.NewBackend(256)
+	if err != nil {
+		panic(err)
+	}
+
+	imageCached := stampede.Handler(slog.Default(), imageCache, 2*time.Second)
+
+	genValueCache, err := memcache.NewBackend(256)
+	if err != nil {
+		panic(err)
+	}
+	generatedValuesCached := stampede.Handler(slog.Default(), genValueCache, 2*time.Second)
 
 	// TODO: Make the max age headers be applied based on the resolved link's configured cache timer
 	router.With(cache.MaxAgeHeaders(time.Minute*10)).Get("/link_resolver/{url}", defaultLinkResolver.HandleRequest)
