@@ -7,7 +7,7 @@ require (
 	github.com/davidbyttow/govips/v2 v2.16.0
 	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
 	github.com/frankban/quicktest v1.14.6
-	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-chi/stampede v0.9.1
 	github.com/goware/cachestore-mem v0.2.2
 	github.com/jackc/pgconn v1.14.3
@@ -24,7 +24,7 @@ require (
 	go.uber.org/mock v0.5.2
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.26.0
-	google.golang.org/api v0.237.0
+	google.golang.org/api v0.238.0
 	honnef.co/go/tools v0.6.1
 )
 
