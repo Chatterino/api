@@ -24,7 +24,7 @@ require (
 	go.uber.org/mock v0.5.2
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.27.0
-	google.golang.org/api v0.244.0
+	google.golang.org/api v0.245.0
 	honnef.co/go/tools v0.6.1
 )
 
