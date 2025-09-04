@@ -19,7 +19,7 @@ jobs:
         os: ["ubuntu-22.04", "ubuntu-24.04"]
 
     steps:
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: ${{ matrix.go }}
 
