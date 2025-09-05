@@ -19,7 +19,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pdfcpu/pdfcpu v0.11.0
 	github.com/prometheus/client_golang v1.23.1
-	github.com/spf13/pflag v1.0.7
+	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.20.1
 	go.uber.org/mock v0.6.0
 	go.uber.org/zap v1.27.0
