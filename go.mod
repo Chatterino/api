@@ -1,6 +1,6 @@
 module github.com/Chatterino/api
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.10.3
@@ -23,7 +23,7 @@ require (
 	github.com/spf13/viper v1.20.1
 	go.uber.org/mock v0.6.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/text v0.28.0
+	golang.org/x/text v0.29.0
 	google.golang.org/api v0.248.0
 	honnef.co/go/tools v0.6.1
 )
@@ -94,7 +94,7 @@ require (
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
 	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
