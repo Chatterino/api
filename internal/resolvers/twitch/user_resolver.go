@@ -14,7 +14,7 @@ import (
 	"github.com/Chatterino/api/pkg/utils"
 )
 
-var userRegex = regexp.MustCompile(`^\/([a-zA-Z0-9_]+)$`)
+var userRegex = regexp.MustCompile(`^\/([a-zA-Z0-9_]+)\/?$`)
 var ignoredUsers = []string{
 	"inventory",
 	"popout",
