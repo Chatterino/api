@@ -44,6 +44,7 @@ var validUsers = []string{
 	"https://twitch.tv/pajlada",
 	"https://www.twitch.tv/pajlada",
 	"https://twitch.tv/matthewde",
+	"https://twitch.tv/forsen/",
 }
 
 var invalidUsers = []string{
