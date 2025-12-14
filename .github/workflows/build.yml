@@ -38,7 +38,7 @@ jobs:
         working-directory: cmd/api
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: chatterino-api-${{ matrix.go }}-${{ matrix.os }}
           path: build/chatterino-api
