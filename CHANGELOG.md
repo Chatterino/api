@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 3.0.0
+
+- Breaking: Go version 1.24 is now the minimum required version to build this project. (#832)
 - Minor: Support Twitch channel URLs ending in a slash (e.g. `twitch.tv/forsen/`). (#833)
 - Fix: Don't parse images as HTML - this fixes the occasional `html parser error (or download) html: open stack of elements exceeds 512 nodes)` error that would occur when the image binary data contained too many angled brackets. (#861)
 - Dev: Bump `go-chi/stampede` to v0.9.1. (#787)
