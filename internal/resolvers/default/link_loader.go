@@ -131,6 +131,8 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 	limiter := &resolver.WriteLimiter{Limit: l.maxContentLength}
 	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
 	if err != nil {
+		body, bodyErr := io.ReadAll(resp.Body)
+		log.Errorw("Bad body?", "body", body, "bodyErr", bodyErr, "err", err, "url", requestUrl)
 		return utils.MarshalNoDur(&resolver.Response{
 			Status:  http.StatusInternalServerError,
 			Message: "html parser error (or download) " + resolver.CleanResponse(err.Error()),
