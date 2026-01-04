@@ -31,6 +31,12 @@ type LinkLoader struct {
 	maxContentLength     uint64
 }
 
+func (l *LinkLoader) minimalTooltipData(resp *http.Response) tooltipData {
+	return tooltipData{
+		URL: resolver.CleanResponse(resp.Request.URL.String()),
+	}
+}
+
 func (l *LinkLoader) defaultTooltipData(doc *goquery.Document, r *http.Request, resp *http.Response) tooltipData {
 	data := tooltipMetaFields(l.baseURL, doc, r, resp, tooltipData{
 		URL: resolver.CleanResponse(resp.Request.URL.String()),
@@ -127,19 +133,25 @@ func (l *LinkLoader) Load(ctx context.Context, urlString string, r *http.Request
 		}
 	}
 
-	// Fallback to parsing via goquery
-	limiter := &resolver.WriteLimiter{Limit: l.maxContentLength}
-	doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
-	if err != nil {
-		body, bodyErr := io.ReadAll(resp.Body)
-		log.Errorw("Bad body?", "body", body, "bodyErr", bodyErr, "err", err, "url", requestUrl)
-		return utils.MarshalNoDur(&resolver.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "html parser error (or download) " + resolver.CleanResponse(err.Error()),
-		})
-	}
+	var data tooltipData
 
-	data := l.defaultTooltipData(doc, r, resp)
+	// Fallback to parsing via goquery
+	if strings.HasPrefix(contentType, "image/") {
+		// Image is not HTML :)
+		data = l.minimalTooltipData(resp)
+	} else {
+		limiter := &resolver.WriteLimiter{Limit: l.maxContentLength}
+		doc, err := goquery.NewDocumentFromReader(io.TeeReader(resp.Body, limiter))
+		if err != nil {
+			body, bodyErr := io.ReadAll(resp.Body)
+			log.Errorw("goquery: failed to parse body", "body", body, "bodyErr", bodyErr, "err", err, "url", requestUrl, "contentType", contentType)
+			return utils.MarshalNoDur(&resolver.Response{
+				Status:  http.StatusInternalServerError,
+				Message: "html parser error (or download) " + resolver.CleanResponse(err.Error()),
+			})
+		}
+		data = l.defaultTooltipData(doc, r, resp)
+	}
 
 	// Truncate title and description in case they're too long
 	data.Truncate()
