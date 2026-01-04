@@ -5,6 +5,7 @@
 - Minor: Support Twitch channel URLs ending in a slash (e.g. `twitch.tv/forsen/`). (#833)
 - Dev: Bump `go-chi/stampede` to v0.9.1. (#787)
 - Dev: Bump indirect deps. (#788)
+- Dev: Add more logging to goquery error. (#860)
 
 ## 2.1.1
 
