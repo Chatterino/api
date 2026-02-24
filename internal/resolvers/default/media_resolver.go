@@ -116,6 +116,8 @@ func extensionFromMime(mimeType string) string {
 			return "ogg"
 		case "quicktime":
 			return "mov"
+		case "webm":
+			return "webm"
 		}
 	}
 
