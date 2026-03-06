@@ -32,7 +32,7 @@ func healthMemory(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCombined(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(fmt.Sprintf("Uptime: %s - Memory: %s", uptimeString(), memoryString())))
+	w.Write(fmt.Appendf(nil, "Uptime: %s - Memory: %s", uptimeString(), memoryString()))
 }
 
 func handleHealth(router *chi.Mux) {
