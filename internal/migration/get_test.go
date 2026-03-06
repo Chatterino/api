@@ -12,7 +12,7 @@ func compareMigrations(t *testing.T, actual, expected []Migration) {
 		t.Fatalf("ERROR - mismatching lengths. Is %d, but should be %d", len(actual), len(expected))
 	}
 
-	for i := 0; i < len(actual); i++ {
+	for i := range actual {
 		migrationActual := actual[i]
 		migrationExpected := expected[i]
 
