@@ -44,7 +44,7 @@ var (
 	   The pages are listed alphabetically. They were sourced by simply looking around the
 	   Twitter web page. AFAIK, there is no resource describing these "special" routes.
 	*/
-	nonUserPages = utils.SetFromSlice([]interface{}{
+	nonUserPages = utils.SetFromSlice([]any{
 		"compose",
 		"explore",
 		"home",

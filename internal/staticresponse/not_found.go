@@ -33,7 +33,7 @@ var (
 	}
 )
 
-func NotFoundf(format string, a ...interface{}) *StaticResponse {
+func NotFoundf(format string, a ...any) *StaticResponse {
 	r := &resolver.Response{
 		Status:  http.StatusNotFound,
 		Message: resolver.CleanResponse(fmt.Sprintf(format, a...)),

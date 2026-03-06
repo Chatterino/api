@@ -21,7 +21,7 @@ const (
 
 // readFromPath reads the config values from the given path (i.e. path/${configName}.yaml) and returns its values as a map.
 // This allows us to use mergeConfig cleanly
-func readFromPath(path string) (values map[string]interface{}, err error) {
+func readFromPath(path string) (values map[string]any, err error) {
 	v := viper.New()
 	v.SetConfigName(configName)
 	v.SetConfigType("yaml")

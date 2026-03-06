@@ -4,13 +4,13 @@ package imgur
 type NullLogger struct {
 }
 
-func (n NullLogger) Criticalf(format string, args ...interface{}) {
+func (n NullLogger) Criticalf(format string, args ...any) {
 }
-func (n NullLogger) Debugf(format string, args ...interface{}) {
+func (n NullLogger) Debugf(format string, args ...any) {
 }
-func (n NullLogger) Errorf(format string, args ...interface{}) {
+func (n NullLogger) Errorf(format string, args ...any) {
 }
-func (n NullLogger) Infof(format string, args ...interface{}) {
+func (n NullLogger) Infof(format string, args ...any) {
 }
-func (n NullLogger) Warningf(format string, args ...interface{}) {
+func (n NullLogger) Warningf(format string, args ...any) {
 }
