@@ -11,13 +11,20 @@ on:
 
 jobs:
   test:
-    name: "Test & upload coverage"
+    name: "Test & upload coverage (${{ matrix.go }})"
     runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["oldstable", "stable"]
+
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
-          go-version: "stable"
+          go-version: ${{ matrix.go }}
+
       - name: Get external dependencies (Ubuntu)
         run: sudo apt update && sudo apt -y install build-essential libvips-dev
       - name: Migration test
@@ -26,6 +33,7 @@ jobs:
         run: go test -race -coverprofile=coverage.txt -covermode=atomic -tags test ./...
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        if: matrix.go == 'stable'
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
