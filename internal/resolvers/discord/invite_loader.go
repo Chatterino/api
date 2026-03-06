@@ -37,14 +37,14 @@ type DiscordInviteData struct {
 		Name     string   `json:"name"`
 		IconHash string   `json:"icon"`
 		Features []string `json:"features"`
-	} `json:"guild,omitempty"`
+	} `json:"guild"`
 	Channel struct {
 		Name string `json:"name"`
-	} `json:"channel,omitempty"`
+	} `json:"channel"`
 	Inviter struct {
 		Username      string `json:"username"`
 		Discriminator string `json:"discriminator"`
-	} `json:"inviter,omitempty"`
+	} `json:"inviter"`
 	OnlineCount uint64 `json:"approximate_presence_count,omitempty"`
 	TotalCount  uint64 `json:"approximate_member_count,omitempty"`
 }
