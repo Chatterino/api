@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+ - Dev: Run `go fix` on the codebase. (#890)
+
 ## 3.0.0
 
 - Breaking: Go version 1.24 is now the minimum required version to build this project. (#832)
