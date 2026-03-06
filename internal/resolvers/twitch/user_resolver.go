@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/Chatterino/api/internal/db"
@@ -39,10 +40,8 @@ func (r *UserResolver) Check(ctx context.Context, url *url.URL) (context.Context
 		return ctx, false
 	}
 
-	for _, ignoredUser := range ignoredUsers {
-		if ignoredUser == strings.ToLower(userMatch[1]) {
-			return ctx, false
-		}
+	if slices.Contains(ignoredUsers, strings.ToLower(userMatch[1])) {
+		return ctx, false
 	}
 
 	return ctx, true

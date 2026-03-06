@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/Chatterino/api/internal/logger"
 	"github.com/Chatterino/api/pkg/config"
-	"github.com/Chatterino/api/pkg/utils"
 	"github.com/davidbyttow/govips/v2/vips"
 )
 
@@ -30,11 +30,11 @@ var (
 )
 
 func IsSupportedThumbnailType(contentType string) bool {
-	return utils.Contains(supportedThumbnails, contentType)
+	return slices.Contains(supportedThumbnails, contentType)
 }
 
 func IsAnimatedThumbnailType(contentType string) bool {
-	return utils.Contains(animatedThumbnails, contentType)
+	return slices.Contains(animatedThumbnails, contentType)
 }
 
 func InitializeConfig(passedCfg config.APIConfig) {

@@ -17,7 +17,6 @@ import (
 	"github.com/Chatterino/api/pkg/cache"
 	"github.com/Chatterino/api/pkg/humanize"
 	"github.com/Chatterino/api/pkg/resolver"
-	"github.com/Chatterino/api/pkg/utils"
 )
 
 type TooltipData struct {
@@ -37,14 +36,14 @@ type DiscordInviteData struct {
 		Name     string   `json:"name"`
 		IconHash string   `json:"icon"`
 		Features []string `json:"features"`
-	} `json:"guild,omitempty"`
+	} `json:"guild"`
 	Channel struct {
 		Name string `json:"name"`
-	} `json:"channel,omitempty"`
+	} `json:"channel"`
 	Inviter struct {
 		Username      string `json:"username"`
 		Discriminator string `json:"discriminator"`
-	} `json:"inviter,omitempty"`
+	} `json:"inviter"`
 	OnlineCount uint64 `json:"approximate_presence_count,omitempty"`
 	TotalCount  uint64 `json:"approximate_member_count,omitempty"`
 }
@@ -147,7 +146,7 @@ func (l *InviteLoader) Load(ctx context.Context, inviteCode string, r *http.Requ
 		return strings.Compare(a, b)
 	})
 	for _, elem := range jsonResponse.Guild.Features {
-		if utils.Contains(accpetedPerks, elem) {
+		if slices.Contains(accpetedPerks, elem) {
 			if parsedPerks != "" {
 				parsedPerks += ", "
 			}

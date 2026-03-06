@@ -59,7 +59,7 @@ func InitializeStaticResponses(ctx context.Context, cfg config.APIConfig) {
 	}
 }
 
-func Errorf(format string, a ...interface{}) (*Response, time.Duration, error) {
+func Errorf(format string, a ...any) (*Response, time.Duration, error) {
 	r := &Response{
 		Status:  http.StatusInternalServerError,
 		Message: CleanResponse(fmt.Sprintf(format, a...)),
@@ -68,7 +68,7 @@ func Errorf(format string, a ...interface{}) (*Response, time.Duration, error) {
 	return r, NoSpecialDur, nil
 }
 
-func WriteInternalServerErrorf(w http.ResponseWriter, format string, a ...interface{}) (int, error) {
+func WriteInternalServerErrorf(w http.ResponseWriter, format string, a ...any) (int, error) {
 	r := &Response{
 		Status:  http.StatusInternalServerError,
 		Message: CleanResponse(fmt.Sprintf(format, a...)),
@@ -84,7 +84,7 @@ func WriteInternalServerErrorf(w http.ResponseWriter, format string, a ...interf
 	return w.Write(marshalledPayload)
 }
 
-func InternalServerErrorf(format string, a ...interface{}) ([]byte, *int, *string, time.Duration, error) {
+func InternalServerErrorf(format string, a ...any) ([]byte, *int, *string, time.Duration, error) {
 	contentType := "application/json"
 
 	r := &Response{

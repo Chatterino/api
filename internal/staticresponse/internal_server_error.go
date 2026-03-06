@@ -8,7 +8,7 @@ import (
 	"github.com/Chatterino/api/pkg/resolver"
 )
 
-func InternalServerErrorf(format string, a ...interface{}) *StaticResponse {
+func InternalServerErrorf(format string, a ...any) *StaticResponse {
 	r := &resolver.Response{
 		Status:  http.StatusInternalServerError,
 		Message: resolver.CleanResponse(fmt.Sprintf(format, a...)),

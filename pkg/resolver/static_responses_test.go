@@ -14,7 +14,7 @@ func TestErrorf(t *testing.T) {
 	tests := []struct {
 		label            string
 		format           string
-		args             []interface{}
+		args             []any
 		expectedResponse *Response
 		expectedDuration time.Duration
 		expectedError    error
@@ -22,7 +22,7 @@ func TestErrorf(t *testing.T) {
 		{
 			"normal",
 			"error",
-			[]interface{}{},
+			[]any{},
 			&Response{
 				Status:  http.StatusInternalServerError,
 				Message: "error",
@@ -33,7 +33,7 @@ func TestErrorf(t *testing.T) {
 		{
 			"args",
 			"error: %s",
-			[]interface{}{"hello"},
+			[]any{"hello"},
 			&Response{
 				Status:  http.StatusInternalServerError,
 				Message: "error: hello",
@@ -44,7 +44,7 @@ func TestErrorf(t *testing.T) {
 		{
 			"html",
 			"<b>error</b>",
-			[]interface{}{},
+			[]any{},
 			&Response{
 				Status:  http.StatusInternalServerError,
 				Message: "&lt;b&gt;error&lt;/b&gt;",
