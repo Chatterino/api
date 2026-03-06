@@ -257,8 +257,6 @@ func (l *TweetLoader) composeThumbnail(
 	wg.Add(numMedia)
 
 	for idx, media := range mediaEntities {
-		idx := idx
-		media := media
 
 		url := media.URL
 		if media.Type == "video" {
