@@ -23,7 +23,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	go.uber.org/mock v0.6.0
 	go.uber.org/zap v1.27.1
-	golang.org/x/text v0.34.0
+	golang.org/x/text v0.35.0
 	google.golang.org/api v0.269.0
 	honnef.co/go/tools v0.7.0
 )
@@ -95,7 +95,7 @@ require (
 	golang.org/x/mod v0.33.0 // indirect
 	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/oauth2 v0.35.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/tools v0.42.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
