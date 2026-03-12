@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
-	github.com/davidbyttow/govips/v2 v2.16.0
+	github.com/davidbyttow/govips/v2 v2.17.0
 	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
 	github.com/frankban/quicktest v1.14.6
 	github.com/go-chi/chi/v5 v5.2.5
