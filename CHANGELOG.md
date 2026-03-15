@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Breaking: Updated the minimum supported Ubuntu version to v24.04. (#895)
+- Breaking: Updated govips to 2.17. (#897)
 
 ## 3.0.1
 
