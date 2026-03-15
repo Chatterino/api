@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Breaking: Updated the minimum supported Ubuntu version to v24.04. (#895)
+
 ## 3.0.1
 
  - Dev: Run `go fix` on the codebase. (#890)
