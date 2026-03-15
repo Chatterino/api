@@ -64,6 +64,9 @@ func BuildStaticThumbnail(inputBuf []byte, resp *http.Response) ([]byte, error) 
 	}
 
 	importParams := vips.NewImportParams()
+	var failOnError vips.BoolParameter
+	failOnError.Set(false)
+	importParams.FailOnError = failOnError
 
 	image, err = vips.LoadThumbnailFromBuffer(inputBuf, maxThumbnailSize, maxThumbnailSize, vips.InterestingNone, vips.SizeDown, importParams)
 
