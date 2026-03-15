@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0
+
 - Breaking: Updated the minimum supported Ubuntu version to v24.04. (#895)
 - Breaking: Updated govips to 2.17. (#897)
 - Bugfix: Allow malformed images from samsung phones. (#898)
