@@ -24,7 +24,7 @@ require (
 	go.uber.org/mock v0.6.0
 	go.uber.org/zap v1.27.1
 	golang.org/x/text v0.35.0
-	google.golang.org/api v0.271.0
+	google.golang.org/api v0.272.0
 	honnef.co/go/tools v0.7.0
 )
 
@@ -50,7 +50,7 @@ require (
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.14 // indirect
-	github.com/googleapis/gax-go/v2 v2.17.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.18.0 // indirect
 	github.com/goware/cachestore2 v0.12.2 // indirect
 	github.com/goware/singleflight v0.3.0 // indirect
 	github.com/hhrutter/lzw v1.0.0 // indirect
@@ -99,7 +99,7 @@ require (
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/tools v0.42.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260311181403-84a4fc48630c // indirect
 	google.golang.org/grpc v1.79.2 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
