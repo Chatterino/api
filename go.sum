@@ -185,8 +185,8 @@ github.com/pashagolub/pgxmock v1.8.0 h1:05JB+jng7yPdeC6i04i8TC4H1Kr7TfcFeQyf4JP6
 github.com/pashagolub/pgxmock v1.8.0/go.mod h1:kDkER7/KJdD3HQjNvFw5siwR7yREKmMvwf8VhAgTK5o=
 github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
 github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
-github.com/pdfcpu/pdfcpu v0.12.0 h1:GonU1Ub45kKo/LdakJhaBA0NTTvBA7KGs3bfmEU1osU=
-github.com/pdfcpu/pdfcpu v0.12.0/go.mod h1:7KPpVLMavcpliPrtN6o7Kuk3cFtYq8nii3SJnnsK7ps=
+github.com/pdfcpu/pdfcpu v0.12.1 h1:HwoN72zJCj+pPbfMDChYBTZrT7SY0VwgUzqeaId3I20=
+github.com/pdfcpu/pdfcpu v0.12.1/go.mod h1:7KPpVLMavcpliPrtN6o7Kuk3cFtYq8nii3SJnnsK7ps=
 github.com/pelletier/go-toml/v2 v2.2.4 h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4=
 github.com/pelletier/go-toml/v2 v2.2.4/go.mod h1:2gIqNv+qfxSVS7cM2xJQKtLSTLUE9V8t9Stt+h56mCY=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
