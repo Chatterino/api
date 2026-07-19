@@ -7,7 +7,7 @@ require (
 	github.com/davidbyttow/govips/v2 v2.18.0
 	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
 	github.com/frankban/quicktest v1.14.6
-	github.com/go-chi/chi/v5 v5.3.0
+	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-chi/stampede v0.9.1
 	github.com/goware/cachestore-mem v0.2.2
 	github.com/jackc/pgconn v1.14.3
