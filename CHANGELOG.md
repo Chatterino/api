@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dev: Harden CI with zizmor. (#962)
+
 ## 4.0.0
 
 - Breaking: Updated the minimum supported Ubuntu version to v24.04. (#895)
