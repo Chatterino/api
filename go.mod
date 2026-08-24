@@ -1,6 +1,6 @@
 module github.com/Chatterino/api
 
-go 1.25.8
+go 1.26.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.12.0
@@ -25,7 +25,7 @@ require (
 	go.uber.org/zap v1.28.0
 	golang.org/x/text v0.41.0
 	google.golang.org/api v0.293.0
-	honnef.co/go/tools v0.7.0
+	honnef.co/go/tools v0.8.1
 )
 
 require (
