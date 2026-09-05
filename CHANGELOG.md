@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 4.0.1
+
 - Dev: Harden CI with zizmor. (#962)
+- Dev: Update a bunch of dependencies.
 
 ## 4.0.0
 
@@ -12,8 +15,8 @@
 
 ## 3.0.1
 
- - Dev: Run `go fix` on the codebase. (#890)
- - Dev: Update a lot of dependencies.
+- Dev: Run `go fix` on the codebase. (#890)
+- Dev: Update a lot of dependencies.
 
 ## 3.0.0
 
