@@ -27,7 +27,7 @@ const (
 var (
 	livestreamfailsClipsTemplate = template.Must(template.New("livestreamfailsclipsTooltip").Parse(livestreamfailsTooltipString))
 
-	pathRegex = regexp.MustCompile(`^/(?:clip|post)/([0-9]+)`)
+	pathRegex = regexp.MustCompile(`^/(?:clip|post)/([A-Za-z0-9]+)`)
 )
 
 func Initialize(ctx context.Context, cfg config.APIConfig, pool db.Pool, resolvers *[]resolver.Resolver) {
