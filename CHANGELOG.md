@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Bugfix: Fixed slug parsing for LSF links. (#978)
+
 ## 4.0.1
 
 - Dev: Harden CI with zizmor. (#962)
