@@ -48,6 +48,11 @@ func TestClipResolver(t *testing.T) {
 				expected: true,
 			},
 			{
+				label:    "Matching domain, no WWW, with slug",
+				input:    utils.MustParseURL("https://livestreamfails.com/clip/kcttOpPdZ9x6/forsen-has-relapsed-back-to-snus-addiction"),
+				expected: true,
+			},
+			{
 				label:    "Matching domain, WWW",
 				input:    utils.MustParseURL("https://www.livestreamfails.com/clip/123"),
 				expected: true,
