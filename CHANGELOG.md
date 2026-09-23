@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Bugfix: Fixed slug parsing for LSF links. (#978)
+- Dev: Reduce dependencies of the release CI job. (#983)
 
 ## 4.0.1
 
