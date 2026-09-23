@@ -50,6 +50,8 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -76,10 +78,6 @@ jobs:
           GITHUB_REF_VALUE: ${{ github.ref }}
 
       - name: create release
-        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
-        with:
-          body_path: release-body
-          files: |
-            final-bins/chatterino-api-ubuntu-x86_64
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --notes-file release-body final-bins/chatterino-api-ubuntu-x86_64
