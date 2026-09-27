@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dev: Attempt to fix the release job. (#985)
+
 ## 4.0.2
 
 - Bugfix: Fixed slug parsing for LSF links. (#978)
