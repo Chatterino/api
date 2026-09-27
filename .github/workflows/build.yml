@@ -78,6 +78,7 @@ jobs:
           GITHUB_REF_VALUE: ${{ github.ref }}
 
       - name: create release
+        working-directory: "project-git-repo"
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --notes-file release-body final-bins/chatterino-api-ubuntu-x86_64
+        run: gh release create "$GITHUB_REF_NAME" --notes-file release-body ../final-bins/chatterino-api-ubuntu-x86_64
